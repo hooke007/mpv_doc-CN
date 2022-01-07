@@ -22,7 +22,7 @@ https://github.com/mpv-player/mpv/tree/master/DOCS/man
 | input      | 按键和命令与属性 | [f9fd50c](https://github.com/mpv-player/mpv/commit/f9fd50c6546f2fa510251267d6423d3f342ca115) |
 | mpv        | 综合             | [3ea1f8e](https://github.com/mpv-player/mpv/commit/3ea1f8e80a33edff8d944ea2e82b0dfe4ff25215) |
 | options    |                  |  |
-| osc        | 屏幕控制器       | [b8926dd](https://github.com/mpv-player/mpv/commit/b8926dd4840d3612065c75d51a2f6b0fd96936fa) |
+| osc        | 屏显式控制器     | [b8926dd](https://github.com/mpv-player/mpv/commit/b8926dd4840d3612065c75d51a2f6b0fd96936fa) |
 | stats      | 统计数据         | [21ab1df](https://github.com/mpv-player/mpv/commit/21ab1df01448a2d864b28ad0de7ce1ce13332114) |
 | vf         | 视频滤镜         | [88460b6](https://github.com/mpv-player/mpv/commit/88460b6f862f7328aa6285636325ff87a84dd99e) |
 | vo         | 视频输出驱动     | [dc73f1a](https://github.com/mpv-player/mpv/commit/dc73f1ad4b235f24657ae53cf82dd18f933cc8f0) |
