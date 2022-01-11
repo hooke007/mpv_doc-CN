@@ -304,7 +304,7 @@ Named arguments
     <append-play>
         添加文件，如果当前没有文件播放，则开始播放（始终从添加的文件开始播放，即使在运行这个命令之前的播放列表不是空的）
 
-    第三个参数是一个选项和值的列表，应该在文件播放时设置。它的形式是 ``opt1=value1,opt2=value2,..`` 。当使用client API时，这可以是一个 ``MPV_FORMAT_NODE_MAP`` （或一个Lua表），但当前的值本身必须是字符串。这些选项在播放过程中设置，并在播放结束时恢复到之前的值（参见 `Per-File Options`_ ）。
+    第三个参数是一个选项和值的列表，应该在文件播放时设置。它的形式是 ``opt1=value1,opt2=value2,..`` 。当使用client API时，这可以是一个 ``MPV_FORMAT_NODE_MAP`` （或一个Lua表），但当前的值本身必须是字符串。这些选项在播放过程中设置，并在播放结束时恢复到之前的值（参见 `单文件选项`_ ）。
 
 ``loadlist <url> [<flags>]``
     加载指定的列表文件或URL（类似 ``--playlist`` ）。
@@ -847,7 +847,7 @@ Named arguments
         应用该配置文件。如果省略该参数，则为默认。
 
     ``restore``
-        恢复执行 ``apply-profile`` 命令应用该配置预设之前的选项。只有当配置预设的 ``profile-restore`` 设置为相关的模式时才有效。如果没有操作执行，则输出一个警告。详情参见 `Runtime profiles`_
+        恢复执行 ``apply-profile`` 命令应用该配置预设之前的选项。只有当配置预设的 ``profile-restore`` 设置为相关的模式时才有效。如果没有操作执行，则输出一个警告。详情参见 `运行时的配置预设`_
 
 ``load-script <filename>``
     加载一个脚本，类似于 ``--script`` 选项。这是否等待脚本完成初始化已被改变了多次，未来的行为未被定义。
@@ -855,7 +855,7 @@ Named arguments
     成功后，返回一个 ``mpv_node`` ，其 ``client_id`` 字段设置为新创建的脚本句柄的 ``mpv_client_id()`` API调用的返回值。
 
 ``change-list <name> <operation> <value>``
-    该命令改变一系列的选项列表，如 `List Options`_ 中所述。 ``<name>`` 参数是普通的选项名称，而 ``<operation>`` 是选项的后缀或操作。
+    该命令改变一系列的选项列表，如 `列表选项`_ 中所述。 ``<name>`` 参数是普通的选项名称，而 ``<operation>`` 是选项的后缀或操作。
 
     有些操作不取值，但命令仍然需要值参数。在这些情况下，值必须是一个空字符串。
 
