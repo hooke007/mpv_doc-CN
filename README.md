@@ -17,11 +17,16 @@ https://github.com/mpv-player/mpv/tree/master/DOCS/man
 | :--- | :--- | :--- |
 | af         | 音频滤镜         | [9aa5cd6](https://github.com/mpv-player/mpv/commit/9aa5cd6f45cef46bcb47ad60cb5066ed7bd61e1d) |
 | ao         | 音频输出驱动     | [87ce3b3](https://github.com/mpv-player/mpv/commit/87ce3b31a92a9bd0b4c4406113586696dc573f2a) |
+| changes    |  |  |
 | console    | 控制台           | [87c9eef](https://github.com/mpv-player/mpv/commit/87c9eefb2928252497f6141e847b74ad1158bc61) |
 | encode     | 编码器           | [bcc921b](https://github.com/mpv-player/mpv/commit/bcc921bd2fc6bcd1cf45279a8497b230f8ebc700) |
 | input      | 按键和命令与属性 | [f9fd50c](https://github.com/mpv-player/mpv/commit/f9fd50c6546f2fa510251267d6423d3f342ca115) |
+| ipc        |  |  |
+| javascript |  |  |
+| libmpv     |  |  |
+| lua        |  |  |
 | mpv        | 综合             | [3ea1f8e](https://github.com/mpv-player/mpv/commit/3ea1f8e80a33edff8d944ea2e82b0dfe4ff25215) |
-| options    |                  |  |
+| options    | 选项             | [d09c73c](https://github.com/mpv-player/mpv/commit/d09c73c7b2b0135cb24ab2173b3c4ee1c55840b0) |
 | osc        | 屏显式控制器     | [b8926dd](https://github.com/mpv-player/mpv/commit/b8926dd4840d3612065c75d51a2f6b0fd96936fa) |
 | stats      | 统计数据         | [21ab1df](https://github.com/mpv-player/mpv/commit/21ab1df01448a2d864b28ad0de7ce1ce13332114) |
 | vf         | 视频滤镜         | [88460b6](https://github.com/mpv-player/mpv/commit/88460b6f862f7328aa6285636325ff87a84dd99e) |
