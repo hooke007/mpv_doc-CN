@@ -1,14 +1,5 @@
 # 目录
 
-## official_etc
-https://github.com/mpv-player/mpv/tree/master/DOCS  
-官方其它文档汉化
-
-| 文件 | 简介 | 同步 |
-| :--- | :--- | :--- |
-| encoding                 | 转码 | [343bf8a](https://github.com/mpv-player/mpv/commit/343bf8a9ac97d4304e0ee6106c0f7ba8d7bff9c3) |
-| mplayer-changes          | 缘起 | [b7afac3](https://github.com/mpv-player/mpv/commit/b7afac32486df794884020b3bcdf72cfa2f3001d) |
-
 ## official_man
 https://github.com/mpv-player/mpv/tree/master/DOCS/man  
 官方手册汉化
@@ -32,11 +23,14 @@ https://github.com/mpv-player/mpv/tree/master/DOCS/man
 | vf         | 视频滤镜         | [05ccc51](https://github.com/mpv-player/mpv/commit/05ccc51d53424a771ece5bb818713d474d7874ce) |
 | vo         | 视频输出驱动     | [dc73f1a](https://github.com/mpv-player/mpv/commit/dc73f1ad4b235f24657ae53cf82dd18f933cc8f0) |
 
-## official_wiki
+## official_misc
+https://github.com/mpv-player/mpv/tree/master/DOCS  
+官方其它文档汉化  
 https://github.com/mpv-player/mpv/wiki  
 官方维基汉化
 
 | 文件 | 简介 | 同步 |
 | :--- | :--- | :--- |
-| FAQ           | 常见问题指南   | [af92a55](https://github.com/mpv-player/mpv/wiki/FAQ/af92a559aa411d640cac077e8e4e557de95a1733) |
-| Interpolation | 刷新率帧率匹配 | [164905f](https://github.com/mpv-player/mpv/wiki/Interpolation/164905fad8f55fa9af052b0766495391992ebfc2) |
+| encoding        | 转码      | [343bf8a](https://github.com/mpv-player/mpv/commit/343bf8a9ac97d4304e0ee6106c0f7ba8d7bff9c3) |
+| mplayer-changes | 缘起      | [b7afac3](https://github.com/mpv-player/mpv/commit/b7afac32486df794884020b3bcdf72cfa2f3001d) |
+| Interpolation   | 刷新率帧率匹配 | [164905f](https://github.com/mpv-player/mpv/wiki/Interpolation/164905fad8f55fa9af052b0766495391992ebfc2) |
