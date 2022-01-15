@@ -29,7 +29,7 @@ https://github.com/mpv-player/mpv/tree/master/DOCS/man
 | options    | 选项             | [d09c73c](https://github.com/mpv-player/mpv/commit/d09c73c7b2b0135cb24ab2173b3c4ee1c55840b0) |
 | osc        | 屏显式控制器     | [b8926dd](https://github.com/mpv-player/mpv/commit/b8926dd4840d3612065c75d51a2f6b0fd96936fa) |
 | stats      | 统计数据         | [21ab1df](https://github.com/mpv-player/mpv/commit/21ab1df01448a2d864b28ad0de7ce1ce13332114) |
-| vf         | 视频滤镜         | [88460b6](https://github.com/mpv-player/mpv/commit/88460b6f862f7328aa6285636325ff87a84dd99e) |
+| vf         | 视频滤镜         | [05ccc51](https://github.com/mpv-player/mpv/commit/05ccc51d53424a771ece5bb818713d474d7874ce) |
 | vo         | 视频输出驱动     | [dc73f1a](https://github.com/mpv-player/mpv/commit/dc73f1ad4b235f24657ae53cf82dd18f933cc8f0) |
 
 ## official_wiki
