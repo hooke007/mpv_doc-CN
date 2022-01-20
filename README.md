@@ -32,5 +32,4 @@ https://github.com/mpv-player/mpv/wiki
 | 文件 | 简介 | 同步 |
 | :--- | :--- | :--- |
 | encoding        | 转码           | [343bf8a](https://github.com/mpv-player/mpv/commit/343bf8a9ac97d4304e0ee6106c0f7ba8d7bff9c3) |
-| mplayer-changes | 缘起           | [b7afac3](https://github.com/mpv-player/mpv/commit/b7afac32486df794884020b3bcdf72cfa2f3001d) |
 | Interpolation   | 帧率刷新率匹配 | [164905f](https://github.com/mpv-player/mpv/wiki/Interpolation/164905fad8f55fa9af052b0766495391992ebfc2) |
