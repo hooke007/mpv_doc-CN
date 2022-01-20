@@ -17,7 +17,7 @@ https://github.com/mpv-player/mpv/tree/master/DOCS/man
 | libmpv     |  |  |
 | lua        |  |  |
 | mpv        | 综合             | [3ea1f8e](https://github.com/mpv-player/mpv/commit/3ea1f8e80a33edff8d944ea2e82b0dfe4ff25215) |
-| options    | 选项             | [d09c73c](https://github.com/mpv-player/mpv/commit/d09c73c7b2b0135cb24ab2173b3c4ee1c55840b0) |
+| options    | 选项             | [9cddd73](https://github.com/mpv-player/mpv/commit/9cddd73f67f11dba2f2921124e2c39c77af01651) |
 | osc        | 屏显式控制器     | [b8926dd](https://github.com/mpv-player/mpv/commit/b8926dd4840d3612065c75d51a2f6b0fd96936fa) |
 | stats      | 统计数据         | [21ab1df](https://github.com/mpv-player/mpv/commit/21ab1df01448a2d864b28ad0de7ce1ce13332114) |
 | vf         | 视频滤镜         | [05ccc51](https://github.com/mpv-player/mpv/commit/05ccc51d53424a771ece5bb818713d474d7874ce) |
@@ -31,6 +31,6 @@ https://github.com/mpv-player/mpv/wiki
 
 | 文件 | 简介 | 同步 |
 | :--- | :--- | :--- |
-| encoding        | 转码      | [343bf8a](https://github.com/mpv-player/mpv/commit/343bf8a9ac97d4304e0ee6106c0f7ba8d7bff9c3) |
-| mplayer-changes | 缘起      | [b7afac3](https://github.com/mpv-player/mpv/commit/b7afac32486df794884020b3bcdf72cfa2f3001d) |
-| Interpolation   | 刷新率帧率匹配 | [164905f](https://github.com/mpv-player/mpv/wiki/Interpolation/164905fad8f55fa9af052b0766495391992ebfc2) |
+| encoding        | 转码           | [343bf8a](https://github.com/mpv-player/mpv/commit/343bf8a9ac97d4304e0ee6106c0f7ba8d7bff9c3) |
+| mplayer-changes | 缘起           | [b7afac3](https://github.com/mpv-player/mpv/commit/b7afac32486df794884020b3bcdf72cfa2f3001d) |
+| Interpolation   | 帧率刷新率匹配 | [164905f](https://github.com/mpv-player/mpv/wiki/Interpolation/164905fad8f55fa9af052b0766495391992ebfc2) |
