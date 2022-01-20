@@ -17,7 +17,7 @@
 ``alsa`` （Linux独占）
     ALSA音频输出驱动
 
-    参见 `ALSA audio output options`_ 查看它的特定选项。
+    参见 `ALSA音频输出选项`_ 以查看它的特定选项。
 
     .. warning::
 
@@ -91,6 +91,14 @@
 
     ``--pulse-allow-suspended=<yes|no>``
         即使sink挂起也允许mpv使用PulseAudio（默认： no）。如果PulseAudio以桥接到jack的方式运行，而mpv的sink-input被设置为jack使用的输入，则会很有用。
+
+``pipewire``
+    PipeWire音频输出驱动
+
+    该音频输出支持以下全局选项：
+
+    ``--pipewire-buffer=<1-2000|native>``
+        设置音频缓冲区，以毫秒为单位。越高的值缓存更多的数据，且具有较低的缓冲区不足概率。值越小，音频流的反应越快，例如对播放速度变化的反应。
 
 ``sdl``
     SDL 1.2+音频输出驱动。应该在任何受SDL 1.2支持的平台上工作，但可能需要为你的系统正确的设置 ``SDL_AUDIODRIVER`` 环境变量。

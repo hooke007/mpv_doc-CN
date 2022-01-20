@@ -7,7 +7,7 @@ https://github.com/mpv-player/mpv/tree/master/DOCS/man
 | 文件 | 简介 | 同步 |
 | :--- | :--- | :--- |
 | af         | 音频滤镜         | [9aa5cd6](https://github.com/mpv-player/mpv/commit/9aa5cd6f45cef46bcb47ad60cb5066ed7bd61e1d) |
-| ao         | 音频输出驱动     | [87ce3b3](https://github.com/mpv-player/mpv/commit/87ce3b31a92a9bd0b4c4406113586696dc573f2a) |
+| ao         | 音频输出驱动     | [87aba14](https://github.com/mpv-player/mpv/commit/87aba146eddd2bc3fe8819180e2814e7947ff1f2) |
 | changes    |  |  |
 | console    | 控制台           | [87c9eef](https://github.com/mpv-player/mpv/commit/87c9eefb2928252497f6141e847b74ad1158bc61) |
 | encode     | 编码/压制        | [bcc921b](https://github.com/mpv-player/mpv/commit/bcc921bd2fc6bcd1cf45279a8497b230f8ebc700) |
