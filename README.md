@@ -10,7 +10,7 @@ https://github.com/mpv-player/mpv/tree/master/DOCS/man
 | ao         | 音频输出驱动     | [87ce3b3](https://github.com/mpv-player/mpv/commit/87ce3b31a92a9bd0b4c4406113586696dc573f2a) |
 | changes    |  |  |
 | console    | 控制台           | [87c9eef](https://github.com/mpv-player/mpv/commit/87c9eefb2928252497f6141e847b74ad1158bc61) |
-| encode     | 编码器           | [bcc921b](https://github.com/mpv-player/mpv/commit/bcc921bd2fc6bcd1cf45279a8497b230f8ebc700) |
+| encode     | 编码/压制        | [bcc921b](https://github.com/mpv-player/mpv/commit/bcc921bd2fc6bcd1cf45279a8497b230f8ebc700) |
 | input      | 按键和命令与属性 | [f9fd50c](https://github.com/mpv-player/mpv/commit/f9fd50c6546f2fa510251267d6423d3f342ca115) |
 | ipc        |  |  |
 | javascript |  |  |
