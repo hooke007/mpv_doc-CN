@@ -1535,10 +1535,6 @@
 ``--secondary-sub-visibility``, ``--no-secondary-sub-visibility``
     可用于禁用次字幕显示，但仍可选中和解码它。
 
-    .. note::
-
-        如果 ``--sub-visibility=no`` ，无论 ``--secondary-sub-visibility`` 如何，次字幕都会被隐藏。
-
 ``--sub-clear-on-seek``
     （费解的，很少有用。）可以用来播放有重复ReadOrder字段的损坏的mkv文件。ReadOrder是Matroska式ASS字幕packets的第一个字段。它应该是唯一的，libass使用它来快速消除重复的内容。这个选项禁用了交叉跳转的字幕缓存，因此在跳转之后，libass不能消除与先前的packets具有相同ReadOrder的字幕packets。
 

@@ -168,7 +168,7 @@
 ``gpu-next``
     基于 ``libplacebo`` 的实验性视频渲染器。它几乎支持与 ``--vo=gpu`` 相同的功能集。列表参见 `GPU renderer options`_
 
-    目前，它只支持Vulkan、OpenGL，不支持硬件解码。与 ``--vo=gpu`` 不同，FBO格式是不可调节的，但你仍然可以设置 ``--gpu-dumb-mode=yes`` 来强制禁用它们。
+    目前，它只支持Vulkan、OpenGL、D3D11，不支持硬件解码。与 ``--vo=gpu`` 不同，FBO格式是不可调节的，但你仍然可以设置 ``--gpu-dumb-mode=yes`` 来强制禁用它们。
 
     通常应该更快，质量更高，但有些功能可能仍然缺失或运行异常。期待（并报告！）错误。
 

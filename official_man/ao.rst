@@ -154,5 +154,10 @@
     ``--ao-pcm-append=<yes|no>``
         追加到文件中，而不是覆盖写入它。一定要和 ``no-waveheader`` 选项一起使用 —— 和 ``waveheader`` 一起使用会损坏，因为每次打开文件时都会写入一个WAVE header
 
+``sndio``
+    音频输出到OpenBSD sndio声音系统
+
+    （注意：仅支持单声道，立体声，4.0/5.1和7.1声道布局）
+
 ``wasapi``
     音频输出到Windows音频会话API

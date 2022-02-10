@@ -572,7 +572,7 @@ file4.mkv       ``--a --b --f``
 
         [something]
         profile-restore=copy-equal
-        vf-add=rotate=90
+        vf-add=rotate=PI/2  # 旋转90度
 
     然后运行这些命令将导致如注释所描述的行为：
 
@@ -580,9 +580,9 @@ file4.mkv       ``--a --b --f``
 
         set vf vflip
         apply-profile something
-        vf-add=hflip
+        vf add hflip
         apply-profile something
-        # vf == vflip,rotate=90,hflip,rotate=90
+        # vf == vflip,rotate=PI/2,hflip,rotate=PI/2
         apply-profile something restore
         # vf == vflip
 
@@ -622,7 +622,7 @@ file4.mkv       ``--a --b --f``
         profile-desc=Mess up video when entering fullscreen
         profile-cond=fullscreen
         profile-restore=copy
-        vf-add=rotate=90
+        vf-add=rotate=PI/2  # 旋转90度
 
     这是在进入全屏时将 ``rotate`` 滤镜追加到视频滤镜链中。当离开全屏时， ``vf`` 选项被设置为进入全屏前的值。请注意，这也会删除用户在全屏模式下添加的任何其它滤镜。避免这种情况比较棘手，例如可以通过添加第二个具有相反条件和操作的配置预设来解决：
 
@@ -630,7 +630,7 @@ file4.mkv       ``--a --b --f``
 
         [something]
         profile-cond=fullscreen
-        vf-add=@rot:rotate=90
+        vf-add=@rot:rotate=PI/2
 
         [something-inv]
         profile-cond=not fullscreen
