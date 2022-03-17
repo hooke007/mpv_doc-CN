@@ -1,5 +1,5 @@
-插值技术
-========
+# 插值技术
+
 本文将涵盖一些标准的视频帧时域插值(temporal interpolation)技术，尤其概述了SVP/MVtools（也称为基于运动的插值）等技术和诸如smoothmotion等算法之间的差异。你还可以在[该资源库](https://github.com/haasn/interpolation-samples)中找到一组专门用于复制这些算法结果的测试片段，以及一些更多的解释。
 
 <img align="right" src="_assets/Interpolation-original.png" />
@@ -8,8 +8,7 @@
 
 我们现将探讨将其转换为60Hz视频流的不同技术（例如，适应在60Hz显示器上显示）。因此，纵轴将从100像素重新缩放到250像素。（60/24=2.5）
 
-3:2下拉(pulldown)
-=================
+## 3:2下拉(pulldown)
 
 <img align="right" src="_assets/Interpolation-pulldown.png" />
 
@@ -21,8 +20,7 @@
 
 这种技术本质上就像最近邻(nearest neighbour)放大 —— 每一帧都简单的选择原始视频源中与之最接近的源帧（向下取整）。
 
-基于运动的插值
-==============
+## 基于运动的插值
 
 <img align="right" src="_assets/Interpolation-interpolated.png" />
 
@@ -35,8 +33,7 @@
 
 这本质上类似于“智能的”放大滤镜，例如NEDI或NNEDI3 —— 它们也有很高的计算成本且产生的结果会极大的改变源图像。
 
-Smoothmotion
-============
+## Smoothmotion
 
 <img align="right" src="_assets/Interpolation-smoothmotion.png" />
 
@@ -52,8 +49,7 @@ Smoothmotion的方法是将每一帧精确的显示2.5次，其中我们通过�
 
 本质上讲，smoothmotion就像使用最邻近算法调整大小，但对结果进行过采样(oversampling)（类似于电视游戏中的多重采样以减少锯齿(aliasing)）。由于该原因，它在mpv中的实现被称为"oversample"。
 
-基于卷积的插值
-==============
+## 基于卷积的插值
 
 <img align="right" src="_assets/Interpolation-tscale.png" />
 

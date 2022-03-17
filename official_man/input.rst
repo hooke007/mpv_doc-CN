@@ -409,7 +409,7 @@ Named arguments
 
     注意，只要参数正确，命令本身将总是返回成功。进程是否可以被生成，或者是否以某种方式被杀死或返回错误状态，必须从结果值中查询。
 
-    这个命令可以通过API异步中止。另参见 `Asynchronous command details`_ 。只有 ``run`` 命令可以以真正脱离的方式启动进程。
+    这个命令可以通过API异步中止。另参见 `异步命令详情`_ 。只有 ``run`` 命令可以以真正脱离的方式启动进程。
 
     .. note:: 如果子进程不是以分离模式启动的，即使 ``playback_only`` 为false，它也会在播放器退出时被中止。
 
@@ -668,12 +668,12 @@ Named arguments
     <allow-vo-dragging>
         相同。
 
-``disable-section <name>````禁用章节
+``disable-section <name>``
     这个命令已经废弃了，除了mpv-internal使用的情况。
 
-    禁用指定的输入部分。撤销``enable-section'`。
+    禁用指定的输入部分。撤销 ``enable-section`` 。
 
-``define-section <name> <contents> [<flags>]``定义section <name> <contents> <flags>。
+``define-section <name> <contents> [<flags>]``
     该命令已被废弃，除了mpv内部使用。
 
     创建一个命名的输入部分，或者替换一个已经存在的输入部分的内容。 ``contents`` 参数使用与 ``input.conf`` 文件相同的语法（除了不允许在其中使用节的语法），包括需要用换行符来分隔绑定的内容。
@@ -686,10 +686,10 @@ Named arguments
 
     最后一个参数有如下含义：
 
-    <default>（如果省略了参数，也可以使用）
+    <default> （如果省略了参数，也可以使用）
         只有当用户还没有把这个键绑定到一个命令时，才使用这个部分定义的键绑定。
     <force>
-        始终绑定一个键。(如果有歧义，最近被激活的输入部分获胜)。
+        始终绑定一个键（如果有歧义，最近被激活的输入部分获胜）。
 
     这个命令可以用来给脚本或客户端API用户分配任意的键。如果输入部分定义了 ``script-binding`` 的命令，也可以获得单独的键上/键下事件，以及相对详细的键状态信息。特殊的键名 ``unmapped`` 可以用来匹配任何未映射的键。
 
@@ -1163,7 +1163,7 @@ Input Sections
 
 .. note::
 
-    大多数选项也可以通过属性在运行时设置。只需从选项名称中移除前面的 ``--`` 。下面没有记录这些内容，参见 `OPTIONS`_ 。只有那些不存在同名的选项的属性，或者与选项有非常不同的行为的属性才会在下面记录。
+    大多数选项也可以通过属性在运行时设置。只需从选项名称中移除前面的 ``--`` 。下面没有记录这些内容，参见 `选项`_ 。只有那些不存在同名的选项的属性，或者与选项有非常不同的行为的属性才会在下面记录。
 
     标记为(RW)的属性是可写的，而那些没有标记的是只读的。
 
@@ -1813,7 +1813,7 @@ Input Sections
 ``playlist``
     播放列表，当前标记的条目。目前，原始属性值是无用的。
 
-    这有一系列子属性。用基于0代替 ``N``的播放列表条目索引
+    这有一系列子属性。用基于0代替 ``N`` 的播放列表条目索引
 
     ``playlist/count``
         播放列表条目的数量（与 ``playlist-count`` 相同）
@@ -1848,7 +1848,7 @@ Input Sections
 ``track-list``
     音频/视频/字幕的轨道列表，当前条目被标记。目前，原始属性值是无用的。
 
-    这有一系列子属性。用基于0代替 ``N``的轨道索引。
+    这有一系列子属性。用基于0代替 ``N`` 的轨道索引。
 
     ``track-list/count``
         轨道的总数
@@ -1971,7 +1971,7 @@ Input Sections
                 "replaygain-album-peak" MPV_FORMAT_DOUBLE
                 "replaygain-album-gain" MPV_FORMAT_DOUBLE
 
-``current-tracks/...`
+``current-tracks/...``
     这可以访问当前选择的轨道。它重定向到 ``track-list`` 中的正确条目。
 
     定义了以下子条目： ``video``, ``audio``, ``sub``, ``sub2``
@@ -2027,7 +2027,7 @@ Input Sections
 ``partially-seekable``
     当前文件是否被认为是跳转的，但只因为缓存是激活的。这意味着小的相对跳转可能是可行的，但较大的跳转可能会失败。跳转是否会成功，通常是不能预先知道的。
 
-    如果这个属性返回 ``yes`` /true，那么 ``seekable``也会返回。
+    如果这个属性返回 ``yes`` /true，那么 ``seekable`` 也会返回。
 
 ``playback-abort``
     播放是否已经停止或将要停止（在不明显的情况下很有用，比如在 ``on_load`` hook处理过程中，用户可以停止播放，但脚本必须明确结束处理）。

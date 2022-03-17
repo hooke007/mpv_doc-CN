@@ -620,7 +620,7 @@
         参见 ``--vd=help`` 了解可用解码器的完整列表。
 
 ``--vf=<filter1[=parameter1:parameter2:...],filter2,...>``
-    指定一个视频滤镜的列表，应用于视频流。详见 `VIDEO FILTERS`_ 了解可用滤镜的描述。选项变体 ``--vf-add``, ``--vf-pre``, ``--vf-del`` 和 ``--vf-clr`` 的存在是为了修改先前指定的列表，但在典型使用中应该不需要这些。
+    指定一个视频滤镜的列表，应用于视频流。详见 `视频滤镜`_ 了解可用滤镜的描述。选项变体 ``--vf-add``, ``--vf-pre``, ``--vf-del`` 和 ``--vf-clr`` 的存在是为了修改先前指定的列表，但在典型使用中应该不需要这些。
 
 ``--untimed``
     在输出视频帧时不休眠。当与 ``--no-audio`` 一起使用时，对基准测试有用。
@@ -745,13 +745,13 @@
 
     .. note::
 
-       大多数non-copy的方式只在OpenGL GPU后端工作。目前，只有 ``vaapi`` 、``nvdec`` 和 ``cuda`` 方式能在Vulkan上工作。
+       大多数non-copy的方式只在OpenGL GPU后端工作。目前，只有 ``vaapi`` 、 ``nvdec`` 和 ``cuda`` 方式能在Vulkan上工作。
 
     ``vaapi`` 模式，如果与 ``--vo=gpu`` 一起使用，需要Mesa 11，并且很可能只适用于Intel和AMD的GPU。它还需要opengl EGL后端。
 
     ``nvdec`` 和 ``nvdec-copy`` 是最新的方式，建议在Nvidia GPU上进行硬解。
 
-    ``cuda`` 和 ``cuda-copy`` 是在Nvidia GPU上进行硬解的老旧实现，使用Nvidia的比特流解析器，而不是FFmpeg的。这可能导致功能上的缺失，比如HDR内容的错误播放， ``nvdec`` / ``nvdec-copy`` 应始终是首选，除非特别需要Nvidia的去隔行扫描算法。要使用这种反交错，必须传递选项： ``vd-lavc-o=deint=[weave|bob|adaptive]`` 。传递 ``weave``（或不设置该选项）来不尝试任何反交错。
+    ``cuda`` 和 ``cuda-copy`` 是在Nvidia GPU上进行硬解的老旧实现，使用Nvidia的比特流解析器，而不是FFmpeg的。这可能导致功能上的缺失，比如HDR内容的错误播放， ``nvdec`` / ``nvdec-copy`` 应始终是首选，除非特别需要Nvidia的去隔行扫描算法。要使用这种反交错，必须传递选项： ``vd-lavc-o=deint=[weave|bob|adaptive]`` 。传递 ``weave`` （或不设置该选项）来不尝试任何反交错。
 
     .. admonition:: 硬件解码的质量降级
 
@@ -2104,7 +2104,7 @@ Demuxer
 
     注意，欢迎打一个补丁，使 *o=* 不需要，并通过AVOption系统传递所有未知的选项。AVOptions的完整列表可以在FFmpeg手册中找到。注意，有些选项可能会与mpv选项冲突。
 
-    这是一个按键/值列表选项。详见 `List Options`_
+    这是一个按键/值列表选项。详见 `列表选项`_
 
     .. admonition:: 示例
 
@@ -2740,7 +2740,7 @@ Audio Resampler
 ``--audio-swresample-o=<string>``
     在SwrContext或AVAudioResampleContext上设置AVOptions。这些应该由FFmpeg或Libav来记录。
 
-    这是一个按键/值列表选项。详见 `List Options`_
+    这是一个按键/值列表选项。详见 `列表选项`_
 
 Terminal
 --------
@@ -2770,7 +2770,7 @@ Terminal
 
     .. note::
 
-        有些信息在命令行被解析之前就被打印出来，因此不受 ``--msg-level`` 的影响。要控制这些信息，你必须使用 ``MPV_VERBOSE`` 环境变量；详情见 `ENVIRONMENT VARIABLES`_
+        有些信息在命令行被解析之前就被打印出来，因此不受 ``--msg-level`` 的影响。要控制这些信息，你必须使用 ``MPV_VERBOSE`` 环境变量；详情见 `环境变量`_
 
     可用的级别：
 
@@ -2818,7 +2818,7 @@ Terminal
 ``--term-playing-msg=<string>``
     开始播放后打印出一个字符串。该字符串会被扩展为属性，例如： ``--term-playing-msg='file: ${filename}'`` 将打印字符串 ``file:`` 后面是空格和当前播放的文件名。
 
-    参见 `Property Expansion`_
+    参见 `属性扩展`_
 
 ``--term-status-msg=<string>``
     在播放过程中打印出一个自定义的字符串，而不是标准的状态行。扩展属性。请看`属性扩展'_。
@@ -2826,7 +2826,7 @@ Terminal
 ``--term-title=<string>``
     设置终端的标题。目前，这只是将设置窗口标题的转义序列与提供的（属性扩展）字符串连接起来。如果扩展的字符串包含结束转义序列的字节，或者终端不理解该序列，这将会造成混乱。后者可能包括令人遗憾的win32.
 
-    展开属性。参见 `Property Expansion`_
+    展开属性。参见 `属性扩展`_
 
 ``--msg-module``
     在每个控制台信息前加上模块名称。
@@ -2955,7 +2955,7 @@ Network
 ``--http-header-fields=<field1,field2>``
     在访问HTTP流时设置自定义HTTP字段。
 
-    这是一个字符串列表选项。详见 `List Options`_
+    这是一个字符串列表选项。详见 `列表选项`_
 
     .. admonition:: 示例
 
@@ -3038,8 +3038,8 @@ DVB
 
     一个例子 ``input.conf`` 可以包含：``H cycle dvbin-channel-switch-offset up``, ``K cycle dvbin-channel-switch-offset down``
 
-ALSA audio output options
--------------------------
+ALSA音频输出选项
+----------------
 
 
 ``--alsa-device=<device>``
@@ -4232,7 +4232,7 @@ GPU渲染选项
         - ``--lavfi-complex='[aid1] [aid2] amix [ao]'`` 同时播放轨道1和2。
         - ``--lavfi-complex='[vid1] [vid2] vstack [vo]'`` 堆叠视频轨1和2并同时播放它们。注意，两个轨道需要有相同的宽度，否则滤镜初始化会失败（你可以在 ``vstack`` 滤镜之前添加 ``scale`` 滤镜来修正尺寸）。为了从其它文件加载视频轨道，你可以使用 ``--external-file=other.mkv``
         - ``--lavfi-complex='[aid1] asplit [t1] [ao] ; [t1] showvolume [t2] ; [vid1] [t2] overlay [vo]'`` 播放音轨1，并将每个扬声器的测量音量覆盖在视频轨1上。
-        - ``null:// --lavfi-complex='life [vo]'``一个libavfilter的源独占滤镜（Conways' Life Game）。
+        - ``null:// --lavfi-complex='life [vo]'`` 一个libavfilter的源独占滤镜（Conways' Life Game）。
 
     关于可用的滤镜，详见FFmpeg libavfilter文档。
 

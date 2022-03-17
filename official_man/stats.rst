@@ -38,7 +38,7 @@ DOWN   向下滚动一行
 设置
 ----
 
-该脚本可以通过放置在mpv用户目录下的设置文件 ``script-opts/stats.conf`` 和 ``--script-opts`` 命令行选项来定制。设置语法在 `ON SCREEN CONTROLLER`_ 中已描述。
+该脚本可以通过放置在mpv用户目录下的设置文件 ``script-opts/stats.conf`` 和 ``--script-opts`` 命令行选项来定制。设置语法在 `屏显式控制器`_ 中已描述。
 
 设置选项
 ~~~~~~~~
@@ -163,7 +163,7 @@ DOWN   向下滚动一行
     e script-binding stats/display-page-2
 
 激活的按键绑定的页面
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 列出激活的按键绑定和它们所绑定的命令，不包括统计数据脚本本身的交互键。也参见 ``--input-test`` 以获得每个绑定的更详细信息。
 
