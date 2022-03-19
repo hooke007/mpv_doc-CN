@@ -94,7 +94,7 @@ mpv的默认设置目录为 <font color=green>**C:/Users/你的用户名/AppData
 ### 4.高频快捷键
 
 上方必要参数输入完保存退出。再记住常用快捷键和界面控件作用：  
-<img src="_assets/mpv_start-04.webp" style="zoom: 40%;" />  
+<img src="_assets/mpv_start-osc.png" style="zoom: 40%;" />  
 `1`  `2` 调整对比度  
 `3`  `4` 调整亮度  
 `5`  `6` 调整伽玛  
