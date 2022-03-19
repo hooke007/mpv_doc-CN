@@ -1,6 +1,8 @@
+_进入右上方网址以提升阅读体验..._
+
 # 总目录
 
-_进入各文件夹内查看子目录的信息_
+在各文件夹内查看子目录的信息
 
 ## official_man
 https://github.com/mpv-player/mpv/tree/master/DOCS/man  
@@ -16,3 +18,5 @@ https://github.com/mpv-player/mpv/wiki
 
 
 
+## official_misc
+非官方的其它中文文档
