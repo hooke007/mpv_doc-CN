@@ -83,53 +83,7 @@
     .. note:: 这只是一个后备方案，通常不应该使用。
 
 ``vdpau`` （X11独占）
-    使用VDPAU接口来显示，也可以选择对视频进行解码。硬件解码需要和 ``--hwdec=vdpau`` 一起使用。注意，除了兼容性之外，绝对没有理由使用它。我们强烈建议你使用 ``--vo=gpu`` ``--hwdec=nvdec`` 代替它们。
-
-    .. note::
-
-        早期版本的mpv（和MPlayer mplayer2）提供了调整vdpau后处理的子选项，如 ``deint``  ``sharpen`` ``denoise`` ``chroma-deint`` ``pullup`` ``hqscaling`` 。这些子选项已过时，你应该使用视频滤镜 ``vdpaupp`` 来代替。
-
-    支持以下全局选项：
-
-    ``--vo-vdpau-sharpen=<-1-1>``
-        （已过时。参见关于 ``vdpaupp`` 的note）
-
-        正值对视频应用锐化算法，负值则为模糊算法（默认： 0）
-    ``--vo-vdpau-denoise=<0-1>``
-        （已过时。参见关于 ``vdpaupp`` 的note）
-
-        对视频应用降噪算法（默认： 0；不降噪）
-    ``--vo-vdpau-chroma-deint``
-        （已过时。参见关于 ``vdpaupp`` 的note）
-
-        使时域去交错器同时对亮度和色度扫描（默认）。使用no-chroma-deint只扫描亮度并加速高级去隔行。对慢速显存有用。
-    ``--vo-vdpau-pullup``
-        （已过时。参见关于 ``vdpaupp`` 的note）
-
-        尝试应用反胶卷过带，需要运动自适应的时域反交错。
-    ``--vo-vdpau-hqscaling=<0-9>``
-        （已过时。参见关于 ``vdpaupp`` 的note）
-
-        0
-            使用默认的VDPAU缩放比例（默认）
-        1-9
-            应用高质量的VDPAU缩放（需要合格的硬件）
-    ``--vo-vdpau-fps=<number>``
-        覆盖自动检测的显示器刷新率值（该值对于framedrop来说是需要的，以允许视频播放速率高于显示刷新率，并用于vsync-aware的帧计时调整）。默认0表示使用自动检测的值。正值被解释为刷新率，单位是Hz，并覆盖了自动检测值。负值禁用所有的计时调整和framedrop逻辑。
-    ``--vo-vdpau-composite-detect``
-        英伟达当前的VDPAU实现在合成窗口管理器下的行为有些不同，不能提供准确的帧计时信息。启用该选项后，播放器将尝试检测合成窗口管理器是否处于活动状态。如果检测到了，播放器将禁用计时调整，就像用户指定了 ``fps=-1`` 一样（因为它们将基于错误的输入）。这意味着计时的准确性比没有合成的情况下要低一些，但由于NVIDIA驱动程序的合成模式行为，即使没有禁用逻辑，也没有硬性的播放速度限制。默认启用，使用 ``--vo-vdpau-composite-detect=no`` 来禁用。
-    ``--vo-vdpau-queuetime-windowed=<number>`` ``queuetime-fs=<number>``
-        使用VDPAU的presentation queue功能，对未来的视频帧变化最多提前这么多毫秒的队列（默认： 50）。其他信息见下文。
-    ``--vo-vdpau-output-surfaces=<2-15>``
-        分配这么多输出surface来显示视频帧（默认： 3）。其他信息见下文。
-    ``--vo-vdpau-colorkey=<#RRGGBB|#AARRGGBB>``
-        设置VDPAU的presentation queue的背景颜色，在实践中，如果VDPAU在overlay模式下运行，它就是使用的colorkey（默认： ``#020507`` ，某种黑色的阴影）。如果这个值的alpha分量为0，就会使用VDPAU的默认colorkey（通常为绿色）。
-    ``--vo-vdpau-force-yuv``
-        不接受RGBA输入。这意味着mpv将插入一个滤镜，在视频输出之前转换为YUV格式。有时对强制使用某些YUV专用的功能很有用，比如视频均衡器或去隔行扫描。
-
-    使用由queuetime选项控制的VDPAU的frame queuing功能使mpv的帧翻转时间对系统CPU负载不那么敏感，并允许mpv略提前解码下一帧，这可以减少个别解码缓慢的帧造成的抖动。然而，如果VDPAU正在使用blit queue（主要发生在你启用composite extension的情况下），并且该功能处于激活状态，NVIDIA图形驱动可能会使例如窗口移动不稳定。如果这种情况发生在你的系统上，并且让你感到困扰，那么你可以将queuetime值设置为0来禁用这个功能。在窗口模式和全屏模式下使用的设置是分开的，在全屏模式下应该没有理由禁用这个功能（因为驱动问题不应该影响视频本身）。
-
-    你可以通过增加queuetime值和 ``output_surfaces`` 计数来提前排队等候更多的帧（为了确保有足够的surfaces来提前缓冲视频，你需要至少与视频在该时间内的帧数一样多的surfaces，再加上两个）。这可以帮助在某些情况下使视频更流畅。主要的缺点是增加了surfaces的视频RAM要求，以及对用户命令的显示响应更滞后（显示变化要在排队后的一段时间内才会显现）。图形驱动的实现也可能对最大队列时间的长度或队列的surface数量有限制，或根本无法正常工作。
+    https://mpv.io/manual/master/#video-output-drivers-vdpau
 
 ``direct3d`` （Windows独占）
     使用Direct3D接口的视频输出驱动
@@ -370,57 +324,7 @@
         默认情况下启用。如果用 ``no`` 禁用，就不会创建OSD层。这也意味着将不会有字幕被渲染。
 
 ``drm`` (Direct Rendering Manager)
-    使用Kernel Mode Setting / Direct Rendering Manager的视频输出驱动。应该在不想安装完整的图形环境时使用（例如，没有X）。不支持硬件加速（如果你需要，请检查 ``drm`` 后端的 ``gpu`` 视频输出）。
-
-    从mpv 0.30.0开始，你可能需要使 ``--profile=sw-fast`` 来获得合格的性能。
-
-    支持以下全局选项：
-
-    ``--drm-connector=[<gpu_number>.]<name>``
-        选择要使用的连接器（通常是显示器）。如果 ``<name>`` 为空或 ``auto`` ，mpv将在第一个可用的连接器上渲染输出。使用 ``--drm-connector=help`` 来获取可用连接器的列表。 ``<gpu_number>`` 参数可用于区分多个显卡，但已过时，改为使用 ``--drm-device`` 。（默认： 空）
-
-    ``--drm-device=<path>``
-        选择要使用的DRM设备文件。如果指定了这个文件，它将取代自动选择卡和任何指定的卡号 ``--drm-connector`` 。（默认： 空）
-
-    ``--drm-mode=<preferred|highest|N|WxH[@R]>``
-        要使用的模式（分辨率和帧速率）。可能的值：
-
-        :preferred: 使用所选连接器上的屏幕的首选模式（默认）
-        :highest:   使用所选连接器上可用的最高分辨率的模式
-        :N:         通过索引选择模式
-        :WxH[@R]:   通过宽度、高度和可选的刷新率来指定模式。如果有几种模式相匹配，则选择EDID模式列表中排在第一位的模式。
-
-        使用 ``--drm-mode=help`` 来获得所有活动连接器的可用模式列表。
-
-    ``--drm-atomic=<no|auto>``
-        切换使用原子模式设置。这在调试时非常有用。
-
-        :no:    使用传统的模式设置
-        :auto:  使用原子模式设置，如果不能使用，则退回到传统模式设置（默认）
-
-        注意：只影响到 ``gpu-context=drm`` 。 ``vo=drm`` 只支持传统的模式设置。
-
-    ``--drm-draw-plane=<primary|overlay|N>``
-        选择DRM平面，在正常情况下，视频和OSD被绘制到该平面。该平面可以被指定为 ``primary`` ，它将选择第一个适用的主平面； ``overlay`` ，它将选择第一个适用的覆盖平面；或者通过索引。索引是基于零的，与CRTC有关（默认： primary）
-
-        当与drmprime-drm hwdec互操作使用该选项时，只有OSD被渲染到这个平面。
-
-    ``--drm-drmprime-video-plane=<primary|overlay|N>``
-        选择DRM平面，用于drmprime-drm hwdec接口的视频（例如RockChip SoC上的rkmpp hwdec，以及其他各种SoC上的v4l2 hwdec）。否则，该平面将不被使用。该选项接受与 ``--drm-draw-plane`` 相同的值。（默认： overlay）
-
-        为了能够在不同的SoC上成功播放4K视频，你可能需要设置 ``--drm-draw-plane=overlay --drm-drmprime-video-plane=primary`` ，并设置 ``--drm-draw-surface-size=1920x1080`` ，以较低的分辨率渲染OSD（由hwdec处理的视频将在drmprime-video平面上以全4K分辨率显示）
-
-    ``--drm-format=<xrgb8888|xrgb2101010>``
-        选择要使用的DRM格式（默认： xrgb8888）。这允许你选择DRM模式的比特深度。xrgb8888是你常用的每像素24比特/每通道8比特的填充RGB格式。xrgb2101010是每像素30比特/每通道10比特的填充RGB格式，有2比特的填充。
-
-        在某些情况下，xrgb2101010可以在 ``drm`` 视频输出中工作，但不能在 ``gpu`` 视频输出的 ``drm`` 后端工作。这是因为使用 ``gpu`` 视频输出，除了需要DRM驱动的支持外，还需要EGL驱动对xrgb2101010的支持。
-
-    ``--drm-draw-surface-size=<[WxH]>``
-        设置在绘制平面上使用的曲面的大小。然后，该曲面将被放大到当前的屏幕分辨率。这个选项在高分辨率下与drmprim-drm hwdec互操作一起使用时非常有用，因为它允许将绘制平面（在这种情况下只处理OSD）缩小到GPU可以处理的尺寸。
-
-        当不使用drmprime-drm hwdec互操作时，这个选项只会导致视频在不同的分辨率下被渲染，然后被缩放到屏幕尺寸。
-
-        注意：这个选项只有在支持DRM atomic的情况下才可用（默认： display resolution）
+    https://mpv.io/manual/master/#video-output-drivers-drm
 
 ``mediacodec_embed`` （安卓）
     将 ``IMGFMT_MEDIACODEC`` 帧直接渲染到 ``android.view.Surface`` 。需要 ``--hwdec=mediacodec`` 的硬件解码，以及 ``--vo=mediacodec_embed`` 和 ``--wid=(intptr_t)(*android.view.Surface)``
