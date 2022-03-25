@@ -400,7 +400,7 @@ VS滤镜参与mpv的播放流程至少需要三个部分： ***dll库 + 对应�
 获取对应的vpy脚本，无所谓扩展名是 `.py` 或者 `.vpy` ，脚本也无命名要求规范
 
 [这里](https://gist.github.com/KCCat/1b3a7b7f085a066af3719859f88ded02) 是KCCat大佬的版本  
-或者选择我在懒人包 [使用的版本](https://github.com/hooke007/MPV_lazy/blob/main/portable_config/mvtools-fast.vpy)
+或者选择我在懒人包 [使用的版本](https://github.com/hooke007/MPV_lazy/blob/main/portable_config/vs/mvtools-fast.vpy)
 
 放置位置也随意，按照前文的推荐放在 <font color=green>**X:/xxxxx/你的MPV文件夹/portable_config/**</font> 内便于调用
 
