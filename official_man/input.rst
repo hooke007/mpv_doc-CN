@@ -1980,7 +1980,7 @@ Input Sections
 
     如果通过 ``--lavfi-complex`` 选择了所要求的类型的轨道，将返回第一个。
 
-``chapter-list``
+``chapter-list`` (RW)
     章节列表，当前条目被标记。目前，原始属性值是无用的。
 
     这有一系列子属性。用基于0代替 ``N`` 的章节索引。

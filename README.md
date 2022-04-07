@@ -28,16 +28,16 @@ https://github.com/mpv-player/mpv/wiki
 | changes    |  |  |
 | console    | 控制台           | https://github.com/mpv-player/mpv/commit/87c9eefb2928252497f6141e847b74ad1158bc61 |
 | encode     | 编码/压制        | https://github.com/mpv-player/mpv/commit/bcc921bd2fc6bcd1cf45279a8497b230f8ebc700 |
-| input      | 按键和命令与属性 | https://github.com/mpv-player/mpv/commit/beac97ba0740982ec82bf1081821295ef6ba5b3e |
+| input      | 按键和命令与属性 | https://github.com/mpv-player/mpv/commit/493066778475f24ea00c2e6e2793c5fa6344286c |
 | ipc        |  |  |
 | javascript |  |  |
 | libmpv     |  |  |
 | lua        |  |  |
 | mpv        | 综合             | https://github.com/mpv-player/mpv/commit/25bd428393fd555afb39b830d836ce48a8b75101 |
-| options    | 选项             | https://github.com/mpv-player/mpv/commit/d598ab2b241cf0f8beb917ccd2c3691b15a6aa7c |
+| options    | 选项             | https://github.com/mpv-player/mpv/commit/d6affda0a7b4b6b4b35a833820e7e98fd88b6c52 |
 | osc        | 屏显式控制器     | https://github.com/mpv-player/mpv/commit/b8926dd4840d3612065c75d51a2f6b0fd96936fa |
 | stats      | 统计数据         | https://github.com/mpv-player/mpv/commit/21ab1df01448a2d864b28ad0de7ce1ce13332114 |
-| vf         | 视频滤镜         | https://github.com/mpv-player/mpv/commit/05ccc51d53424a771ece5bb818713d474d7874ce |
+| vf         | 视频滤镜         | https://github.com/mpv-player/mpv/commit/723055019128a4ab2016e88286d8ecaba64f8497 |
 | vo         | 视频输出驱动     | https://github.com/mpv-player/mpv/commit/d598ab2b241cf0f8beb917ccd2c3691b15a6aa7c |
 |  |  |  |
 |  |  |  |
