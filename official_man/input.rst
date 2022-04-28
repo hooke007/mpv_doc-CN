@@ -437,7 +437,7 @@ Named arguments
     退出播放器。如果给了一个参数，它将作为进程的退出代码。
 
 ``quit-watch-later [<code>]``
-    退出播放器，并存储当前的播放位置。以后播放该文件时，将跳转到先前的位置。参数（可选）与 ``quit`` 命令完全一样。
+    退出播放器，并存储当前的播放位置。以后播放该文件时，将跳转到先前的位置。参数（可选）与 ``quit`` 命令完全一样。参见 `恢复播放`_
 
 ``sub-add <url> [<flags> [<title> [<lang>]]]``
     加载指定的字幕文件或流。默认情况下，加载后它被选为当前字幕。
@@ -2050,7 +2050,8 @@ Input Sections
 
     注意，你需要转义 ``\`` 字符，因为字符串在传递给OSD代码之前会被处理为C转义序列。详见 `Flat命令语法`_
 
-    标签的列表可以在这里找到： http://docs.aegisub.org/latest/ASS_Tags/
+    标签的列表可以在这里找到：
+    https://aeg-dev.github.io/AegiSite/docs/3.2/ass_tags/
 
 ``vo-configured``
     当前视频输出驱动是否被配置了。通常这与视频窗口是否可见相对应。如果使用了 ``--force-window`` 选项，通常总是返回``yes`` /true。

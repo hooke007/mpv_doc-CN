@@ -406,16 +406,6 @@
 
     注意， ``--no-config`` 选项优先于该选项。
 
-``--save-position-on-quit``
-    在退出时总是保存当前的播放位置。当以后再次播放该文件时，播放器会在开始时跳转到之前的播放位置。如果以任何其他方式停止一个文件的播放而不是退出，这种情况不会发生。例如，前往播放列表中的下一个文件不会保存位置，而是在下次播放该文件时从头开始播放。
-
-    这种行为默认是禁用的，但当用Shift+Q退出播放器时，总是可用的。
-
-``--watch-later-directory=<path>``
-    存储“稍后观看”临时文件的目录。
-
-    默认是在设置目录下的一个名为 "watch_later" 的子目录（通常是 ``~/.config/mpv/`` ）。
-
 ``--dump-stats=<filename>``
     将某些统计数据写入给定的文件。该文件在打开时被截断。该文件将包含原始样本，每个样本都有一个时间戳。为了使这个文件变成可读的，可以使用脚本 ``TOOLS/stats-conv.py`` （目前它以图表形式显示）。
 
@@ -445,12 +435,6 @@
 ``--merge-files``
     假装所有传递给mpv的文件都被串联成一个单一的大文件。这使用内部的时间轴/EDL支持。
 
-``--no-resume-playback``
-    不要从设置子目录 ``watch_later`` （通常是 ``~/.config/mpv/watch_later/`` ）恢复播放位置。参见 ``quit-watch-later`` 输入命令。
-
-``--resume-playback-check-mtime``
-    如果文件的修改时间与保存时间相同，只恢复设置子目录 ``watch_later`` （通常是 ``~/.config/mpv/watch_later/`` ）中的播放位置。这可以阻止同名但内容不同的文件向后跳过。（默认： ``no`` ）
-
 ``--profile=<profile1,profile2,...>``
     使用给定的配置预设， ``--profile=help`` 显示已定义的配置预设的列表。
 
@@ -475,33 +459,6 @@
           重置全屏和播放速度设置，如果它们在播放过程中被改变
         - ``--reset-on-next-file=all``
           尝试重置所有在播放过程中被改变的设置
-
-``--watch-later-options=option1,option2,...``
-    如果选项在mpv启动后被改变，它们将被保存在 "watch_later" 里的文件中。这些值将在下次播放文件时被恢复。播放位置总是保存为 ``start`` ，所以在这个列表中添加 ``start`` 没有影响。
-
-    当移除选项时，已有的稍后观看的数据不会被修改，仍然会被完全应用，但是新的稍后观看的数据将不包含这些选项。
-
-    这是一个字符串列表选项。详见 `列表选项`_
-
-    .. admonition:: 示例
-
-        - ``--watch-later-options-remove=fullscreen``
-          全屏状态不会被保存到稍后观看的文件中
-        - ``--watch-later-options-remove=volume``
-          ``--watch-later-options-remove=mute``
-          音量和静音状态不会被保存到稍后观看的文件中
-        - ``--watch-later-options-clr``
-          除了开始播放位置外，不会为以后的文件保存任何选项
-
-``--write-filename-in-watch-later-config``
-    在稍后观看的设置文件前加上它们所指的文件名。这只是作为注释简单的写入在文件的顶部。
-
-    .. warning::
-
-        这个选项可能会暴露隐私敏感信息，因此默认禁用。
-
-``--ignore-path-in-watch-later-config``
-    在使用稍后观看功能时忽略路径（即只使用文件名）。（默认： 禁用）
 
 ``--show-profile=<profile>``
     显示一个配置预设的描述和内容。如果没有提供参数，则列出所有的配置预设。
@@ -598,13 +555,59 @@
     启用内置脚本，在一个按键绑定上显示有用的播放信息（默认： yes）。默认情况下，使用 ``i`` 键（ ``I`` 键使覆盖层永久化）。
 
 ``--load-osd-console=<yes|no>``
-    启用内置脚本，在一个按键绑定上显示控制台，可让你输入命令（默认： yes）。在默认情况下， ``´`` 键用于显示控制台， ``ESC`` 键用于再次隐藏它。（这是基于名为 ``repl.lua`` 的一个用户脚本。）
+    启用内置脚本，在一个按键绑定上显示控制台，可让你输入命令（默认： yes）。在默认情况下， ````` 键用于显示控制台， ``ESC`` 键用于再次隐藏它。
 
 ``--load-auto-profiles=<yes|no|auto>``
     启用内置脚本，进行自动配置预设（默认： ``auto`` ）。详见 `附带条件的自动配置预设`_ 。 ``auto`` 将加载脚本，但如果不存在附带条件的自动配置预设，则立即卸载它。
 
 ``--player-operation-mode=<cplayer|pseudo-gui>``
     用于启用“伪GUI模式”，这表示一些选项的默认值被改变。这个选项通常不应该直接使用，而应该由mpv内部使用，或者由mpv提供的脚本、设置文件或.desktop文件。详见 `伪GUI模式`_
+
+稍后观看
+--------
+
+``--save-position-on-quit``
+    在退出时总是保存当前的播放位置。当以后再次播放该文件时，播放器会在开始时跳转到之前的播放位置。如果以任何其他方式停止一个文件的播放而不是退出，这种情况不会发生。例如，前往播放列表中的下一个文件不会保存位置，而是在下次播放该文件时从头开始播放。
+
+    这种行为默认是禁用的，但当用Shift+Q退出播放器时，总是可用的。
+
+``--watch-later-directory=<path>``
+    存储“稍后观看”临时文件的目录。
+
+    默认是在设置目录下的一个名为 "watch_later" 的子目录（通常是 ``~/.config/mpv/`` ）。
+
+``--no-resume-playback``
+    不要从设置子目录 ``watch_later`` （通常是 ``~/.config/mpv/watch_later/`` ）恢复播放位置。参见 ``quit-watch-later`` 输入命令。
+
+``--resume-playback-check-mtime``
+    如果文件的修改时间与保存时间相同，只恢复设置子目录 ``watch_later`` （通常是 ``~/.config/mpv/watch_later/`` ）中的播放位置。这可以阻止同名但内容不同的文件向后跳过。（默认： ``no`` ）
+
+``--watch-later-options=option1,option2,...``
+    如果选项在mpv启动后被改变，它们将被保存在 "watch_later" 里的文件中。这些值将在下次播放文件时被恢复。播放位置总是保存为 ``start`` ，所以在这个列表中添加 ``start`` 没有影响。
+
+    当移除选项时，已有的稍后观看的数据不会被修改，仍然会被完全应用，但是新的稍后观看的数据将不包含这些选项。
+
+    这是一个字符串列表选项。详见 `列表选项`_
+
+    .. admonition:: 示例
+
+        - ``--watch-later-options-remove=fullscreen``
+          全屏状态不会被保存到稍后观看的文件中
+        - ``--watch-later-options-remove=volume``
+          ``--watch-later-options-remove=mute``
+          音量和静音状态不会被保存到稍后观看的文件中
+        - ``--watch-later-options-clr``
+          除了开始播放位置外，不会为以后的文件保存任何选项
+
+``--write-filename-in-watch-later-config``
+    在稍后观看的设置文件前加上它们所指的文件名。这只是作为注释简单的写入在文件的顶部。
+
+    .. warning::
+
+        这个选项可能会暴露隐私敏感信息，因此默认禁用。
+
+``--ignore-path-in-watch-later-config``
+    在使用稍后观看功能时忽略路径（即只使用文件名）。（默认： no）
 
 视频
 ----
@@ -2534,6 +2537,7 @@ OSD
     :jpg:       JPEG（默认）
     :jpeg:      JPEG（JPG的别名）
     :webp:      WebP
+    :jxl:       JPEG XL
 
 ``--screenshot-tag-colorspace=<yes|no>``
     用适当的色彩空间标记屏幕截图。
@@ -2627,6 +2631,12 @@ OSD
 
 ``--screenshot-webp-compression=<0-6>``
     设置WebP的压缩等级。越高表示更好的压缩率，但需要更多的CPU时间。注意，在使用有损的WebP文件时，这也会影响截图质量。默认： 4
+
+``--screenshot-jxl-distance=<0-15>``
+    设置JPEG XL的Butteraugli距离。更低意味着更好的质量。无损是 0.0 ，而 1.0 大约相当于摄影内容的JPEG质量90。对于“视觉无损”的屏幕截图，使用 0.1 。默认： 1.0
+
+``--screenshot-jxl-effort=<1-9>``
+    设置JPEG XL的压缩力度。更高的力度（通常）意味着更好的压缩度，但需要更多的CPU时间。默认： 3
 
 ``--screenshot-sw=<yes|no>``
     是否对屏幕截图使用软件渲染（默认： no）。
@@ -4180,13 +4190,18 @@ GPU渲染选项
     是否自动加载 _外部的_ 封面图。类似于 ``--sub-auto`` 和 ``--audio-file-auto`` 。如果一个视频已经有轨道（没有标记为封面），外部封面将不会被加载。
 
     :no:    不自动加载封面图
-    :exact: 加载带有图像文件扩展名的媒体文件
-    :fuzzy: 加载所有包含媒体文件名和内部白名单中的文件名的封面图，比如 ``cover.jpg`` （默认）
+    :exact: 加载带有图像文件扩展名的媒体文件（默认）
+    :fuzzy: 加载所有包含媒体文件名的封面图
     :all:   加载当前目录下的所有图像
 
     详见 ``--cover-art-files`` 了解封面图的组成。
 
     参见 ``--audio-display`` 关于如何控制封面图的显示（这可用来禁用属于文件一部分的封面图）。
+
+``--cover-art-whitelist=<no|yes>``
+    是否加载内部白名单中的文件名，比如 ``cover.jpg`` 作为封面图。如果 ``cover-art-auto`` 被设置为 ``no`` ，即使这个选项被设置为 ``yes`` ，白名单上的文件名也不会被加载。
+
+    默认： ``yes``
 
 ``--autoload-files=<yes|no>``
     自动加载/选择外部文件（默认： yes）。

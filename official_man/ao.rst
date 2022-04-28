@@ -23,7 +23,7 @@
 
         要获得多声道/环绕声音频，使用 ``--audio-channels=auto`` 。 这个选项的默认值是 ``auto-safe``，它将明确地拒绝多声道输出，因为无法检测某个声道布局是否被实际支持。
 
-        你也可以尝试 `使用上混插件 <http://git.io/vfuAy>`_ 。这使 ``default`` 设备启用多声道音频，并在共享访问的情况下自动上混，因此同时播放立体声和多声道音频将按预期工作。
+        你也可以尝试 `使用上混插件 <https://github.com/mpv-player/mpv/wiki/ALSA-Surround-Sound-and-Upmixing>`_ 。这使 ``default`` 设备启用多声道音频，并在共享访问的情况下自动上混，因此同时播放立体声和多声道音频将按预期工作。
 
 ``oss``
     OSS音频输出驱动
