@@ -23,12 +23,12 @@ https://github.com/mpv-player/mpv/wiki
 
 | 名称 | 简介 | 同步 |
 | :--- | :--- | :--- |
-| af         | 音频滤镜         | [9aa5cd6](https://github.com/mpv-player/mpv/commit/9aa5cd6f45cef46bcb47ad60cb5066ed7bd61e1d) |
+| af         | 音频滤镜         | [fe9e074](https://github.com/mpv-player/mpv/commit/fe9e074752da1352e970dce5afcfdc3d30bfb7e2) |
 | ao         | 音频输出驱动     | [05f0ff3](https://github.com/mpv-player/mpv/commit/05f0ff304ee5c6b7b531ce3b89a8793987c4fe1c) |
 | changes    |  |  |
 | console    | 控制台           | [87c9eef](https://github.com/mpv-player/mpv/commit/87c9eefb2928252497f6141e847b74ad1158bc61) |
 | encode     | 编码/压制        | [bcc921b](https://github.com/mpv-player/mpv/commit/bcc921bd2fc6bcd1cf45279a8497b230f8ebc700) |
-| input      | 按键和命令与属性 | [c812511](https://github.com/mpv-player/mpv/commit/c8125119fa8116d059ea948ea2388e64b1b7e4b5) |
+| input      | 按键和命令与属性 | [90d291d](https://github.com/mpv-player/mpv/commit/90d291dce70e754f0399ccb0c5a3dae9fd1ece3a) |
 | ipc        |  |  |
 | javascript |  |  |
 | libmpv     |  |  |

@@ -111,7 +111,7 @@
 
         ``mpv --af=scaletempo=scale=1.2:speed=pitch audio.ogg``
             将以1.2倍于正常的速度播放媒体，音频为正常音调。改变播放速度将改变音调，使音频节奏保持在1.2倍。
-    
+
 ``scaletempo2[=option1:option2:...]``
     缩放音频节奏而不改变音调。这个算法是从chromium移植过来的，使用了波形相似度叠加（WSOLA）方法。它似乎比scaletempo和rubberband实现了更高的音频质量。
 
@@ -125,7 +125,7 @@
 
     ``search-interval=<amount>``
         搜索最佳重叠位置的长度，以毫秒为单位（默认： 30）
-    
+
     ``window-size=<amount>``
         overlap-and-add window的长度，以毫秒为单位（默认： 20）
 
