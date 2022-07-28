@@ -54,7 +54,7 @@
   mpv infile --o=outfile.avi \
     --vf=fps=25 \
     --ovc=mpeg4 --ovcopts=qscale=4 \
-    --oac=libmp3lame --oacopts=ab=128k
+    --oac=libmp3lame --oacopts=b=128k
 
 注意：AVI不支持可变帧率，所以必须使用fps滤镜。帧率最好与输入相匹配（PAL为25，NTSC为24000/1001或30000/1001）。
 
@@ -62,20 +62,20 @@
 
   mpv infile --o=outfile.mkv \
     --ovc=libx264 --ovcopts=preset=medium,crf=23,profile=baseline \
-    --oac=libvorbis --oacopts=qscale=3
+    --oac=libopus --oacopts=qscale=3
 
 压制典型的MPEG-4 Part 10 ("AVC", "H.264") ，MPEG-4 (MP4) 容器::
 
   mpv infile --o=outfile.mp4 \
     --ovc=libx264 --ovcopts=preset=medium,crf=23,profile=baseline \
-    --oac=aac --oacopts=ab=128k
+    --oac=aac --oacopts=b=128k
 
 压制典型的VP8，WebM (受限制的Matroska) 容器::
 
   mpv infile --o=outfile.mkv \
     --of=webm \
     --ovc=libvpx --ovcopts=qmin=6,b=1000000k \
-    --oac=libvorbis --oacopts=qscale=3
+    --oac=libopus --oacopts=qscale=3
 
 
 设备目标
@@ -119,7 +119,7 @@
 * 直接从DVD、网络流、网络摄像头或任何其它mpv支持的来源进行编码
 * 使用x264预设/调节/profiles（通过在 ``--ovcopts`` 中使用 profile=, tune=, preset= ）
 * 使用mpv的任何用于去隔行/反交错的滤镜
-* 音频文件转换： ``mpv --o=outfile.mp3 infile.flac --no-video --oac=libmp3lame --oacopts=ab=320k``
+* 音频文件转换： ``mpv --o=outfile.m4a infile.flac --no-video --oac=aac --oacopts=b=320k``
 
 尚不可用的功能
 ==============

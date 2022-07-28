@@ -201,6 +201,11 @@ OSC通过放置在mpv用户目录下的设置文件 ``script-opts/osc.conf`` 和
 
     全屏时启用OSC
 
+``idlescreen``
+    默认： yes
+
+    空闲状态下显示mpv的logo和文字
+
 ``scalewindowed``
     默认： 1.0
 
@@ -271,6 +276,11 @@ OSC通过放置在mpv用户目录下的设置文件 ``script-opts/osc.conf`` 和
 
     显示带毫秒的时间码
 
+``tcspace``
+    默认： 100 （允许的范围： 50-200 ）
+
+    调整 ``bottombar`` 和 ``topbar`` 布局中为时间码（当前时间和剩余时间）保留的空间。时间码的宽度取决于字体，对于某些字体，时间码附近的间距变得太小。使用高于100的值来增加间距，或低于100的值来减少间距。
+
 ``visibility``
     默认： auto （鼠标移动时自动隐藏/显示）
 
@@ -328,6 +338,11 @@ OSC通过放置在mpv用户目录下的设置文件 ``script-opts/osc.conf`` 和
 
     当悬停在进度条上时，显示章节名称的模板。使用 ``no`` 来禁止悬停时的章节显示。否则，它是一个lua ``string.format`` 模板， ``%s`` 被替换成实际的名字。
 
+``unicodeminus``
+    默认： no
+
+    在显示剩余播放时间时，使用Unicode减号而不是ASCII连字符。
+
 
 脚本命令
 ~~~~~~~~
@@ -346,6 +361,9 @@ OSC脚本会监听某些脚本命令。这些命令可以绑定在 ``input.conf`
 
     a script-message osc-visibility never
     b script-message osc-visibility auto
+
+``osc-idlescreen``
+    控制空闲状态时mpv的logo可见性。有效的参数是 ``yes`` ``no`` ，也可用 ``cycle`` 来切换。
 
 ``osc-playlist`` ``osc-chapterlist`` ``osc-tracklist``
     使用OSC显示各自类型的列表的有限视图。第一个参数是持续时间，单位是秒。
