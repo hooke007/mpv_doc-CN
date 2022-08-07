@@ -1,6 +1,6 @@
 # mpv播放器的使用引导
 
-_ver.20220318_
+_ver.20220808_
 
 
 - 极短的介绍
@@ -209,7 +209,7 @@ mpv集成的 **stats.lua** 脚本带来了类似 Mediainfo 的功能，可用于
 官方手册 [定位](https://mpv.io/manual/master/#stats)
 
 
-##### 3.1.3.条件配置
+##### 3.1.3.条件配置预设
 
 mpv集成的 **auto_profiles.lua** 脚本带来了根据条件自动切换设置的功能。  
 参考 [mpv-lazy系列手册02](https://hooke007.github.io/mpv-lazy/[02]_%E9%85%8D%E7%BD%AE%E7%BB%84%E4%B8%8E%E5%8F%A6%E7%B1%BB%E5%86%99%E6%B3%95%E7%A4%BA%E4%BE%8B.html)  
@@ -226,7 +226,7 @@ mpv集成的 **ytdl_hook.lua** 脚本加强了网络串流的播放能力。
 需要 **mpv.exe** 所在目录存在 **yt-dlp.exe** [官方发布地址](https://github.com/yt-dlp/yt-dlp/releases)
 
 如何指定使用的程序可参考 [此处](https://github.com/hooke007/MPV_lazy/blob/main/portable_config/script-opts/ytdl_hook.conf)  
-（注意mpv0.34.0及之后的版本默认优先使用yt-dlp）
+（注意mpv0.34.0及之后的版本默认优先使用yt-dlp，而youtube-dl项目已转入维护阶段，无非特殊情况应使用yt-dlp）
 
 
 #### 3.2.外置脚本
@@ -236,11 +236,11 @@ mpv集成的 **ytdl_hook.lua** 脚本加强了网络串流的播放能力。
 
 以我的推荐用法为例，下载你所需要的脚本， `xxx.lua` 放置在 <font color=green>**X:/xxxxx/你的MPV文件夹/portable_config/scripts/**</font> 内  
 对应的设置文件 `xxx.conf` 放置在 <font color=green>**X:/xxxxx/你的MPV文件夹/portable_config/script-opts/**</font> 里  
-具体参数遵循你所使用的脚本的作者说明。同上，你依然可以参考我仓库内的示例。
+具体的可用选项/参数遵循你所使用的脚本的作者说明。同上，你依然可以参考我仓库内的示例。
 
 示范：  
-===这里以许多人都会用的一个脚本 "**autoload.lua**" （自动导入同目录所有文件到播放列表）为例  
-===对应的设置文件： https://github.com/hooke007/MPV_lazy/blob/main/portable_config/script-opts/autoload.conf  
+===这里以许多人都会用的一个脚本 "**autoload.lua**" [源链接](https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua)（自动导入同目录所有文件到播放列表）为例  
+===对应的设置文件： [参考链接](https://github.com/hooke007/MPV_lazy/blob/7124c926533771c9dc3c8208a79abe93251ffe59/portable_config/script-opts/autoload.conf)  
 ===分别下载两个文件或手动复制源码（注意文本规范）创建到指定位置。  
 ===在含有多个视频文件的目录随意打开某个视频，按 F8 查看播放列表，预期情况是已正确载入所有视频文件。
 
@@ -297,7 +297,7 @@ Ctrl+UP  vf toggle vflip
 
 滤镜类的全部 [可用后缀](https://mpv.io/manual/master/#filter-options) 。
 
-🔺 关于该部分内容，重写的 [手册[03]](https://hooke007.github.io/mpv-lazy/[03]_%E8%A7%86%E9%A2%91%E6%BB%A4%E9%95%9C.html) 中记录的更具体和完善。
+🔺 关于该部分内容，重写的 [手册[03]](https://hooke007.github.io/mpv-lazy/mpv_lazy_d03.html) 中记录的更具体和完善。
 
 
 ### 5.第三方着色器
@@ -353,7 +353,7 @@ CTRL+1 change-list glsl-shaders toggle "~~/shaders/adaptive-sharpen.glsl"
 
 #### 5.3.第三方着色器介绍
 
-参考 [mpv-lazy系列手册[01]](https://hooke007.github.io/mpv-lazy/[01]_%E7%AC%AC%E4%B8%89%E6%96%B9%E7%9D%80%E8%89%B2%E5%99%A8%E4%BB%8B%E7%BB%8D.html)
+参考 [mpv-lazy系列手册[01]](https://hooke007.github.io/mpv-lazy/mpv_lazy_d01.html)
 
 
 ### 6.VapourSynth
@@ -376,7 +376,7 @@ mpv未集成该部分，需要手动安装（以下步骤出于绿色化考虑�
 
 <img src="_assets/mpv_start-11.webp" style="zoom:40%;" />
 
-🔺 官方的VapourSyhth版本号很依赖Python，因此需要使用匹配的Python版本才能正常工作，例如 R53-R57 对应 3.8.x-3.9.x
+🔺 官方的VapourSyhth版本需要使用匹配的Python版本才能正常工作，例如 R53-R57 对应 3.8.x 或 3.9.x
 
 
 #### 6.2.mvtools 补帧法
@@ -400,7 +400,7 @@ VS滤镜参与mpv的播放流程至少需要三个部分： ***dll库 + 对应�
 获取对应的vpy脚本，无所谓扩展名是 `.py` 或者 `.vpy` ，脚本也无命名要求规范
 
 [这里](https://gist.github.com/KCCat/1b3a7b7f085a066af3719859f88ded02) 是KCCat大佬的版本  
-或者选择我在懒人包 [使用的版本](https://github.com/hooke007/MPV_lazy/blob/main/portable_config/vs/mvtools-fast.vpy)
+或者选择我在懒人包 [使用的版本](https://github.com/hooke007/MPV_lazy/blob/main/portable_config/vs/mvtools-2x.vpy)
 
 放置位置也随意，按照前文的推荐放在 <font color=green>**X:/xxxxx/你的MPV文件夹/portable_config/**</font> 内便于调用
 
@@ -444,7 +444,7 @@ VS工作状态的检验可多方结合，例如在统计信息中的滤镜列表
 
 - **mpv-lazy的发布帖收集了萌新常见问题的解决方案？**
 
-大部分都可以无障碍参考 [坛友踩坑录===镜像手册[04]](https://hooke007.github.io/mpv-lazy/[04]_%E5%B8%B8%E8%A7%81FAQ%EF%BC%88%E8%B8%A9%E5%9D%91%E5%BD%95%EF%BC%89.html)
+大部分都可以无障碍参考 [坛友踩坑录===镜像手册[04]](https://hooke007.github.io/mpv-lazy/mpv_lazy_d04.html)
 
 - **mpv的命令行操作的介绍呢？**
 
