@@ -944,15 +944,9 @@ Linux桌面问题
 
 一个常见的问题是，Linux桌面环境忽略了mpv所依赖的标准屏保API。特别是，mpv在X11上使用屏幕保护程序扩展（XSS），在Wayland上使用idle-inhibit。
 
-GNOME是最严重的违法者之一，它甚至忽略了现在广泛支持的idle-inhibit协议（这可能是由于恶意和无能的结合，但由于实现这个协议只需要几行代码，所以最可能是前者。你也会注意到，每当他们的破坏行为被指出来时，GNOME的拥护者是如何做出冒犯的反应的，这表明他们要么是虚伪的，要么更是无知的）。
+特别是 GNOME 仍然忽略了idle-inhibit协议，并且有自己的 D-Bus 接口用于显示电源管理，而mpv不支持这些。
 
-这种不兼容的桌面环境（即无视标准）通常需要使用DBus API。这在几个方面都是荒谬的。直接的实际问题是，它需要为DBus库添加一个相当不便利的依赖关系，以某种方式将其mainloop整合到mpv中，以及其它普遍无法接受的事情。
-
-然而，由于mpv并不正式支持GNOME，这并不算严重问题。如果你是那些想在GNOME上使用mpv的悲惨用户之一，请在GNOME问题追踪器上报告一个错误： https://gitlab.gnome.org/groups/GNOME/-/issues
-
-另外，也可以编写一个Lua脚本，调用 ``xdg-screensaver`` 命令行程序（顺便，这个命令行程序是一个完全可怕的笨拙程序，它试图识别你的DE，然后试图通过DBus CLI工具发送正确的DBus命令）。如果你觉得为了不让屏保启动而不得不编写一个脚本的想法很可笑，那就不要使用GNOME，或者使用GNOME video software取代mpv（祝好运）。
-
-在mpv0.33.0之前，X11后端在未暂停时以10秒的间隔运行 ``xdg-screensaver reset`` 。在0.33.0中，这个hack被移除。
+在mpv 0.33.0之前，X11后端在未暂停时以10秒的间隔运行 ``xdg-screensaver reset`` ，以支持这些环境下的屏保抑制。这个功能在0.33.0中被移除，但可以从用户脚本中调用 ``xdg-screensaver`` 命令行程序来代替。
 
 .. include:: options.rst
 

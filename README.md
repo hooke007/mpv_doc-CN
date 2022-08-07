@@ -33,7 +33,7 @@ https://github.com/mpv-player/mpv/wiki
 | javascript |  |  |
 | libmpv     |  |  |
 | lua        |  |  |
-| mpv        | 综合             | [120989f](https://github.com/mpv-player/mpv/commit/120989f56ae9487ab489c46fdfd2265b736fefdb) |
+| mpv        | 综合             | [120989f](https://github.com/mpv-player/mpv/commit/2c46ae8ea3d9ae32b52eae9092f0517d69dcedbc) |
 | options    | 选项             | [24f4582](https://github.com/mpv-player/mpv/commit/24f4582b6f7f57f566418551f9252b8578d2b602) |
 | osc        | 屏显式控制器     | [ad5a1ac](https://github.com/mpv-player/mpv/commit/ad5a1ac8733e6b4cf86e7b6d84c50ddf37ca62cd) |
 | stats      | 统计数据         | [21ab1df](https://github.com/mpv-player/mpv/commit/21ab1df01448a2d864b28ad0de7ce1ce13332114) |
