@@ -138,8 +138,8 @@
     ``--sdl-switch-mode``
         指示SDL在全屏时切换显示器的视频模式
 
-``vaapi-wayland``
-    实验性的Wayland输出驱动，旨在与VA API硬件解码一起使用。该驱动被设计为避免任何GPU到CPU的拷贝，并使用固定功能的硬件（如果可用的话）而不是GPU着色器来执行缩放和色彩空间转换。这就为其它任务释放了GPU资源。目前该驱动是实验性的，只与 ``--hwdec=vaapi`` 视频输出驱动一起工作；OSD也不受支持。支持的合成器：Weston和Sway。
+``dmabuf-wayland``
+    实验性的Wayland输出驱动，旨在与 drm stateless 或 VA API 硬件解码一起使用。该驱动被设计为避免任何GPU到CPU的拷贝，并使用固定功能的硬件（如果可用的话）而不是GPU着色器来执行缩放和色彩空间转换。这就为其它任务释放了GPU资源。目前该驱动是实验性的，只与 ``--hwdec=vaapi`` 或 ``--hwdec=drm`` 一起工作；OSD也不受支持。支持的合成器：Weston和Sway。
 
 ``vaapi``
     Intel VA API视频输出驱动，支持硬件解码。请注意除了兼容性之外，绝对没有理由使用这个。这是低质量的，而且在OSD方面有问题。我们强烈建议你使用 ``--vo=gpu`` ``--hwdec=vaapi`` 代替它。
@@ -334,7 +334,7 @@
 
     由于这个视频输出使用原生解码和渲染程序，mpv的许多功能（字幕渲染、OSD/OSC、视频滤镜等）在这个驱动中是不可用的。
 
-    要使用硬解码应使用 ``--vo=gpu`` ，并一起使用 ``--hwdec=mediacodec-copy`` 和 ``--gpu-context=android``
+    要使用硬解码应使用 ``--vo=gpu`` ，并一起使用 ``--hwdec=mediacodec`` 或 ``--hwdec=mediacodec-copy`` 和 ``--gpu-context=android``
 
 ``wlshm`` （Wayland独占）
     没有硬件加速的共享内存视频输出驱动，只要有Wayland就能工作。

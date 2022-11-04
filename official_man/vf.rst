@@ -306,7 +306,7 @@
             ::
 
                 import vapoursynth as vs
-                core = vs.get_core()
+                from vapoursynth import core
                 core.std.AddBorders(video_in, 10, 10, 20, 20).set_output()
 
         .. warning::
