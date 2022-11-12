@@ -1,7 +1,7 @@
 
 # 第三方用户着色器
 
-_ver.20221103_
+_ver.20221112_
 
 ## 起
 
@@ -18,7 +18,7 @@ _ver.20221103_
 
 ## ...
 
-🔺 如果下方列出的着色器未在整合包中找到，前往 [**此处**](https://github.com/hooke007/MPV_lazy/tree/main/Temp/shaders) 搜寻获取。
+🔺 如果下方列出的着色器未在整合包中找到，前往 [**此处**](https://github.com/hooke007/MPV_lazy/tree/main/portable_config/shaders) 搜寻获取。
 
 ☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲
 
@@ -135,16 +135,16 @@ Anime4K_3DGraphics_AA_Upscale_x2_US.glsl
 ### Anime4k-legacy
 
 此处专指旧版不带放大功能的Anime4k v1及之前的版本，可作为动漫向专用的锐化器独立或搭配其它放大着色器使用，实现不错的最终效果。  
-重命名为直观的anime-sharpen并降低v1中不合理的缩放倍率限制。 10系列中被开发者视为最佳质量的变体反而被我认为质量最差（扭曲文字图形且油画感太重）
+已降低v1中不合理的缩放倍率限制。 10系列中被开发者视为最佳质量的变体反而被我认为质量最差（扭曲文字图形且油画感太重）
 
 🔺 变体 10 的最小缩放触发倍率为1
 
 相关列表：（推荐程度 **09 >> 10\_UltraFast > 10\_Fast > 10** ）  
 ```
-anime-sharpen_09.glsl
-anime-sharpen_10.glsl
-anime-sharpen_10_Fast.glsl
-anime-sharpen_10_UltraFast.glsl
+Anime4K_legacy_09.glsl
+Anime4K_legacy_10.glsl
+Anime4K_legacy_10_Fast.glsl
+Anime4K_legacy_10_UltraFast.glsl
 ```
 
 ☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲
@@ -181,15 +181,15 @@ LineArt 和 anime 变体更适合2d动画 enhance 变体在去除伪影强度上
 
 相关列表：[igv-FSRCNN](https://github.com/igv/FSRCNN-TensorFlow)  
 ```
-FSRCNNX_x2_8-0-4-1.glsl
-FSRCNNX_x2_8-0-4-1_LineArt.glsl
-FSRCNNX_x2_16-0-4-1.glsl
+FSRCNNX_x2_8_0_4_1.glsl
+FSRCNNX_x2_8_0_4_1_LineArt.glsl
+FSRCNNX_x2_16_0_4_1.glsl
 ```
 
 相关列表：[HelpSeeker-FSRCNN](https://github.com/HelpSeeker/FSRCNN-TensorFlow)  
 ```
-FSRCNNX_x2_16-0-4-1_anime_enhance.glsl
-FSRCNNX_x2_16-0-4-1_enhance.glsl
+FSRCNNX_x2_16_0_4_1_anime_enhance.glsl
+FSRCNNX_x2_16_0_4_1_enhance.glsl
 ```
 
 ☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲
@@ -253,7 +253,7 @@ mpv目前最好的色度升频着色器，可以与其他缩放（ `--scale/dsca
 
 相关列表：[igv-hooks](https://gist.github.com/igv)  
 ```
-adaptive-sharpen.glsl
+adaptive_sharpen.glsl
 
 KrigBilateral.glsl
 
@@ -263,7 +263,7 @@ SSimSuperRes.glsl
 
 相关列表：MOD （变体 luma 仅作用于亮度通道）  
 ```
-adaptive-sharpen_luma.glsl
+adaptive_sharpen_luma.glsl
 ```
 
 ☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲
@@ -303,59 +303,59 @@ win8x4 → win8x6
 无其它后缀的和 lite 变体的最小缩放触发倍率约为1.414， 3x 变体最小缩放触发倍率约为2.121。 zoom 变体直接放大到目标分辨率，触发倍率＞1；  
 nnedi3最小缩放触发倍率约为1.414，对性能要求极高（临时加载可能导致假死）， nns128 级别以上的因速度极慢而很难即时观看时使用。
 
-懒人包内精简并保留的部分列表（已统一修改后缀格式名为glsl）：  
+仓库主分支内精简并保留的部分列表（已统一修改后缀格式名为glsl）：  
 来自 vulkan/compute  
 ```
-ravu-3x-r2.glsl
-ravu-3x-r2-rgb.glsl
-ravu-3x-r2-yuv.glsl
-ravu-3x-r3.glsl
-ravu-3x-r3-rgb.glsl
-ravu-3x-r3-yuv.glsl
-ravu-3x-r4.glsl
-ravu-3x-r4-rgb.glsl
-ravu-3x-r4-yuv.glsl
-ravu-lite-r2.glsl
-ravu-lite-r3.glsl
-ravu-lite-r4.glsl
-ravu-r2.glsl
-ravu-r2-rgb.glsl
-ravu-r2-yuv.glsl
-ravu-r3.glsl
-ravu-r3-rgb.glsl
-ravu-r3-yuv.glsl
-ravu-r4.glsl
-ravu-r4-rgb.glsl
-ravu-r4-yuv.glsl
-ravu-zoom-r2.glsl
-ravu-zoom-r2-chroma.glsl
-ravu-zoom-r2-rgb.glsl
-ravu-zoom-r2-yuv.glsl
-ravu-zoom-r3.glsl
-ravu-zoom-r3-chroma.glsl
-ravu-zoom-r3-rgb.glsl
-ravu-zoom-r3-yuv.glsl
+ravu_3x_r2.glsl
+ravu_3x_r2_rgb.glsl
+ravu_3x_r2_yuv.glsl
+ravu_3x_r3.glsl
+ravu_3x_r3_rgb.glsl
+ravu_3x_r3_yuv.glsl
+ravu_3x_r4.glsl
+ravu_3x_r4_rgb.glsl
+ravu_3x_r4_yuv.glsl
+ravu_lite_r2.glsl
+ravu_lite_r3.glsl
+ravu_lite_r4.glsl
+ravu_r2.glsl
+ravu_r2_rgb.glsl
+ravu_r2_yuv.glsl
+ravu_r3.glsl
+ravu_r3_rgb.glsl
+ravu_r3_yuv.glsl
+ravu_r4.glsl
+ravu_r4_rgb.glsl
+ravu_r4_yuv.glsl
+ravu-zoom_r2.glsl
+ravu-zoom_r2_chroma.glsl
+ravu-zoom_r2_rgb.glsl
+ravu-zoom_r2_yuv.glsl
+ravu-zoom_r3.glsl
+ravu-zoom_r3_chroma.glsl
+ravu-zoom_r3_rgb.glsl
+ravu-zoom_r3_yuv.glsl
 ```
 
 来自 compute  
 ```
-nnedi3-nns16-win8x4.glsl
-nnedi3-nns16-win8x6.glsl
-nnedi3-nns32-win8x4.glsl
-nnedi3-nns32-win8x6.glsl
-nnedi3-nns64-win8x4.glsl
-nnedi3-nns64-win8x6.glsl
-nnedi3-nns128-win8x4.glsl
-nnedi3-nns128-win8x6.glsl
-nnedi3-nns256-win8x4.glsl
-nnedi3-nns256-win8x6.glsl
+nnedi3_nns16_win8x4.glsl
+nnedi3_nns16_win8x6.glsl
+nnedi3_nns32_win8x4.glsl
+nnedi3_nns32_win8x6.glsl
+nnedi3_nns64_win8x4.glsl
+nnedi3_nns64_win8x6.glsl
+nnedi3_nns128_win8x4.glsl
+nnedi3_nns128_win8x6.glsl
+nnedi3_nns256_win8x4.glsl
+nnedi3_nns256_win8x6.glsl
 ```
 
 来自 主目录  
 ```
 superxbr.glsl
-superxbr-rgb.glsl
-superxbr-yuv.glsl
+superxbr_rgb.glsl
+superxbr_yuv.glsl
 ```
 
 ☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲
@@ -373,27 +373,27 @@ superxbr-yuv.glsl
 相关列表：[agyild-fsr](https://gist.github.com/agyild/82219c545228d70c5604f865ce0b0ce5) & [agyild-cas](https://gist.github.com/agyild/bbb4e58298b2f86aa24da3032a0d2ee6)  
 （变体 scaled 功能完整，附带了缩放模块而非纯粹的锐化算法）  
 ```
-AMD-CAS.glsl
-AMD-CAS-scaled.glsl
-AMD-FSR.glsl
+AMD_CAS.glsl
+AMD_CAS_scaled.glsl
+AMD_FSR.glsl
 ```
 
 相关列表：MOD  
 （变体 luma rgb 没有放大倍率的上限；变体 EASU 分离自fsr的放大模块，用作纯粹的放大算法）  
 ```
-AMD-CAS_rgb.glsl
-AMD-CAS-scaled_rgb.glsl
-AMD-FSR_rgb.glsl
-AMD-FSR-EASU_luma.glsl
-AMD-FSR-EASU_rgb.glsl
+AMD_CAS_rgb.glsl
+AMD_CAS_scaled_rgb.glsl
+AMD_FSR_rgb.glsl
+AMD_FSR_EASU_luma.glsl
+AMD_FSR_EASU_rgb.glsl
 ```
 
 相关列表：[deus0ww-cas](https://github.com/deus0ww/mpv-conf/tree/master/shaders/cas) & [kevinlekiller-cas](https://gist.github.com/kevinlekiller/2ff6d0222fe6dcd81d63fd11e73ff9d1)  
 （其它人移植的精简cas功能后的版本，更快速和低耗）  
 ```
-AMD-CAS-lite_luma.glsl
-AMD-CAS-lite_rgb.glsl
-AMD-CAS-lite2_rgb.glsl
+AMD_CAS_lite_luma.glsl
+AMD_CAS_lite_rgb.glsl
+AMD_CAS_lite2_rgb.glsl
 ```
 
 🔺 变体 luma 和无其它后缀名的版本都只作用于亮度通道（预处理）
@@ -462,24 +462,23 @@ _来源非全部可查_
 [voltmtr-lumasharpen](https://gist.github.com/voltmtr/8b4404b4e23129b226b9e64863d3e28b)  
 
 ```
-color-alt_luma.glsl                  -- 色彩黑白翻转（亮度通道）
-colorlevel_expand.glsl               -- 色彩范围扩展
-colorlevel_expand_chroma.glsl        -- 色彩范围扩展（色度通道）
-colorlevel_expand_luma.glsl          -- 色彩范围扩展（亮度通道）
-colorlevel_shrink.glsl               -- 色彩范围收缩
-colorlevel_shrink_chroma.glsl        -- 色彩范围收缩（色度通道）
-colorlevel_shrink_luma.glsl          -- 色彩范围收缩（亮度通道）
-fake_hdr.glsl                        -- 伪HDR，过饱和
-faux-hdr.glsl                        -- 伪HDR，过饱和
-LumaSharpen.glsl                     -- 亮度通道的锐化
-minblur-usm.glsl                     -- 通用锐化，程度细微
-saturate.glsl                        -- 通用过饱和
-TsubaDS.glsl                         -- 基于SSIMDS
-TsubaUP.glsl                         -- 基于FSRCNNX
-unsharp.glsl                         -- 通用锐化，程度轻微
-unsharp-masking_blur.glsl            -- 通用糊化
-unsharp-masking_sharpen.glsl         -- 通用锐化
-YIQ-converter.glsl                   -- YIQ转换，过饱和
+color_alt_luma.glsl                  -- 色彩黑白翻转（亮度通道）
+colorlevel_expand.glsl               -- 色彩范围扩展
+colorlevel_expand_chroma.glsl        -- 色彩范围扩展（色度通道）
+colorlevel_expand_luma.glsl          -- 色彩范围扩展（亮度通道）
+colorlevel_shrink.glsl               -- 色彩范围收缩
+colorlevel_shrink_chroma.glsl        -- 色彩范围收缩（色度通道）
+colorlevel_shrink_luma.glsl          -- 色彩范围收缩（亮度通道）
+fake_hdr.glsl                        -- 伪HDR，过饱和
+faux_hdr.glsl                        -- 伪HDR，过饱和
+LumaSharpen.glsl                     -- 亮度通道的锐化
+minblur_usm.glsl                     -- 通用锐化，程度细微
+saturate.glsl                        -- 通用过饱和
+TsubaDS.glsl                         -- 基于SSIMDS
+TsubaUP.glsl                         -- 基于FSRCNNX
+unsharp.glsl                         -- 通用锐化，程度轻微
+unsharp_masking_next.glsl            -- 通用锐/糊化（ --vo=gpu-next 专用）
+YIQ_converter.glsl                   -- YIQ转换，过饱和
 ```
 
 
@@ -497,9 +496,9 @@ YIQ-converter.glsl                   -- YIQ转换，过饱和
 ```
 因此，着色器的实际工作顺序，首选遵守该原则，其次才是用户指定的顺序。（此外在同为预处理与后处理类的着色器之中也有顺序限制，具体请自行测试）
 
-*   预处理： 所有 luma、 chroma 变体； ACNet FSRCNNX AiU Krig RAVU NNEDI3 SXBR CAS NoiseS minblur-usm
-*   后处理： 所有 yuv、 rgb 变体； A4k anime-sharpen-09 SSDS SSSR Adaptive colorlevel saturate unsharp unsharp-masking
-*   混合： anime-sharpen-10
+*   预处理： 所有 luma、 chroma 变体； ACNet FSRCNNX AiU Krig RAVU NNEDI3 SXBR CAS NoiseS minblur\_usm
+*   后处理： 所有 yuv、 rgb 变体； A4k Anime4K\_legacy\_09 SSDS SSSR Adaptive colorlevel saturate unsharp unsharp\_masking\_next
+*   混合： Anime4K\_legacy\_10
 
 🔺 （此处未完整列出全部着色器）
 
@@ -536,7 +535,7 @@ YIQ-converter.glsl                   -- YIQ转换，过饱和
 例如：
 
 ```
-CTRL+1 change-list glsl-shaders set "~~/shaders/KrigBilateral.glsl;~~/shaders/ravu-zoom-r3.glsl;~~/shaders/AMD-CAS-lite_luma.glsl"
+CTRL+1 change-list glsl-shaders set "~~/shaders/KrigBilateral.glsl;~~/shaders/ravu_zoom_r3.glsl;~~/shaders/AMD_CAS_lite_luma.glsl"
 ```
 
 其它示例参考仓库内的 **input.conf** 即可。

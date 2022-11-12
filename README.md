@@ -34,7 +34,7 @@ https://github.com/mpv-player/mpv/wiki
 | libmpv     |  |  |
 | lua        |  |  |
 | mpv        | 综合             | [050f5e7](https://github.com/mpv-player/mpv/commit/050f5e7915045a28ada36c55bf817b8f909020ae) |
-| options    | 选项             | [adb556b](https://github.com/mpv-player/mpv/commit/adb556bf15e9b09afce6c9cb0a0911c53cf27feb) |
+| options    | 选项             | [33136c2](https://github.com/mpv-player/mpv/commit/33136c276c550a3a38bb36f512718a5fd2fd82ee) |
 | osc        | 屏显式控制器     | [ad5a1ac](https://github.com/mpv-player/mpv/commit/ad5a1ac8733e6b4cf86e7b6d84c50ddf37ca62cd) |
 | stats      | 统计数据         | [21ab1df](https://github.com/mpv-player/mpv/commit/21ab1df01448a2d864b28ad0de7ce1ce13332114) |
 | vf         | 视频滤镜         | [1c05a30](https://github.com/mpv-player/mpv/commit/1c05a30e951f973f8cd8173a30d1fe0df59fd390) |

@@ -1,6 +1,6 @@
 # mpv播放器的使用引导
 
-_ver.20220808_
+_ver.20221112_
 
 
 - 极短的介绍
@@ -302,7 +302,7 @@ Ctrl+UP  vf toggle vflip
 
 ### 5.第三方着色器
 
-你可以在此处获取一些公开的第三方着色器： https://github.com/mpv-player/mpv/wiki/User-Scripts#user-shaders  
+你可以在 [此处](https://github.com/mpv-player/mpv/wiki/User-Scripts#user-shaders) 获取一些公开的第三方着色器  
 下载的着色器文件扩展名通常为 **.glsl** 或 **.hook** ，mpv并没有规定这些文件的默认加载路径。  
 如果你有很多着色器的使用需求，我建议你在主设置文件路径下建立一个 <font color=green>**shaders**</font> 文件夹放置所有第三方着色器。  
 以我的推荐用法为例，下载你想要的着色器， `xxx.glsl` 放置在 <font color=green>**X:/xxxxx/你的MPV文件夹/portable_config/shaders/**</font> 内
@@ -400,7 +400,7 @@ VS滤镜参与mpv的播放流程至少需要三个部分： ***dll库 + 对应�
 获取对应的vpy脚本，无所谓扩展名是 `.py` 或者 `.vpy` ，脚本也无命名要求规范
 
 [这里](https://gist.github.com/KCCat/1b3a7b7f085a066af3719859f88ded02) 是KCCat大佬的版本  
-或者选择我在懒人包 [使用的版本](https://github.com/hooke007/MPV_lazy/blob/main/portable_config/vs/mvtools-2x.vpy)
+或者选择我在懒人包 [使用的版本](https://github.com/hooke007/MPV_lazy/blob/main/portable_config/vs/mvtools_2x.vpy)
 
 放置位置也随意，按照前文的推荐放在 <font color=green>**X:/xxxxx/你的MPV文件夹/portable_config/**</font> 内便于调用
 
