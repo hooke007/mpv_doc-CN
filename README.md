@@ -49,3 +49,4 @@ https://github.com/mpv-player/mpv/wiki
 | mpv_start   | mpv的入门与进阶  | N/A |
 | mpv_shaders | 第三方着色器简介 | N/A |
 | mpv_profiles | profile的运用 | N/A |
+| mpv_input | 快捷键和命令与控制台 | N/A |
