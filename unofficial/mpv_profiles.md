@@ -38,7 +38,7 @@ profile-restore=copy
 ontop=yes
 ```
 
-## 顺序逻辑
+## 1.顺序逻辑
 
 在一个主设置文件中，使用参数 `profile=xxx` 即插入某profile，而profile本身是一个参数集合（不会在启动时应用）  
 依照整体逻辑，从上往下读取。对于一般选项，如果存在重名的则后者覆盖前者成为实际被应用的参数。  
@@ -83,7 +83,7 @@ sub-border-size=4
 
 P.S. 在此示例中，把 `deband=no` 放在 `profile=gpu-hq` 之后，也是因为目的是要禁用去色带，否则如果顺序相反只会产生相反的结果。
 
-## 分类
+## 2.分类
 
 profile可大致分为 常规/普通profile 和 条件/自动profile  
 简单概括特性即 条件profile 会根据内部设定的触发条件，满足情况时自动启用
@@ -108,9 +108,11 @@ profile-restore=copy              # 不满足时的回退方式
 border=no                         # 此行往后填写要你要应用的参数，自定义
 ```
 
-### 条件profile的深入解释
+### 2.1.条件profile的深入解释
 
-1. 首先是有哪些触发条件即 `profile-cond` 可用，它被解释为Lua条件，即使你完全不了解这门语言，这里亦有示例带你快速入门使用。
+### 2.1.1.cond
+
+首先是有哪些触发条件即 `profile-cond` 可用，它被解释为Lua条件，即使你完全不了解这门语言，这里亦有示例带你快速入门使用。
 
 判定的核心对象是 “属性” 即手册中的[属性列表](https://mpv.io/manual/master/#property-list)中列出的全部，  
 一个安全的引用属性的方式是 `p["xxxx"]` ，这样就不用担心特殊符号导致的判定无效。
@@ -125,16 +127,18 @@ P.S. 更多示例参见 [主仓库_profiles](https://github.com/hooke007/MPV_laz
 
 P.S. 常见的引用属性的方式是直接写属性名和 `p.xxxx` 的形式（参见前文的示范），这种方式适合名字简单无符号的属性，不用担心语法上的暗病。
 
-2. 其次是profile触发后，不满足条件时的回退方式。
+### 2.1.2.restore
+
+其次是profile触发后，不满足条件时的回退方式。
 
 正如开头讲，profile被解析为具体一行行参数，因此准确讲profile并没有开启和关闭的概念。为了解决现实的需求，它以变通的方式解决了这个问题，即备份触发前的涉及的选项及其值，然后在条件不满足是还原备份的参数。
 
 对应“回退方式”的即 `profile-cond` 它的常用可选值为 `default` 或 `copy`  
 如果使用 `default` ，则没有“回退”处理。它的实用场景较少，因此常见的几乎都是使用 `copy`
 
-## 非典型使用
+## 3.非典型使用
 
-### 旧版的自动profile
+### 3.1.旧版的自动profile
 
 mpv遗留了一种旧版的 自动profile ，如下所示
 
@@ -147,7 +151,7 @@ hwdec=auto                         # 此行往后填写要你要应用的参数�
 
 它的功能有限，通常没有使用的必要而且可以转换为当前的 条件profile ，这在之前的 [《profiles_补充内容》](https://github.com/hooke007/MPV_lazy/discussions/42) 有记录。
 
-### profile嵌套
+### 3.2.profile嵌套
 
 如图所示，注意书写顺序，确保后方的profile所调用的profile已被读取到。
 
@@ -170,14 +174,14 @@ profile=deband_plus
 
 注意：不要在 条件profile 里嵌套 条件profile
 
-### 隔离profile
+### 3.3.隔离profile
 
 这也是我当前在 mpv-lazy 中的处理方式，避免开头提到的 常驻参数 误入profile的问题。  
 实现方式是通过在mpv.conf中使用参数 `--include=xxxx.conf` 这样mpv就会在主设置文件读取完毕后，再读取该文件作为 mpv.conf 的补充内容，而我只在该文件内写profile，常驻参数只写在 mpv.conf 中。
 
 P.S. 我以同样的方式隔离了脚本选项，参见 [《集中化管理mpv的脚本选项》](https://github.com/hooke007/MPV_lazy/discussions/126)
 
-### 穿插常驻参数
+### 3.4.穿插常驻参数
 
 如果你执意要在两个profile之间穿插 常驻参数 ，官方亦提供了一种解决方案，见下方示例 ——
 
@@ -205,5 +209,3 @@ bbbb=bbbb
 ```
 
 这种方案带来了附属影响，即 `profile=default` 原本是空的，而此时被赋予了 `yyy...` 这部分参数。
-
-

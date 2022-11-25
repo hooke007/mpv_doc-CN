@@ -160,7 +160,7 @@ Ctrl+RIGHT cycle-values video-rotate "0" "90" "180" "270" # ~~~~~~~~逆~~~~~~~~~
 `cycle` 通常用于只有 `yes` 或 `no` 两个状态的参数； `cycle-values` 可用于在指定的多个值从左往右切换。  
 上方示例利用这个特性，成功实现了无脚本依赖的360°旋转操作。
 
-注意事项、完整功能与更多示例参考 [手册[05]](https://hooke007.github.io/mpv-lazy/[05]_%E5%BF%AB%E6%8D%B7%E9%94%AE%E8%87%AA%E5%AE%9A%E4%B9%89.html)
+注意事项、完整功能与更多示例参考 [此处](https://hooke007.github.io/unofficial/mpv_input.html)
 
 
 ### 3.脚本增强（LUA）
@@ -183,7 +183,7 @@ mpv中的很多功能都是依赖LUA脚本的，比如 i 键显示的统计信�
 
 以我的推荐用法为例，在 <font color=green>**X:/xxxxx/你的MPV文件夹/portable_config/script-opts/**</font> 里放置 `xxxx.conf` 的脚本设置文件  
 你依然可以在 [我的仓库](https://github.com/hooke007/MPV_lazy/tree/main/portable_config/script-opts) 里参考：  
-其中 `console.conf` `osc.conf` `stats.conf` 都是内置脚本的设置文件
+其中 `console.conf` `osc.conf` `stats.conf` `ytdl_hook.conf` 都是内置脚本的设置文件
 
 🔺 此后为了避免识别问题，严格文本规范：  
 ===应该直接写 `xxx=yyy` **不要加多余的空格**，**如需注释务必单独另起一行**。  
@@ -212,7 +212,7 @@ mpv集成的 **stats.lua** 脚本带来了类似 Mediainfo 的功能，可用于
 ##### 3.1.3.条件配置预设
 
 mpv集成的 **auto_profiles.lua** 脚本带来了根据条件自动切换设置的功能。  
-参考 [mpv-lazy系列手册02](https://hooke007.github.io/mpv-lazy/[02]_%E9%85%8D%E7%BD%AE%E7%BB%84%E4%B8%8E%E5%8F%A6%E7%B1%BB%E5%86%99%E6%B3%95%E7%A4%BA%E4%BE%8B.html)  
+详情参考 [此处](https://hooke007.github.io/unofficial/mpv_profiles.html)  
 官方手册 [定位](https://mpv.io/manual/master/#conditional-auto-profiles)
 
 
@@ -297,7 +297,7 @@ Ctrl+UP  vf toggle vflip
 
 滤镜类的全部 [可用后缀](https://mpv.io/manual/master/#filter-options) 。
 
-🔺 关于该部分内容，重写的 [手册[03]](https://hooke007.github.io/mpv-lazy/mpv_lazy_d03.html) 中记录的更具体和完善。
+🔺 关于该部分内容，重写的 [文档](https://hooke007.github.io/unofficial/mpv_filters.html) 中记录的更具体和完善。
 
 
 ### 5.第三方着色器
@@ -353,7 +353,7 @@ CTRL+1 change-list glsl-shaders toggle "~~/shaders/adaptive-sharpen.glsl"
 
 #### 5.3.第三方着色器介绍
 
-参考 [mpv-lazy系列手册[01]](https://hooke007.github.io/mpv-lazy/mpv_lazy_d01.html)
+参考 [此文档](https://hooke007.github.io/unofficial/mpv_shaders.html)
 
 
 ### 6.VapourSynth
@@ -444,7 +444,7 @@ VS工作状态的检验可多方结合，例如在统计信息中的滤镜列表
 
 - **mpv-lazy的发布帖收集了萌新常见问题的解决方案？**
 
-大部分都可以无障碍参考 [坛友踩坑录===镜像手册[04]](https://hooke007.github.io/mpv-lazy/mpv_lazy_d04.html)
+大部分都可以无障碍参考 [维基FAQ](https://github.com/hooke007/MPV_lazy/wiki/0_FAQ)
 
 - **mpv的命令行操作的介绍呢？**
 

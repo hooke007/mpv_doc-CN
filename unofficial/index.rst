@@ -8,3 +8,6 @@
 
    mpv_start
    mpv_shaders
+   mpv_profiles
+   mpv_input
+   mpv_filters

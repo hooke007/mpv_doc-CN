@@ -9,7 +9,7 @@ _ver.20221124_
 
 关联官方手册部分 [Manual_inputconf](https://mpv.io/manual/master/#input-conf)
 
-## 前文要点
+### 前文要点
 
 - 设置文件夹内的 **input.conf** 存储用户自行设定的快捷键。通常mpv读取该文件并覆盖内建的初始快捷键方案中的重名项。  
 如果没有该文件则默认使用 [内建的原始快捷键预设](https://github.com/mpv-player/mpv/blob/master/etc/input.conf)  
@@ -19,7 +19,7 @@ _ver.20221124_
 
 - mpv-lazy版中可供参考的大量[示例](https://github.com/hooke007/MPV_lazy/blob/main/portable_config/input.conf)
 
-## 语法简述
+## 1.语法简述
 
 ```ini
 <键位绑定（按键名）>   <具体命令>   # 支持行后注释
@@ -28,9 +28,11 @@ _ver.20221124_
 `键位绑定` 前添加注释符 `#` 即屏蔽该行内容  
 若存在多行相同的 `按键名` ，则后方的行覆盖之前的行，成为mpv读取的实际内容。
 
-### 键位绑定
+### 1.1.键位绑定
 
-1. 普通按键和一般功能键可单独作为键位绑定
+### 1.1.1.单键位
+
+普通按键和一般功能键可单独作为键位绑定
 
 <kbd>a</kbd> <kbd>1</kbd> <kbd>F1</kbd> <kbd>SPACE</kbd>  
 示例：
@@ -40,7 +42,7 @@ SPACE   cycle pause   # 切换暂停
 
 🔺 编辑键值名时，输入符号时应注意中文输入法的全半角（即用英文字符）
 
-2. 以下按键作为前缀构成的组合键
+### 1.1.2.组合键
 
 <kbd>Shift</kbd> <kbd>Ctrl</kbd> <kbd>Alt</kbd>  
 示例：
@@ -50,7 +52,7 @@ Ctrl+a   set aid no   # 禁用音轨
 
 🔺 但是这几个键自身不可以作为键位触发
 
-3. 大写和上档
+### 1.1.3.大写和上档
 
 不支持 `Shift+字母/数字` 这种写法，解决方案是 ——
 
@@ -69,7 +71,7 @@ A   cycle mute   # 切换静音
 
 🔺 由于 注释符 与 按键 <kbd>#</kbd> 重名，所以如果你要绑定这个键位，用 `SHARP` 作为按键名
 
-4. 连键
+### 1.1.4.连键
 
 连键不是双击，两次按键之间没有限制触发时间间隔。
 
@@ -90,11 +92,11 @@ q-a     ignore
 连键不仅支持不同按键，更支持串联多个不同按键  
 同上，安全起见，屏蔽中间键的动作
 
-### 具体命令
+### 1.2.具体命令
 
 大体分为两类 ——
 
-1. 属性相关
+#### 1.2.1.属性相关
 
 在mpv运行时可以通过操作属性，来达成动态修改mpv.conf中的选项值的效果。  
 mpv中可用的属性列表参见 [此处](https://mpv.io/manual/master/#property-list)  
@@ -119,15 +121,15 @@ i   cycle-values hwdec yes no auto-copy   # 切换解码模式
 
 🔺 并非所有属性都可以在运行时变更
 
-1.1. 滤镜与着色器列表管理
+##### 1.2.1.1.滤镜与着色器列表管理
 
 虽然依然可用通过 `set <属性名> <值>` 的方式设置，但是涉及列表的部分属性提供了更灵活的细致操作 ——
 
-- 滤镜相关的内容详见 （还没重写，先看[旧版](https://hooke007.github.io/mpv-lazy/mpv_lazy_d03)）
+- 滤镜相关的内容详见 [此处](https://hooke007.github.io/unofficial/mpv_filters.html#input-conf)
 
 - 着色器相关的内容详见 [此处](https://hooke007.github.io/unofficial/mpv_shaders.html#id7)
 
-2. 直接命令
+#### 1.2.2.直接命令
 
 即指不触碰属性，直接执行动作，示例：
 ```ini
@@ -138,7 +140,7 @@ s   stop   # 停止
 
 更多可用直接命令参见 [此处](https://mpv.io/manual/master/#list-of-input-commands)
 
-2.1. 脚本指令
+##### 1.2.2.1.脚本指令
 
 mpv的脚本可能提供了额外定义的名义可供用户使用，这通常应由开发者进行详细说明。  
 涉及的命令为：  
@@ -152,7 +154,7 @@ I   script-binding stats/display-stats-toggle   # 开/关 常驻显示统计信�
 i   script-binding display-stats-toggle
 ```
 
-#### 静默与串联
+#### 1.2.3.静默与串联
 
 大多数命令执行时会显示OSD信息，可以通过 `no-osd` 作为命令的前缀来禁止其显示。  
 示例：
@@ -166,7 +168,7 @@ RIGHT   no-osd seek 5   # 前进 5 秒
 RIGHT   seek 5 ; show-text "向前 5 秒"   # 前进 5 秒并显示OSD文本消息
 ```
 
-## 辅助
+## 2.辅助
 
 - mpv的内建脚本 **stats.lua** 的第四页可显示已绑定的按键信息  
 ```{image} _assets/mpv_input-stats_01.webp
@@ -180,7 +182,7 @@ RIGHT   seek 5 ; show-text "向前 5 秒"   # 前进 5 秒并显示OSD文本消�
 - 终端运行 `./mpv --input-test --force-window --idle` 将打开一个空mpv窗口便于测试实际键位对应的值  
 （mpv-lazy提供了 [输入模式](https://github.com/hooke007/MPV_lazy/blob/main/installer/mpv-输入模式.bat) 便于更快启动）
 
-## 控制台
+## 3.控制台
 
 mpv的内建脚本 **console.lua** 提供了控制台的功能。这是另一种在运行时动态修改“选项值”的解决方案。
 
