@@ -103,6 +103,9 @@
     ``--pipewire-remote=<remote>``
         指定通过本地UNIX套接字连接的PipeWire远程守护进程名称。一个空的 <remote> 字符串使用默认的名为``pipewire-0`` 的远程。
 
+    ``--pipewire-volume-mode=<channel|global>``
+        指定 ``ao-volume`` 属性是否应该应用于声道音量或全局音量。默认为全局音量。
+
 ``sdl``
     SDL 1.2+音频输出驱动。应该在任何受SDL 1.2支持的平台上工作，但可能需要为你的系统正确的设置 ``SDL_AUDIODRIVER`` 环境变量。
 
