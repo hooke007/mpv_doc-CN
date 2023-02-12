@@ -1,6 +1,6 @@
 # 音视频滤镜
 
-_ver.20221125_
+_ver.20230212_
 
 ## 序
 
@@ -91,7 +91,7 @@ k   vf toggle vflip
 mpv所能使用的滤镜大体分为两类 ——
 
 mpv自己实现的滤镜：  
-[format](https://mpv.io/manual/master/#video-filters-format) [sub](https://mpv.io/manual/master/#video-filters-sub) [vapoursynth](https://mpv.io/manual/master/#video-filters-vapoursynth) [vavpp](https://mpv.io/manual/master/#video-filters-vavpp) [vdpaupp](https://mpv.io/manual/master/#video-filters-vdpaupp) [d3d11vpp](https://mpv.io/manual/master/#video-filters-d3d11vpp) [fingerprint](https://mpv.io/manual/master/#video-filters-fingerprint) [gpu](https://mpv.io/manual/master/#video-filters-gpu)
+[format](https://mpv.io/manual/master/#video-filters-format) & [sub](https://mpv.io/manual/master/#video-filters-sub) & [vapoursynth](https://mpv.io/manual/master/#video-filters-vapoursynth) & [vavpp](https://mpv.io/manual/master/#video-filters-vavpp) & [vdpaupp](https://mpv.io/manual/master/#video-filters-vdpaupp) & [d3d11vpp](https://mpv.io/manual/master/#video-filters-d3d11vpp) & [fingerprint](https://mpv.io/manual/master/#video-filters-fingerprint) & [gpu](https://mpv.io/manual/master/#video-filters-gpu)
 
 来自ffmpeg的滤镜：  
 [lavfi](https://mpv.io/manual/master/#video-filters-lavfi)

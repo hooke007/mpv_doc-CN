@@ -1,7 +1,7 @@
 
 # 第三方用户着色器
 
-_ver.20221112_
+_ver.20230212_
 
 ## 起
 
@@ -18,7 +18,8 @@ _ver.20221112_
 
 ## ...
 
-🔺 如果下方列出的着色器未在整合包中找到，前往 [**此处**](https://github.com/hooke007/MPV_lazy/tree/main/portable_config/shaders) 搜寻获取。
+🔺 如果下方列出的着色器未在整合包中找到，前往 [**此处**](https://github.com/hooke007/MPV_lazy/tree/main/portable_config/shaders) 搜寻获取。  
+🔺 我对部分2x放大类的着色器进行了最小缩放倍率限制的统一修改(1.2)，因此下方的涉及该部分说明已过时。
 
 ☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲
 
@@ -433,10 +434,28 @@ NVSharpen_rgb.glsl
 相关列表：[AN3223-nlmeans](https://github.com/AN3223/dotfiles/tree/master/.config/mpv/shaders)  
 ```
 nlmeans.glsl
-nlmeans_next.glsl
+nlmeans_anime.glsl
+nlmeans_anime_hq.glsl
+nlmeans_anime_hq_medium.glsl
+nlmeans_anime_medium.glsl
+nlmeans_heavy.glsl
+nlmeans_hq.glsl
+nlmeans_hq_heavy.glsl
+nlmeans_hq_medium.glsl
+nlmeans_hq_sharpen_denoise.glsl
+nlmeans_hq_sharpen_only.glsl
+nlmeans_hqx.glsl
+nlmeans_lq.glsl
+nlmeans_luma.glsl
+nlmeans_medium.glsl
+nlmeans_sharpen_denoise.glsl
+nlmeans_sharpen_only.glsl
+nlmeans_temporal.glsl
+nlmeans_temporal_sharpen_denoise.glsl
+nlmeans_temporal_sharpen_only.glsl
 ```
 
-🔺变体 next 只能在 --vo=gpu-next 下使用（可利用时域信息进行处理）
+🔺变体 temporal 只能在 --vo=gpu-next 下使用（可利用时域信息进行处理）
 
 ☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲
 
@@ -516,7 +535,8 @@ YIQ_converter.glsl                   -- YIQ转换，过饱和
 ## 通过快捷键动态启用与禁用
 
 适用于 **input.conf**  
-语法结构： `键位(组合)名   change-list glsl-shaders (不带符号"-"的)后缀   着色器文件名(可多项，用半角符号";"分隔)`
+语法结构：  
+`键位(组合)名   change-list glsl-shaders (不带符号"-"的)后缀   着色器文件名(可多项，用半角符号";"分隔)`
 
 [《string-list-and-path-list-options》](https://mpv.io/manual/master/#string-list-and-path-list-options)
 
@@ -538,11 +558,11 @@ YIQ_converter.glsl                   -- YIQ转换，过饱和
 CTRL+1 change-list glsl-shaders set "~~/shaders/KrigBilateral.glsl;~~/shaders/ravu_zoom_r3.glsl;~~/shaders/AMD_CAS_lite_luma.glsl"
 ```
 
-其它示例参考仓库内的 **input.conf** 即可。
+其它示例可参考仓库内 [**input.conf**](https://github.com/hooke007/MPV_lazy/blob/main/portable_config/input_list.conf) 的“着色器列表”部分。
 
 ## 速度的对比参考
 
-🔺 （此节的信息可能已过时）
+🔺 （此节的信息可能已过时。我对部分着色器的跑分测试参见 [此处](https://github.com/hooke007/MPV_lazy/discussions/255#discussioncomment-4685344)）
 
 使用个别着色器进行两倍放大，计算每秒所能生成的最大帧数。数值越大说明速度越快，越适合实际观看时使用，数值低于视频原始帧率即完全不可用。  
 实际速度**极大**取决于视频的质量、缩放倍率和你的显卡性能，因此两表中同一个 fsrcnnx16 的性能结果差异不符合常理也不奇怪，数据仅供大概参考。

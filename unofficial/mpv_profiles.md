@@ -1,6 +1,6 @@
 # 配置预设
 
-_ver.20221122_
+_ver.20230212_
 
 ## 序
 
@@ -45,7 +45,7 @@ ontop=yes
 其中 `profile=xxx` 是一个特殊选项，当它被读取时，会被解析为它的赋值对象中的实际参数集。
 
 `[xxxxx]` 是一个profile的头部标志，两个profile之间 —— 即 `[srt_style]` 到 `[playing_ontop]` 所有中间行的参数都属于 `[srt_style]` 。  
-一旦你在 mpv.conf 自己建立了profile，就不要把常驻参数（即启动时就应用的项）写在profile的后方，因为profile没有明确的结束标志，在上方示例中，任何写在最后的参数都会被mpv认定为属于 `[srt_style]`
+一旦你在 mpv.conf 自己建立了profile，就不要把常驻参数（即启动时就应用的项）写在profile的后方，因为profile没有明确的结束标志，在上方示例中，任何写在最后的参数都会被mpv认定为属于 `[playing_ontop]`
 
 `gpu-hq` 是mpv内建（自带）的一个profile，它具体包含以下参数：
 ```ini
@@ -172,7 +172,7 @@ profile-restore=copy
 profile=deband_plus
 ```
 
-注意：不要在 条件profile 里嵌套 条件profile
+🔺 注意：不要在 条件profile 里嵌套 条件profile
 
 ### 3.3.隔离profile
 
@@ -197,7 +197,8 @@ aaaa=aaaa
 aaaa=aaaa
 aaaa=aaaa
 
-[default]   # 使用名为 "default" 的profile即可让这部分的参数被归为 “常驻参数”
+# 使用名为 "default" 的profile即可让这部分的参数被归为 “常驻参数”
+[default]
 yyyy=yyyy
 yyyy=yyyy
 yyyy=yyyy

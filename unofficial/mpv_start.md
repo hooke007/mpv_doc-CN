@@ -1,6 +1,6 @@
 # mpv播放器的使用引导
 
-_ver.20221112_
+_ver.20230212_
 
 
 - 极短的介绍
@@ -11,8 +11,8 @@ mpv是极简设计的高画质的开源播放器。
 
 - ...
 
-本文的假定使用环境 win11-x64 Intel-CPU Nvidia-GPU  
-本教程独立，不从属于懒人包的文档，基于shinchiro编译并打包发布的版本撰写。
+本文的假定使用环境 win10/11-x64 & AMD/Intel-CPU & Nvidia-GPU  
+本教程独立，不从属于懒人包的文档，基于shinchiro的工具链编译并打包发布的版本撰写。
 
 推荐使用的高级文本编辑器，完全可替代系统自带的记事本 [Notepad3](https://www.rizonesoft.com/downloads/notepad3/)
 
@@ -20,12 +20,12 @@ mpv是极简设计的高画质的开源播放器。
 
 ## mpv 播放器的使用【入门】
 
-> 既是入门，也是最省心的用法。
+> 既是入门，也是省心的用法。
 
 
 ### 1.下载安装
 
-mpv目前没有官方编译的版本，第三方shinchiro编译的算公认的半官方版，在 [SOURCEGORGE](https://sourceforge.net/projects/mpv-player-windows/files/64bit/) 或 [他的仓库](https://github.com/shinchiro/mpv-winbuild-cmake/releases) 获取64位最新版本：    
+mpv目前不发行官方编译的版本，第三方shinchiro编译的算认可度高的半官方版，在 [SOURCEGORGE](https://sourceforge.net/projects/mpv-player-windows/files/64bit/) 或 [他的仓库](https://github.com/shinchiro/mpv-winbuild-cmake/releases) 获取64位最新版本（Excavator/Haswell架构之后的处理器可选择v3版）。  
 全部解压至自定义目录，点击运行 **mpv.exe** ，拖入任意视频播放以快速测试兼容性。
 
 如果需要注册成可选的默认播放器，以管理员权限运行 <font color=green>**installer**</font> 文件夹内的 **mpv-install.bat** ，此后不要更改 **mpv.exe** 所在文件夹的路径或名称，否则需要重新执行该文件重新注册到系统。
@@ -44,10 +44,11 @@ _放在C盘目录的通常需要这一步_
 
 ### 3.选项设置
 
-因为mpv本身不具有图形化前端，绝大多数的设置选项都是靠在**主设置文件** <font color=blue>**mpv.conf**</font> 中输入参数实现的。
+因为mpv本身不具有图形化前端，绝大多数的设置选项都是靠在**主设置文件** <font color=blue>**mpv.conf**</font> 中预写入参数实现的。
 
-mpv的默认设置目录为 <font color=green>**C:/Users/你的用户名/AppData/Roaming/mpv/**</font>  
-强烈建议你在 **mpv.exe** 的旁边新建一个 <font color=green>**portable_config**</font> 的文件夹，该目录具有最高级的优先级，一旦存在此文件夹，其它所有的设置目录都会被忽略。  
+mpv的默认读取的高优先级的设置目录为 <font color=green>**C:/Users/你的用户名/AppData/Roaming/mpv/**</font>
+
+但我强烈建议你在 **mpv.exe** 的旁边新建一个 <font color=green>**portable_config**</font> 的文件夹。该目录具有最高级的优先级，一旦存在此文件夹，其它所有的设置目录都会被忽略。  
 因此在 <font color=green>**/portable_config/**</font> 内新建一个 <font color=blue>**mpv.conf**</font> 的空文本，先确保文本编码为 `UTF-8`  
 即 <font color=green>**X:/xxxxx/你的MPV文件夹/portable_config/mpv.conf**</font>  
 <img src="_assets/mpv_start-03.webp" style="zoom: 40%;" />
@@ -57,53 +58,49 @@ mpv的默认设置目录为 <font color=green>**C:/Users/你的用户名/AppData
 - 以 <font color=green>**X:/xxxxx/你的MPV文件夹/portable_config/**</font> 为设置目录，除去其具有最高优先级（会让其忽略“全局设置”）的特性，还赋予了软件绿色化的特性（查看 **【进阶】** 章可知大部分文件都可放在设置目录），非常适合便携党。
 
 
-在 <font color=blue>**mpv.conf**</font> 中输入以下必要参数：
+在 <font color=blue>**mpv.conf**</font> 中写入以下基本参数：
 
 ```ini
- hwdec=d3d11va                           # 使用d3d11va硬解（原生模式）
- hwdec-codecs=all                        # 尽可能所有格式先尝试硬解
+ hwdec=auto                              # 优先使用硬解（原生模式）
 #log-file="~~desktop/mpv.log"            # 输出log日志在桌面
- keep-open=yes                           # 播放完毕后不自动退出
- save-position-on-quit=yes               # 退出时保存当前播放状态
- audio-file-auto=fuzzy                   # 自动加载同名外置音轨
-#icc-profile-auto                        # 应用系统icc文件进行色彩修正
- icc-cache-dir="~~/icc_cache"            # 存储icc缓存以加速二次启动
-#profile=gpu-hq                          # 使用内置的预设的较高画质方案
- gpu-shader-cache-dir="~~/shaders_cache" # 存储着色器缓存以加速二次启动
- sub-auto=fuzzy                          # 自动加载同名外置字幕
+ keep-open=yes                           # 播放列表中的最后一个条目播放完毕后暂停
+ save-position-on-quit=yes               # 退出时保存当前的播放状态
+ watch-later-options=start,vid,aid,sid   # 限制保存播放状态的属性列表（示例表示：播放位置、视频 音频 字幕轨号）
+ audio-file-auto=fuzzy                   # 自动加载近似名的外置音轨
+ sub-auto=fuzzy                          # 自动加载近似名的外置字幕
+#profile=gpu-hq                          # 使用一个内置的画质方案预设
  screenshot-directory="~~desktop/"       # 截图的输出路径在桌面
 ```
 
 辅助理解：  
 如何理解这样写的目的，某一行参数中如果有注释符号"**#**"，意味着该行 `#` 所在位置以后的内容为无效。  
-如果将这一行一行参数看作一个一个可以打勾的选项。则 `hwdec=d3d11va` 类似于 "☑使用d3d11va硬解" 激活该参数，反之 `#hwdec=d3d11va` 对应 "☐使用d3d11va硬解" 未勾选该选项（使用默认值）。
+如果将这一行一行参数看作一个一个可以打勾的选项。则 `hwdec=auto` 类似于 "☑使用硬解" 激活该参数，反之 `#hwdec=auto` 对应 "☐使用硬解" 未勾选该选项（使用默认值）。
 
 部分被注释掉的参数：  
   `--log-file` 用于输出日志查错，一般人用不到也看不懂  
-  `--icc-profile-auto` 对于已经校色的用户应当开启，未校色的用户开启会产生色彩错误  
-  `--profile=gpu-hq` 如果你的显卡不太差，可以使用这个内建的方案
+  `--profile=gpu-hq` 如果你的显卡不太差，可以使用这个内建的方案（不要被名字里所谓的hq迷惑）
 
 🔺 由于主设置文件的书写规范最为宽松：  
-===你可以在参数后直接注释中文解释 `hwdec=d3d11va # 使用d3d11va硬解（原生模式）` ；  
-===也可以加大量空格美化参数的排版 `hwdec  =  d3d11va  #  使用d3d11va硬解（原生模式）` ；  
-===还可以用 `--hwdec=d3d11va` 这种（不合规的）替代写法表示激活的参数；  
-===甚至其中 `no-osd-bar` 这类no-开头的参数可改成为 `osd-bar=no`；  
+===你可以在参数后直接注释中文解释 `hwdec=auto # 优先使用硬解（原生模式）` ；  
+===也可以加大量空格美化参数的排版 `hwdec  =  auto  #  优先使用硬解（原生模式）` ；  
+===还可以用 `--hwdec=auto` 这种命令行写法表示激活的参数；  
+===其中例如 `no-osd-bar` 这类 `no-` 开头的参数可改成为 `osd-bar=no` ；  
 ===以及官方手册中没有赋值的参数比如 `deband` 可以写成 `deband=yes` （等效）。
 
 
 ### 4.高频快捷键
 
-上方必要参数输入完保存退出。再记住常用快捷键和界面控件作用：  
+上方的基本参数输入完保存退出。再记住常用快捷键和界面控件作用：  
 <img src="_assets/mpv_start-osc.png" style="zoom: 40%;" />  
-`1`  `2` 调整对比度  
-`3`  `4` 调整亮度  
-`5`  `6` 调整伽玛  
-`7`  `8` 调整饱和度  
-`9`  `0` 调整音量  
-`[`  `]` 调整播放速度  
-`Backspace` 重置播放速度  
-`s` 快速截屏  
-`i` 显示有关当前播放文件的统计信息  
+<kbd>1</kbd>  <kbd>2</kbd> 调整对比度  
+<kbd>3</kbd>  <kbd>4</kbd> 调整亮度  
+<kbd>5</kbd>  <kbd>6</kbd> 调整伽玛  
+<kbd>7</kbd>  <kbd>8</kbd> 调整饱和度  
+<kbd>9</kbd>  <kbd>0</kbd> 调整音量  
+<kbd>\[</kbd>  <kbd>\]</kbd> 调整播放速度  
+<kbd>Backspace</kbd> 重置播放速度  
+<kbd>s</kbd> 按源分辨率截屏  
+<kbd>i</kbd> 显示有关当前播放文件的统计信息  
 还有其它的 [常用快捷键](https://mpv.io/manual/master/#interactive-control)
 
 
@@ -172,9 +169,9 @@ mpv中的很多功能都是依赖LUA脚本的，比如 i 键显示的统计信�
 因此在 `mpv.conf` 的所在位置新建 `script-opts` 文件夹，这里面将放置所有脚本的设置文件，mpv会自动读取。  
 脚本的对应设置文件名为 <font color=green>**同脚本名.conf**</font>
 
-🔺 此处开始往后，应该注释掉这个参数 `--save-position-on-quit=yes`  
-===目前为止，这个参数除了保存了播放进度外，还储存了许多 [额外的状态](https://github.com/mpv-player/mpv/issues/4641) ，个人偏好不使用；  
-===如果你希望保留**退出时记录播放进度**的功能，可以不禁用该功能，同时用另一个参数 `watch-later-options=vid,aid,sid` 限制其额外记录的属性（示例对应的是：视频轨、音轨、字幕轨序号）
+🔺 此处开始往后，如果你在使用参数 `--save-position-on-quit=yes` ，应注意：  
+===目前为止，这个参数除了保存了播放进度外，还储存了许多 [额外的状态](https://github.com/mpv-player/mpv/issues/4641) ，个人倾向不单独使用它；  
+===如果你希望保留**退出时记录播放进度**的功能，可以不禁用该功能，同时用另一个参数 `watch-later-options=start,vid,aid,sid` 限制其记录的属性（示例对应的是：播放位置、视频轨、音轨、字幕轨序号）
 
 
 #### 3.1内置脚本
@@ -196,7 +193,7 @@ mpv中的很多功能都是依赖LUA脚本的，比如 i 键显示的统计信�
 
 mpv集成的 **console.lua** 脚本带来了控制台功能，一般用于便于快速查错/临时变更属性或选项。  
 官方手册 [定位](https://mpv.io/manual/master/#console)  
-打开播放器后，按快捷键 ` 唤起控制台查看控制台信息，此时再按 Esc 关闭控制台。  
+打开播放器后，按快捷键 <kbd>`</kbd> 唤起控制台查看控制台信息，此时再按 <kbd>Esc</kbd> 关闭控制台。  
 
 <img src="_assets/mpv_start-06.webp" style="zoom:40%;" />
 
@@ -206,8 +203,12 @@ mpv集成的 **console.lua** 脚本带来了控制台功能，一般用于便于
 ##### 3.1.2.数据统计
 
 mpv集成的 **stats.lua** 脚本带来了类似 Mediainfo 的功能，可用于查看各项状态信息。  
-官方手册 [定位](https://mpv.io/manual/master/#stats)
-
+官方手册 [定位](https://mpv.io/manual/master/#stats)  
+默认按键如下：  
+<kbd>i</kbd> 临时显示，再次按下更新 （<kbd>Shift</kbd> + <kbd>i</kbd> 常驻显示，再次按下隐藏）  
+===在显示时，部分按键的原始功能变更：  
+<kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> <kbd>0</kbd> 翻到不同页面以展示不同类型的信息  
+其中部分页面支持 <kbd>↑</kbd> <kbd>↓</kbd> 按键翻页
 
 ##### 3.1.3.条件配置预设
 
@@ -226,7 +227,7 @@ mpv集成的 **ytdl_hook.lua** 脚本加强了网络串流的播放能力。
 需要 **mpv.exe** 所在目录存在 **yt-dlp.exe** [官方发布地址](https://github.com/yt-dlp/yt-dlp/releases)
 
 如何指定使用的程序可参考 [此处](https://github.com/hooke007/MPV_lazy/blob/main/portable_config/script-opts/ytdl_hook.conf)  
-（注意mpv0.34.0及之后的版本默认优先使用yt-dlp，而youtube-dl项目已转入维护阶段，无非特殊情况应使用yt-dlp）
+（注意mpv0.34.0及之后的版本默认优先使用yt-dlp，且youtube-dl项目已转入维护阶段，无非特殊情况应使用yt-dlp）
 
 
 #### 3.2.外置脚本
@@ -240,9 +241,9 @@ mpv集成的 **ytdl_hook.lua** 脚本加强了网络串流的播放能力。
 
 示范：  
 ===这里以许多人都会用的一个脚本 "**autoload.lua**" [源链接](https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua)（自动导入同目录所有文件到播放列表）为例  
-===对应的设置文件： [参考链接](https://github.com/hooke007/MPV_lazy/blob/7124c926533771c9dc3c8208a79abe93251ffe59/portable_config/script-opts/autoload.conf)  
+===对应的设置文件： [参考链接](https://gist.github.com/hooke007/f6bb6f28e8b05738eb60a370494974ed)  
 ===分别下载两个文件或手动复制源码（注意文本规范）创建到指定位置。  
-===在含有多个视频文件的目录随意打开某个视频，按 F8 查看播放列表，预期情况是已正确载入所有视频文件。
+===在含有多个视频文件的目录随意打开某个视频，默认可按 <kbd>F8</kbd> 查看播放列表，预期情况是已正确载入所有视频文件。
 
 🔺 此处为了避免识别问题，严格文本规范：内容同上。  
 🔺 一种略罕见的脚本的包装形式表现为多个文件群组。它的文件结构为：必有一个名为 **main.lua** 的脚本文件位于某个文件夹中，且同路径下附带有多个其它文件（不限lua）。它的使用方法与单文件的lua脚本略不同，你至少需要把整个文件夹塞进 <font color=green>**scripts**</font> 目录中（绝对不能直接把 **main.lua** 放在此处），其它进一步的安装步骤遵作者本人的使用说明。
@@ -254,15 +255,15 @@ mpv集成的 **ytdl_hook.lua** 脚本加强了网络串流的播放能力。
 [音频滤镜](https://mpv.io/manual/master/#audio-filters)  
 [视频滤镜](https://mpv.io/manual/master/#video-filters)
 
-🔺 此处往后，为了避免原生硬解模式不支持，在主设置文件中应使用 `hwdec=d3d11va-copy` 或 `hwdec=no`  
-_`dxva2-copy` 不见得一定比 `d3d11va-copy` 实际性能表现差，根据你的实际情况选择。高端N卡用户应高优先使用 `nvdec-copy`_
+🔺 此处往后，为了避免原生硬解模式不受支持，在主设置文件中应使用 `hwdec=auto-copy` 或 `hwdec=no`  
+_如果你想要手动指定为具体的模式 `dxva2-copy` 不见得一定比 `d3d11va-copy` 实际性能表现差，根据你的实际测试情况选择。高端N卡用户应高优先使用 `nvdec-copy`_
 
 
 #### 4.1.常规用法
 
 这里导入实例讲解：  
-===如果你使用 `--icc-profile-auto` 这个参数对视频进行了3dlut色彩映射操作，你可能会发觉mpv的视频色彩偏亮（如果你使用madvr的3dlut对比过）。  
-===根本原因在于mpv遵循的是BT.1886曲线，因此，你需要在 <font color=blue>**mpv.conf**</font> 中使用如下参数进行GAMMA修正以符合标准SRGB。
+===如果你在主设置文件中使用了参数 `--icc-profile-auto` 对视频进行了3dlut色彩映射操作，你可能会发觉mpv的视频色彩偏亮（对比madvr的3dlut）。  
+===原因在于mpv遵循的是BT.1886曲线，因此你可在 <font color=blue>**mpv.conf**</font> 中使用如下参数进行GAMMA修正以贴合SRGB标准。
 
 ```ini
 vf-append=format=gamma=gamma2.2
@@ -276,7 +277,7 @@ vf=滤镜①=参数❶=值:参数❷=值,滤镜②...   # 不同滤镜间用","�
 
 但是为了避免运行时被覆盖，使用 `-append` 后缀，意为追加视频滤镜。可以存在多个 `vf-append` 且不影响 `vf=xxxxx` 指定的滤镜
 
-🔺 此处往后，带 `-append` `-del` 之类后缀的参数只能一条带一个滤镜/着色器
+🔺 带 `-append` `-del` 之类后缀的参数只能一条带一个滤镜/着色器
 
 
 #### 4.2.运行时启用
@@ -288,16 +289,16 @@ vf=滤镜①=参数❶=值:参数❷=值,滤镜②...   # 不同滤镜间用","�
 Ctrl+UP  vf toggle vflip
 ```
 
-结构很容易理解—— “快捷键 参数”，和主设置文件不同的是，后缀 `toggle` 和 `vf` 之间不要用 `-` 进行连接。  
+结构很容易理解—— `按键名   命令`，和主设置文件不同的是，后缀 `toggle` 和 `vf` 之间不要用 `-` 进行连接。  
 保存后在mpv中播放视频测试，你可以先按下 shift+i 常驻统计信息，观察留意下方。
 
 <img src="_assets/mpv_start-07.webp" style="zoom:40%;" />
 
-第一次按下 Ctrl+↑ 将插入垂直翻转滤镜，第二次按下将撤销该滤镜。
+首次按下 <kbd>Ctrl</kbd> + <kbd>↑</kbd> 将插入垂直翻转滤镜，再次按下将撤销该滤镜。
 
-滤镜类的全部 [可用后缀](https://mpv.io/manual/master/#filter-options) 。
+关于滤镜类的全部可用后缀，参见 [此处](https://mpv.io/manual/master/#filter-options) 。
 
-🔺 关于该部分内容，重写的 [文档](https://hooke007.github.io/unofficial/mpv_filters.html) 中记录的更具体和完善。
+🔺 关于该部分内容，重写的 [快捷键文档](https://hooke007.github.io/unofficial/mpv_filters.html) 中记录的更具体和完善。
 
 
 ### 5.第三方着色器
@@ -305,13 +306,13 @@ Ctrl+UP  vf toggle vflip
 你可以在 [此处](https://github.com/mpv-player/mpv/wiki/User-Scripts#user-shaders) 获取一些公开的第三方着色器  
 下载的着色器文件扩展名通常为 **.glsl** 或 **.hook** ，mpv并没有规定这些文件的默认加载路径。  
 如果你有很多着色器的使用需求，我建议你在主设置文件路径下建立一个 <font color=green>**shaders**</font> 文件夹放置所有第三方着色器。  
-以我的推荐用法为例，下载你想要的着色器， `xxx.glsl` 放置在 <font color=green>**X:/xxxxx/你的MPV文件夹/portable_config/shaders/**</font> 内
+以我的推荐用法为例，下载你想要的着色器 `xxx.glsl` 放置在 <font color=green>**X:/xxxxx/你的MPV文件夹/portable_config/shaders/**</font> 内
 
 
 #### 5.1.常规用法
 
 在主设置文件中，使用参数 `glsl-shaders=<file-list>` 设置初始加载的多个着色器。  
-同样为了避免运行时被覆盖，使用 `-append` 后缀，意为追加着色器。可以存在多个 `glsl-shaders-append` 且不影响 `glsl-shaders=` 指定的滤镜。  
+同样为了避免读取时被同名参数覆盖，使用 `-append` 后缀（意为追加着色器）。可以存在多个 `glsl-shaders-append` 且不影响 `glsl-shaders=` 指定的滤镜。  
 注意**不要混淆**，近似参数 `glsl-shader=<file>` 等效 `glsl-shaders-append`
 
 加载着色器的路径写法，官方手册 [定位](https://mpv.io/manual/master/#paths)  
@@ -327,9 +328,9 @@ glsl-shaders-append="X:/xxxxx/你的MPV文件夹/portable_config/shaders/xxx.gls
 glsl-shaders-append="~~/shaders/xxx.glsl"
 ```
 
-🔺 其中 `~~/` 等效 `~~home/` ，指代的是 设置目录**（高优先级）**  
-===使用 `glsl-shaders=` 加载多个着色器时用 `;` 分隔  
-===尽量避免windows的路径下 `/` 和 `\` 的混用，统一使用 `/` 避免可能的错误
+🔺 其中 `~~/` 等效 `~~home/` ，指代的是 设置目录 **（高优先级）**  
+===使用 `glsl-shaders=` 一次性加载多个着色器时用 `;` 分隔  
+===尽量避免Windows的路径符 `/` 和 `\` 的混用，统一使用 `/` 避免可能的错误
 
 
 #### 5.2.运行时启用
@@ -342,18 +343,18 @@ glsl-shaders-append="~~/shaders/xxx.glsl"
 CTRL+1 change-list glsl-shaders toggle "~~/shaders/adaptive-sharpen.glsl"
 ```
 
-保存后在mpv中播放视频测试，你可以先按下 "shift+i" 常驻统计信息，再按 "2" 翻到第二页，观察留意着色器列表。
+保存后在mpv中播放视频测试，你可以先按下 <kbd>Shift</kbd> + <kbd>i</kbd> 常驻显示统计信息，再按 <kbd>2</kbd> 切换到第二页，观察留意着色器列表。
 
 <img src="_assets/mpv_start-08.webp" style="zoom:40%;" />
 
-第一次按下 "Ctrl+↑" 将出现 `user shader: ...` ，第二次按下将撤销。
+首次按下 <kbd>Ctrl</kbd> + <kbd>↑</kbd> 将出现 `user shader: ...` ，再次按下将撤销。
 
-着色器类的 [可用后缀](https://mpv.io/manual/master/#string-list-and-path-list-options) 。
+关于着色器类的可用后缀，参考 [此处](https://mpv.io/manual/master/#string-list-and-path-list-options) 。
 
 
 #### 5.3.第三方着色器介绍
 
-参考 [此文档](https://hooke007.github.io/unofficial/mpv_shaders.html)
+参见 [着色器文档](https://hooke007.github.io/unofficial/mpv_shaders.html) ，不再重复记录同内容。
 
 
 ### 6.VapourSynth
@@ -376,7 +377,7 @@ mpv未集成该部分，需要手动安装（以下步骤出于绿色化考虑�
 
 <img src="_assets/mpv_start-11.webp" style="zoom:40%;" />
 
-🔺 官方的VapourSyhth版本需要使用匹配的Python版本才能正常工作，例如 R53-R57 对应 3.8.x 或 3.9.x
+🔺 官方的VapourSyhth版本需要使用匹配的Python版本才能正常工作，例如 R53-R57 对应 3.8.x 或 3.9.x ，R58-R60 对应 3.8.x 或 3.10.x ，如果使用最新版本则查询 [vs的文档](http://vapoursynth.com/doc/installation.html#prerequisites)。
 
 
 #### 6.2.mvtools 补帧法
@@ -384,11 +385,12 @@ mpv未集成该部分，需要手动安装（以下步骤出于绿色化考虑�
 你可以在 [此处](https://github.com/mpv-player/mpv/wiki/User-Scripts#vapoursynth-scripts) 获取公开的VS脚本  
 VS滤镜参与mpv的播放流程至少需要三个部分： ***dll库 + 对应的vpy脚本 + mpv/input.conf中触发条件的参数***
 
+“使用mvtools对视频进行补帧”作为较常见的一种用法，此处将它作为示例：
+
 
 ##### 6.2.1.库的下载
 
-“使用mvtools对视频进行补帧”作为较常见的一种用法，此处将它作为示例：  
-获取mvtools所需的 [库](https://github.com/dubhater/vapoursynth-mvtools/releases)
+获取mvtools所需的 [插件库](https://github.com/dubhater/vapoursynth-mvtools/releases)
 
 <img src="_assets/mpv_start-12.webp" style="zoom:40%;" />
 
@@ -461,13 +463,12 @@ _首先你要解决依赖问题，以确保几乎本文记录的所有功能在�
 
 - **有无可用的第三方前端？**
 
-windows:  
-[KikoPlay](https://KikoPlayProject.github.io) 支持弹幕，简易库管理  
-[mpv.net](https://github.com/stax76/mpv.net) 近乎原生体验，右键提供快捷多功能  
-[mpv.net_CM](https://github.com/hooke007/mpv.net_CM) 因为好用于是做了汉化，并依个人需求的定制化成了单独的模组
+Windows:  
+[KikoPlay](https://KikoPlayProject.github.io) 特殊功能用途（弹幕），简易库管理  
+[mpv.net_CM（中止更新）](https://github.com/hooke007/mpv.net_CM) 因较为好用（近原生体验，右键提供快捷多功能）而做了汉化，并依个人的需求定制成了独立的模组
 
-mac:  
+Mac:  
 [IINA](https://github.com/iina/iina)
 
-linux:  
+Linux:  
 很多，但我不熟，而且似乎没必要（
