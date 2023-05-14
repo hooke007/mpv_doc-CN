@@ -159,7 +159,7 @@ OSC通过放置在mpv用户目录下的设置文件 ``script-opts/osc.conf`` 和
 ``seekbarhandlesize``
     默认： 0.6
 
-    如果 ``seekbarstyle`` 被设置为 ``dimaond`` 或 ``knob`` ，播放位置标记的大小比例。这是相对于进度条的全部高度而言的。
+    如果 ``seekbarstyle`` 被设置为 ``diamond`` 或 ``knob`` ，播放位置标记的大小比例。这是相对于进度条的全部高度而言的。
 
 ``seekbarkeyframes``
     默认： yes
