@@ -611,6 +611,14 @@ file4.mkv       ``--a --b --f``
         profile-cond=width >= 1280
         hue=-50
 
+    让路径中含有 "youtube" 或 "youtu.be" 的视频变的更加明亮 ：
+
+    ::
+
+        [youtube]
+        profile-cond=path:find('youtu%.?be')
+        gamma=20
+
     如果你想在条件再次变为false时还原配置预设，你可以设置 ``profile-restore`` ：
 
     ::

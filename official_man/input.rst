@@ -1785,6 +1785,9 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 ``secondary-sub-end``
     与 ``sub-end`` 相同，但用于次字幕。
 
+``sub-forced-only-cur``
+    只读 - 当前字幕轨是否以 forced-only 模式显示。
+
 ``playlist-pos`` (RW)
     当前在播放列表中的位置。第一个条目是在0的位置。写入这个属性将在新位置开始播放。
 
@@ -1883,6 +1886,10 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
     ``track-list/N/forced``
         如果文件中设置了force标志，则为 ``yes`` /true，否则为 ``no`` /false或不可用
+
+    ``track-list/N/auto-forced-only``
+        ``yes``/true if the track was autoselected in forced-only mode, ``no``/false or unavailable otherwise.
+        如果该轨道是在强制模式下自动选择的，则为 ``yes`` /true，否则为 ``no`` /false或不可用
 
     ``track-list/N/codec``
         该轨道使用的编解码器名称，例如 ``h264`` 。在某些罕见情况下不可用
