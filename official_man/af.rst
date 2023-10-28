@@ -14,7 +14,7 @@
 
     ``--vf`` 的描述阐述了如何使用libavfilter以及如何解决已过时的mpv滤镜。
 
-参见 ``--vf`` 的选项组，了解 ``--af-defaults``, ``--af-add``, ``--af-pre``, ``--af-del``, ``--af-clr`` 以及其它可能的工作方式。
+参见 ``--vf`` 的选项组，了解 ``--af-add`` , ``--af-pre`` , ``--af-clr`` 以及其它可能的工作方式。
 
 可用的滤镜有：
 
@@ -67,7 +67,7 @@
     *注意* ：这个滤镜曾经被命名为 ``force`` 。旧的 ``format`` 滤镜曾经自行转换，不像这个滤镜让滤镜系统处理转换。
 
 ``scaletempo[=option1:option2:...]``
-    在不改变音调的情况下缩放音频节奏，可选与播放速度同步（默认）。
+    在不改变音调的情况下缩放音频节奏，可选与播放速度同步。
 
     它的工作原理是以正常速度播放 'stride' 毫秒的音频，然后消耗 'stride*scale' 毫秒的输入音频。它通过将 'overlap'% 的步长与前一个步长之后的音频混合在一起。它可选对下一个 'search' 毫秒的音频进行简短的数据分析，以确定最佳重叠位置。
 
@@ -75,8 +75,8 @@
         名义上的缩放节奏的数量。除了速度之外，还对这个量进行缩放（默认： 1.0）
     ``stride=<amount>``
         输出每个步幅的长度，单位是毫秒。太高的值会在高音阶量时产生明显的跳动，在低音阶量时产生回声。非常低的值会反转音调。增加会改善性能（默认：60）
-    ``overlap=<percent>``
-        重叠步长的百分比。减少会改善性能（默认： 20）
+    ``overlap=<factor>``
+        重叠步长的系数。减少会改善性能（默认： 20）
     ``search=<amount>``
         搜索最佳重叠位置的长度，以毫秒为单位。减少会明显改善性能。在慢速系统上，你可能想把它设置得很低（默认： 14）
     ``speed=<tempo|pitch|both|none>``
@@ -113,7 +113,7 @@
             将以1.2倍于正常的速度播放媒体，音频为正常音调。改变播放速度将改变音调，使音频节奏保持在1.2倍。
 
 ``scaletempo2[=option1:option2:...]``
-    缩放音频节奏而不改变音调。这个算法是从chromium移植过来的，使用了波形相似度叠加（WSOLA）方法。它似乎比scaletempo和rubberband实现了更高的音频质量。
+    缩放音频节奏而不改变音调。这个算法是从chromium移植过来的，使用了波形相似度叠加（WSOLA）方法。与 scaletempo 和 rubberband R2 引擎或 ``engine=faster`` 相比，它似乎能获得更高的音频质量。如果使用了 ``audio-pitch-correction`` 选项（默认开启），则在改变播放速度时会自动插入该滤镜。
 
     默认情况下， ``search-interval`` 和 ``window-size`` 参数的值与chromium相同。
 
@@ -121,21 +121,27 @@
         如果播放速度低于 ``<speed>`` ，则将音频静音（默认： 0.25）
 
     ``max-speed=<speed>``
-        如果播放速度高于 ``<speed>`` 并且 ``<speed> != 0`` ，则将音频静音（默认： 4.0）
+        如果播放速度高于 ``<speed>`` 并且 ``<speed> != 0`` ，则将音频静音（默认： 8.0）
 
     ``search-interval=<amount>``
-        搜索最佳重叠位置的长度，以毫秒为单位（默认： 30）
+        搜索最佳重叠位置的长度，以毫秒为单位（默认： 40）
 
     ``window-size=<amount>``
-        overlap-and-add window的长度，以毫秒为单位（默认： 20）
+        overlap-and-add window的长度，以毫秒为单位（默认： 12）
 
 ``rubberband``
-    用librubberband进行高质量的音调修正。它可以代替 ``scaletempo`` ，当以不同于正常的速度播放时，它将用于调整音频音调。它也可以用来调整音频音调而不改变播放速度。
+    用librubberband进行高质量的音调修正。它可以代替 ``scaletempo`` 和 ``scaletempo2`` ，当以不同于正常的速度播放时，它将用于调整音频音调。它也可以用来调整音频音调而不改变播放速度。
 
-    ``<pitch-scale>``
+    ``<pitch-scale=<amount>``
         设置音调比例系数。频率要乘以这个值。
 
-    这个滤镜有许多额外的子选项。你可以用 ``mpv --af=rubberband=help`` 列出它们。这也会显示每个选项的默认值。这里没有记录这些选项，因为它们只是被传递给librubberband。参阅librubberband的文档以了解每个选项的作用： https://breakfastquay.com/rubberband/code-doc/classRubberBand_1_1RubberBandStretcher.html （mpv rubberband滤镜的子选项名称和值与librubberband的映射遵循一个简单的模式： ``"Option" + Name + Value`` ）
+    ``engine=<faster|finer>``
+        选择要使用的核心 Rubberband 引擎。有两种可供选择：
+
+        :Faster: 这是 Rubberband R2 引擎。它的 CPU 占用率明显低于 Finer(R3) 引擎。
+        :Finer: 这是 Rubberband R3 引擎。该引擎仅适用于 librubberband 3 或更高版本。其输出质量明显更高，但 CPU 占用率也更高（如果可用的话它是默认值）
+
+    这个滤镜有许多额外的子选项。你可以用 ``mpv --af=rubberband=help`` 列出它们。这也会显示每个选项的默认值。这里没有记录这些选项，因为它们只是被传递给librubberband。参阅librubberband的文档以了解每个选项的作用： https://breakfastquay.com/rubberband/code-doc/classRubberBand_1_1RubberBandStretcher.html 请注意，某些选项只适用于 R2(faster) 和 R3(finer) 引擎中的一个。（mpv rubberband滤镜的子选项名称和值与librubberband的映射遵循一个简单的模式： ``"Option" + Name + Value`` ）
 
     这个滤镜支持下列 ``af-command`` 命令：
 

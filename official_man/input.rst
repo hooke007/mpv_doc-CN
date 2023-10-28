@@ -245,7 +245,7 @@ Flat命令语法
     <video>
         类似 ``subtitles`` ，但通常没有OSD或字幕。具体行为取决于所选的视频输出。
     <window>
-        保存mpv窗口的内容。通常视频是缩放过的，有OSD和字幕。具体行为取决于所选的视频输出，如果不支持，表现和 ``video`` 一样。
+        保存mpv窗口的内容。通常视频是缩放过的，有OSD和字幕。具体行为取决于所选的视频输出。
     <each-frame>
         每一帧截一次屏。再次发出这个命令可以停止截图。注意，使用这种模式时，你应该禁用frame-dropping功能 —— 否则在丢帧的情况下，你可能会收到重复的图像。这个标志可以和其他标志结合使用，例如 ``video+each-frame``
 
@@ -283,6 +283,12 @@ Flat命令语法
         如果播放列表的第一个文件是当前播放的文件，则无操作
     force
         如果第一个文件正在播放，就终止播放
+
+``playlist-next-playlist``
+    以不同的 ``playlist-path`` 转到播放列表上的下一个条目。
+
+``playlist-prev-playlist``
+    以不同的 ``playlist-path`` 转到播放列表上的上一个条目。
 
 ``playlist-play-index <integer|current|none>``
     开始（或重新开始）播放指定的播放列表索引。除了基于0的播放列表条目索引外，它还支持以下值：
@@ -835,12 +841,16 @@ Flat命令语法
 
     ``flags`` 参数与 ``screenshot`` 的第一个参数一样，支持 ``subtitles``, ``video``, ``window``
 
-``vf-command <label> <command> <argument>``
-    向滤镜发送一个命令，带有指定的 ``<label>`` 。使用 ``all`` 可以一次性发送给所有滤镜。命令和参数字符串是针对滤镜的。目前，这只适用于 ``lavfi`` 滤镜 —— 参见libavfilter文档，了解滤镜支持的命令。
+``vf-command <label> <command> <argument> [<target>]``
+    向滤镜发送命令。请注意，目前这只适用于 ``lavfi`` 滤镜。有关每个滤镜支持的命令列表，请参阅 libavfilter 文档。
 
-    注意， ``<label>`` 是mpv滤镜的标签，不是libavfilter滤镜的名称。
+    ``<label>`` 是 mpv 滤镜的标签，使用 ``all`` 一次发送到所有滤镜。
 
-``af-command <label> <command> <argument>``
+    ``<command>`` 和 ``<argument>`` 是滤镜指定的字符串。
+
+    ``<target>`` 是滤镜或滤镜实例名称，默认为 ``all`` 。请注意，对于支持目标的过滤器（如复杂的 ``lavfi`` 过滤器链），目标是一个额外的指定符。
+
+``af-command <label> <command> <argument> [<target>]``
     与 ``vf-command`` 相同，但用于音频滤镜。
 
 ``apply-profile <name> [<mode>]``
@@ -1237,6 +1247,12 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
     它取代了 ``length`` 属性，该属性在mpv0.9发布后已过时。（语义是一样的）
 
+
+    它有一个子属性：
+
+    ``duration/full``
+        即 ``duration`` 附带毫秒数
+
 ``avsync``
     最近的A/V同步差异。如果音频或视频被禁用，则不可用。
 
@@ -1246,12 +1262,8 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 ``decoder-frame-drop-count``
     解码器的丢帧数，由于视频进度远落后于音频（当使用 ``--framedrop=decoder`` 时）。有时，在其它情况下，例如视频封装损坏，或解码器不遵循通常的规则，这可能会增加丢帧数。如果视频被禁用，则不可用。
 
-    ``drop-frame-count`` 是一个已过时的别名
-
 ``frame-drop-count``
     视频输出驱动的丢帧数（当使用 ``--framedrop=vo`` 时）。
-
-    ``vo-drop-frame-count`` 是一个已过时的别名
 
 ``mistimed-frame-count``
     为了保持A/V同步，在显示同步模式下没有正确计时的视频帧数。这不包括外部情况，例如视频渲染太慢或图形驱动程序以某种方式跳过垂直同步。它也不包括取整的错误（特别是在源时间戳不正常的情况下可能发生）。例如，使用 ``display-desync`` 模式时，不应该把这个值从0改变。
@@ -1268,20 +1280,45 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 ``time-pos`` (RW)
     当前文件中的位置，以秒为单位。
 
+    它有一个子属性：
+
+    ``time-pos/full``
+        即 ``time-pos`` 附带毫秒数
+
 ``time-start``
     已过时。在mpv0.14之前，它用于返回文件的开始时间（可能影响例如传输流）。参见 ``--rebase-start-time`` 选项。
 
 ``time-remaining``
     文件的剩余长度，以秒为单位。注意，文件的持续时间并不总是准确已知的，所以这是一个估计值。
 
+    它有一个子属性：
+
+    ``time-remaining/full``
+        即 ``time-remaining`` 附带毫秒数
+
 ``audio-pts``
     当前文件中的音频播放位置（秒）。与time-pos不同，它的更新频率高于每帧一次。对于纯音频文件，它几乎等同于时间位置，而对于纯视频文件，这个属性不可用。
+
+    它有一个子属性：
+
+    ``audio-pts/full``
+        即 ``audio-pts`` 附带毫秒数
 
 ``playtime-remaining``
     ``time-remaining`` 与当前的 ``speed`` 相乘。
 
+    它有一个子属性：
+
+    ``playtime-remaining/full``
+        即 ``playtime-remaining`` 附带毫秒数
+
 ``playback-time`` (RW)
     在当前文件中的位置，以秒为单位。与 ``time-pos`` 不同，时间被钳制在文件的范围内。（不准确的文件持续时间等可能使它超出范围。在尝试跳转到文件范围以外时很有用，因为跳转的目标时间被认为是跳转过程中的当前位置）。
+
+    它有一个子属性：
+
+    ``playback-time/full``
+        即 ``playback-time`` 附带毫秒数
 
 ``chapter`` (RW)
     当前的章节编号。第一章的编号是0。
@@ -1575,8 +1612,17 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     ``video-params/dw``, ``video-params/dh``
         视频尺寸为整数，按正确的长宽比进行缩放
 
+    ``video-params/crop-x``, ``video-params/crop-y``
+        源视频帧的裁切偏移量
+
+    ``video-params/crop-w``, ``video-params/crop-h``
+        视频裁切后的尺寸
+
     ``video-params/aspect``
         显示长宽比为浮点数
+
+    ``video-params/aspect-name``
+        以字符串形式显示宽高比名称。该名称与特定宽高比的电影胶片格式名相对应。
 
     ``video-params/par``
         像素长宽比
@@ -1635,6 +1681,51 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
             "stereo-in"         MPV_FORMAT_STRING
             "average-bpp"       MPV_FORMAT_INT64
             "alpha"             MPV_FORMAT_STRING
+
+``hdr-metadata``
+    视频每帧的 HDR 元数据，包括峰值亮度检测的结果。它有许多子属性：
+
+    ``hdr-metadata/min-luma``
+        HDR10 元数据报告的最小亮度（单位 cd/m²）
+
+    ``hdr-metadata/max-luma``
+        HDR10 元数据报告的最大亮度（单位 cd/m²）
+
+    ``hdr-metadata/max-cll``
+        HDR10 元数据报告的最大内容光照度（单位 cd/m²）
+
+    ``hdr-metadata/max-fall``
+        HDR10 元数据报告的最大帧平均光亮度（单位 cd/m²）
+
+    ``hdr-metadata/scene-max-r``
+        HDR10+ 元数据报告的场景中R分量的最大RGB值（单位 cd/m²）
+
+    ``hdr-metadata/scene-max-g``
+        HDR10+ 元数据报告的场景中G分量的最大RGB值（单位 cd/m²）
+
+    ``hdr-metadata/scene-max-b``
+        HDR10+ 元数据报告的场景中B分量的最大RGB值（单位 cd/m²）
+
+    ``hdr-metadata/max-pq-y``
+        峰值检测报告的帧的最大PQ亮度（以PQ单位，0-1表示）
+
+    ``hdr-metadata/avg-pq-y``
+        由峰值检测报告的帧的平均PQ亮度（以PQ单位，0-1表示）
+
+    当使用客户端API使用 ``MPV_FORMAT_NODE`` 查询属性，或者使用 Lua 的 ``mp.get_property_native`` 查询属性时，将返回一个包含以下内容的 mpv_node ：
+
+    ::
+
+        MPV_FORMAT_NODE_MAP
+            "min-luma"     MPV_FORMAT_DOUBLE
+            "max-luma"     MPV_FORMAT_DOUBLE
+            "max-cll"      MPV_FORMAT_DOUBLE
+            "max-fall"     MPV_FORMAT_DOUBLE
+            "scene-max-r"  MPV_FORMAT_DOUBLE
+            "scene-max-g"  MPV_FORMAT_DOUBLE
+            "scene-max-b"  MPV_FORMAT_DOUBLE
+            "max-pq-y"     MPV_FORMAT_DOUBLE
+            "avg-pq-y"     MPV_FORMAT_DOUBLE
 
 ``dwidth``, ``dheight``
     视频显示尺寸。这是应用了滤镜和长宽比缩放之后的视频尺寸。实际的视频窗口大小仍可能与此不同，例如，如果用户手动调整视频窗口的大小。
@@ -1697,8 +1788,6 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 ``display-fps``
     当前显示器的刷新率。目前，这是视频涵盖的任何显示器的最低FPS，由底层系统API检索（例如X11的xrandr）。它不是测量的FPS。它不一定在所有平台上都可用。注意，任何列出的事实都可能在没有警告的情况下随时改变。
 
-    写入此属性已过时。它与写入 ``overrid-display-fps`` 的效果相同。从mpv0.31.0开始，如果没有显示器FPS的报告，这个属性就不可用（例如，如果没有视频被激活），而在旧版本中，它返回 ``--display-fps`` 选项的值。
-
 ``estimated-display-fps``
     显示器刷新的实际速度，由系统时间测量。只有在display-sync模式（由 ``--video-sync`` 选择）激活时才可用。
 
@@ -1710,11 +1799,6 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
 ``display-hidpi-scale``
     由窗口后端报告的HiDPI比例系数。如果没有视频输出程序被激活，或者视频输出没有报告一个值，这个属性是不可用的。报告一个绝对的DPI可能更合理，然而，这是大多数操作系统API实现HiDPI支持的方式。另参见 ``--hidpi-window-scale``
-
-``video-aspect`` (RW)
-    已废弃。该选项与 ``--video-aspect-override`` 相关，但如果视频处于激活状态，则总是报告当前的视频长宽比。
-
-    这个选项的读和写部分可分别拆为 ``--video-params/aspect`` 和 ``--video-aspect-override``
 
 ``osd-width``, ``osd-height``
     最近的已知的OSD宽度（可以是0）。如果你想使用 ``overlay-add`` 命令，就需要这个。它给你实际的OSD/窗口尺寸（不包括操作系统窗口管理器绘制的装饰）。
@@ -1762,6 +1846,9 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     ``mouse-pos/hover``
         布尔值 —— 鼠标指针是否悬停在视频窗口上。当此值为false时，坐标应被忽略，因为视频后端只有在指针悬停窗口时才会更新坐标
 
+``sub-ass-extradata``
+    当前 ASS 字幕轨道的额外数据。不进行格式化。额外数据将以字符串形式按原样返回。此属性不适用于非 ASS 类的字幕轨。
+
 ``sub-text``
     当前的字幕文本，不管字幕是否可见。格式被剥离。如果字幕不是基于文本的（例如DVD/BD字幕），将返回一个空字符串。
 
@@ -1785,9 +1872,6 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 ``secondary-sub-end``
     与 ``sub-end`` 相同，但用于次字幕。
 
-``sub-forced-only-cur``
-    只读 - 当前字幕轨是否以 forced-only 模式显示。
-
 ``playlist-pos`` (RW)
     当前在播放列表中的位置。第一个条目是在0的位置。写入这个属性将在新位置开始播放。
 
@@ -1795,7 +1879,7 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
     如果播放列表是空的，或者如果它不是空的，但没有条目是 "current" 的，这个属性就会返回-1。同样，写入-1将使播放器进入空闲模式（如果没有启用空闲模式则退出播放）。（在mpv0.33.0之前，如果没有播放列表条目是“当前的”，这个属性就不可用）
 
-    将当前值写入回该属性是有可能改变的。目前，它将重新启动播放列表条目的播放。但在未来，写入回当前值将被忽略。使用 ``playlist-play-index`` 命令来获得保证的行为。
+    将当前值写回属性不会有任何影响。如果需要，可使用 ``playlist-play-index`` 重启当前条目的播放。
 
 ``playlist-pos-1`` (RW)
     与 ``playlist-pos`` 相同，但基于1。
@@ -1816,6 +1900,9 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
 ``playlist-count``
     总共的播放列表条目的数量。
+
+``playlist-path``
+    mpv展开条目之前，当前条目的原始播放列表路径。如果文件最初没有以某种方式与播放列表相关联，则不可用。
 
 ``playlist``
     播放列表，当前标记的条目。目前，原始属性值是无用的。
@@ -1839,6 +1926,9 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
     ``playlist/N/id``
         这个条目的唯一ID。这是一个自动分配的整数ID，在当前mpv核心实例的整个生命周期中是唯一的。其他命令、事件等使用它作为 ``playlist_entry_id`` 字段
+
+    ``playlist/N/playlist-path``
+        mpv展开此条目之前的播放列表的原始路径。如果文件最初没有以某种方式与播放列表相关联，则不可用
 
     当client API使用 ``MPV_FORMAT_NODE`` 查询该属性时，或者用Lua ``mp.get_property_native`` ，这将返回一个mpv_node，内容如下：
 
@@ -1887,10 +1977,6 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     ``track-list/N/forced``
         如果文件中设置了force标志，则为 ``yes`` /true，否则为 ``no`` /false或不可用
 
-    ``track-list/N/auto-forced-only``
-        ``yes``/true if the track was autoselected in forced-only mode, ``no``/false or unavailable otherwise.
-        如果该轨道是在强制模式下自动选择的，则为 ``yes`` /true，否则为 ``no`` /false或不可用
-
     ``track-list/N/codec``
         该轨道使用的编解码器名称，例如 ``h264`` 。在某些罕见情况下不可用
 
@@ -1914,6 +2000,12 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
     ``track-list/N/demux-w``, ``track-list/N/demux-h``
         容器显示的视频尺寸提示（不总是准确）
+
+    ``track-list/N/demux-crop-x``, ``track-list/N/demux-crop-y``
+        源视频帧的裁切偏移量
+
+    ``track-list/N/demux-crop-w``, ``track-list/N/demux-crop-h``
+        裁切后的视频尺寸
 
     ``track-list/N/demux-channel-count``
         容器显示的音频声道数量（并不总是准确 —— 特别是音轨可能被解码为不同数量）
@@ -1969,6 +2061,10 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
                 "decoder-desc"      MPV_FORMAT_STRING
                 "demux-w"           MPV_FORMAT_INT64
                 "demux-h"           MPV_FORMAT_INT64
+                "demux-crop-x"      MPV_FORMAT_INT64
+                "demux-crop-y"      MPV_FORMAT_INT64
+                "demux-crop-w"      MPV_FORMAT_INT64
+                "demux-crop-h"      MPV_FORMAT_INT64
                 "demux-channel-count" MPV_FORMAT_INT64
                 "demux-channels"    MPV_FORMAT_STRING
                 "demux-samplerate"  MPV_FORMAT_INT64
@@ -2062,7 +2158,7 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     注意，你需要转义 ``\`` 字符，因为字符串在传递给OSD代码之前会被处理为C转义序列。详见 `Flat命令语法`_
 
     标签的列表可以在这里找到：
-    https://aeg-dev.github.io/AegiSite/docs/3.2/ass_tags/
+    https://aegisub.org/docs/latest/ass_tags/
 
 ``vo-configured``
     当前视频输出驱动是否被配置了。通常这与视频窗口是否可见相对应。如果使用了 ``--force-window`` 选项，通常总是返回``yes`` /true。

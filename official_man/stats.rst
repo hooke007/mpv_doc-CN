@@ -30,11 +30,6 @@ UP     向上滚动一行
 DOWN   向下滚动一行
 ====   ==================
 
-字体
-~~~~
-
-为了获得最佳的视觉体验，建议使用支持多种字重和等宽的字体。默认情况下，使用开源字体 `Source Sans Pro <https://github.com/adobe-fonts/source-sans-pro>`_
-
 设置
 ----
 
@@ -92,18 +87,23 @@ DOWN   向下滚动一行
 
     显示vsync和jitter值的图表（第1页）。只有在始终显示时才显示。
 
+``plot_tonemapping_lut``
+    默认： no
+
+    自动启用色调映射LUT可视化。仅在切换时启用。
+
 ``flush_graph_data``
     默认： yes
 
     在始终显示时清除用于绘制图形的数据缓存
 
 ``font``
-    默认： Source Sans Pro
+    默认： sans-serif
 
     字体名称。应支持尽可能多的字重来获得最佳的视觉体验。
 
 ``font_mono``
-    默认： Source Sans Pro
+    默认： monospace
 
     用于对齐文本所必需的等宽字体名称。目前，monospaced digits已足够。
 
@@ -190,6 +190,6 @@ DOWN   向下滚动一行
 
 Memory usage是近似情况，并不反映internal fragmentation 。
 
-JS脚本的内存报告默认是禁用的，因为在JS端收集数据有一定的开销。在启动mpv之前，可以通过导出环境变量 ``MPV_LEAK_REPORT=1`` 来启用它，这将增加JS的内存使用。
+JS脚本内存报告默认情况下是禁用的，因为在JS端收集数据会增加开销并增加内存使用。可以通过在启动mpv之前设置 ``--js-memory-report`` 选项来启用它。
 
 如果条目有 ``/time`` 和 ``/cpu`` 变量，前者给出真实时间（monotonic clock），而后者给出thread CPU time（只有当相应的pthread API工作并被支持时）。
