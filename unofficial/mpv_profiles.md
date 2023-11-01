@@ -1,6 +1,6 @@
 # 配置预设
 
-_ver.20230212_
+_ver.20231101_
 
 ## 序
 
@@ -19,7 +19,7 @@ _ver.20230212_
 
 vo=gpu
 hwdec=yes
-profile=gpu-hq
+profile=high-quality
 deband=no
 keep-open=yes
 profile=srt_style
@@ -47,16 +47,12 @@ ontop=yes
 `[xxxxx]` 是一个profile的头部标志，两个profile之间 —— 即 `[srt_style]` 到 `[playing_ontop]` 所有中间行的参数都属于 `[srt_style]` 。  
 一旦你在 mpv.conf 自己建立了profile，就不要把常驻参数（即启动时就应用的项）写在profile的后方，因为profile没有明确的结束标志，在上方示例中，任何写在最后的参数都会被mpv认定为属于 `[playing_ontop]`
 
-`gpu-hq` 是mpv内建（自带）的一个profile，它具体包含以下参数：
+`high-quality` 是mpv内建（自带）的一个profile（旧版mpv中是 `gpu-hq` ），它具体包含以下参数：
 ```ini
-scale = spline36
-cscale = spline36
-dscale = mitchell
-dither-depth = auto
-correct-downscaling = yes
-linear-downscaling = yes
-sigmoid-upscaling = yes
-deband = yes
+scale = ewa_lanczossharp
+hdr-peak-percentile = 99.995
+hdr-contrast-recovery = 0.30
+deband=yes
 ```
 
 P.S. mpv还有其它内建profile，详见 [《profiles_补充内容》](https://github.com/hooke007/MPV_lazy/discussions/42)
@@ -66,14 +62,12 @@ P.S. mpv还有其它内建profile，详见 [《profiles_补充内容》](https:/
 ### 常驻参数
 vo=gpu
 hwdec=yes
-scale=spline36
-cscale=spline36
-dscale=mitchell
-dither-depth=auto
-correct-downscaling=yes
-linear-downscaling=yes
-sigmoid-upscaling=yes
+
+scale = ewa_lanczossharp
+hdr-peak-percentile = 99.995
+hdr-contrast-recovery = 0.30
 deband=yes
+
 deband=no
 keep-open=yes
 sub-scale-with-window=no
@@ -81,7 +75,7 @@ sub-font-size=58
 sub-border-size=4
 ```
 
-P.S. 在此示例中，把 `deband=no` 放在 `profile=gpu-hq` 之后，也是因为目的是要禁用去色带，否则如果顺序相反只会产生相反的结果。
+P.S. 在此示例中，把 `deband=no` 放在 `profile=high-qualit` 之后，也是因为目的是要禁用去色带，否则如果顺序相反只会产生相反的结果。
 
 ## 2.分类
 

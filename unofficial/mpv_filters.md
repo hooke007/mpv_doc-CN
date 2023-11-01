@@ -1,6 +1,6 @@
 # 音视频滤镜
 
-_ver.20230212_
+_ver.20231101_
 
 ## 序
 
@@ -29,7 +29,6 @@ _滤镜 也常被翻译作 过滤器_
 | pre    | 追加单个或多个滤镜（在前方） |
 | clr    | 移除所有滤镜 |
 | remove | 移除指定的滤镜 |
-| del    | 移除单个或多个滤镜 |
 | toggle | 追加指定的滤镜（在后方），但如果已经存在则移除该滤镜 |
 | help   | 仅支持在终端使用，用于输出该滤镜的更多信息 |
 
@@ -79,8 +78,7 @@ d   vf add vflip,hflip
 f   vf pre vflip,hflip
 g   vf clr ""
 h   vf remove vflip
-j   vf del vflip,hflip
-k   vf toggle vflip
+j   vf toggle vflip
 ```
 
 🔺 根据input语法中的“操作属性”的用法， `vf set vflip,hflip` 亦等效 `set vf vflip,hflip`  
@@ -146,6 +144,9 @@ vf=fps=60
 _我推荐尽可能把子参数名写上，如果不写子参数名，mpv会尝试自动打上标签。_
 
 🔺 原生与非原生滤镜中可能存在重名的条目，例如通常当使用 `vf=format=...` 时首选mpv滤镜，最简的解决方案是显式指定为ffmpeg滤镜，即 `--vf=lavfi-format=...`
+
+🔺 性能提速小技巧：  
+当只使用多个非原生滤镜时，建议合并进一个filtergraph处理，示例 优先用 `vf="lavfi=[vflip,hflip]"` 而不是 `vf=vflip,hflip`
 
 #### 2.2.1.字符串处理
 

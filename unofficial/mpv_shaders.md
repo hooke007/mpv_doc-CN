@@ -1,7 +1,7 @@
 
 # 第三方用户着色器
 
-_ver.20230212_
+_ver.20231101_
 
 ## 起
 
@@ -19,7 +19,8 @@ _ver.20230212_
 ## ...
 
 🔺 如果下方列出的着色器未在整合包中找到，前往 [**此处**](https://github.com/hooke007/MPV_lazy/tree/main/portable_config/shaders) 搜寻获取。  
-🔺 我对部分2x放大类的着色器进行了最小缩放倍率限制的统一修改(1.2)，因此下方的涉及该部分说明已过时。
+🔺 我统一修改了2x 3x 4x放大类着色器的最小缩放倍率限制，与上游的原始版本不同。
+🔺 名字中含有 next 的变体，指仅能在 `--vo=gpu-next` 的条件下( mpv.conf )使用
 
 ☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲
 
@@ -169,16 +170,55 @@ ACNet_HDN_L3.glsl
 
 ☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲
 
+### Chroma from Luma (CfL) Prediction
+
+由现代视频编码方式启发的色度还原算法
+
+🔺 启用将覆盖 **mpv.conf** 中指定的 `--cscale=xxxxx` 算法
+
+### joint-bilateral
+
+简化的双边滤波色度还原算法，利用亮度信息为引导。
+
+🔺 启用将覆盖 **mpv.conf** 中指定的 `--cscale=xxxxx` 算法
+
+### pixel-clipper
+
+简易像素裁切，用于通用的后处理抗振铃。
+
+以上三项由同一开发者移植，在项目中提供了更多说明。
+
+🔺 Lite 变体支持了 `--vo=gpu`
+
+相关列表： [Artoriuz-cfl](https://github.com/Artoriuz/glsl-chroma-from-luma-prediction) + [Artoriuz-bilateral](https://github.com/Artoriuz/glsl-joint-bilateral) + [Artoriuz-pixelclipper](https://github.com/Artoriuz/glsl-pixel-clipper)  
+```
+CfL_Prediction.glsl
+
+FastBilateral_next.glsl
+JointBilateral_next.glsl
+MemeBilateral_next.glsl
+
+PixelClipper.glsl
+```
+
+相关列表（MOD）： [deus0ww-bilateral](https://github.com/deus0ww/mpv-conf/tree/master/shaders/bilateral)
+```
+CfL_Prediction_Lite.glsl
+MemeBilateral_Lite.glsl
+```
+
+☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲
+
 ### FSRCNNX
 
 由原始SRCNN发展而来，是FSRCNN的变体，较快速的通用型AI放大算法。
 
 🔺 启用将覆盖 **mpv.conf** 中指定的 `--scale=xxxxx` 算法  
-🔺 最小缩放触发倍率为1.3
+🔺 最小缩放触发倍率为1.2
 
-LineArt 和 anime 变体更适合2d动画 enhance 变体在去除伪影强度上更大
+LineArt 和 anime 变体更适合2d动画； enhance 变体在去除伪影强度上更大； 1x 变体不执行放大
 
-副作用： 16-0-4-1 变体用更多的能耗（更慢）换取更好的质量，但感知较弱。
+副作用： `16_0_4_1` 变体用更多的能耗（更慢）换取更好的质量，但感知较弱。
 
 相关列表：[igv-FSRCNN](https://github.com/igv/FSRCNN-TensorFlow)  
 ```
@@ -189,8 +229,10 @@ FSRCNNX_x2_16_0_4_1.glsl
 
 相关列表：[HelpSeeker-FSRCNN](https://github.com/HelpSeeker/FSRCNN-TensorFlow)  
 ```
-FSRCNNX_x2_16_0_4_1_anime_enhance.glsl
-FSRCNNX_x2_16_0_4_1_enhance.glsl
+FSRCNNX_x1_16_0_4_1_anime_distort.glsl
+FSRCNNX_x1_16_0_4_1_distort.glsl
+FSRCNNX_x2_16_0_4_1_anime_distort.glsl
+FSRCNNX_x2_16_0_4_1_distort.glsl
 ```
 
 ☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲
@@ -205,7 +247,7 @@ x2 x3 x4 分别对应 二倍 三倍 四倍 放大
 LineArt 适合2D画面而 Photo 适合现实类画面
 
 🔺 启用将覆盖 **mpv.conf** 中指定的 `--scale=xxxxx` 算法  
-🔺 不同倍率对应的最小缩放触发倍率分别为1.4  2.4  3.4
+🔺 不同倍率对应的最小缩放触发倍率分别为1.2  2.2  3.2
 
 相关列表：（已省略3x和4x的类似名变体）[Alexkral-hooks](https://github.com/Alexkral/AviSynthAiUpscale)  
 ```
@@ -248,8 +290,6 @@ mpv目前最好的色度升频着色器，可以与其他缩放（ `--scale/dsca
 
 基于感知的对mpv内置 `--dscale=xxxxx` 缩小算法进行增强校正。（例如抗振铃）
 
-🔺 仅当 **mpv.conf** 中设定 `--linear-downscaling=no` 时正常工作
-
 以上四项及FSRCNNX皆由同一开发者移植
 
 相关列表：[igv-hooks](https://gist.github.com/igv)  
@@ -291,21 +331,21 @@ win8x4 → win8x6
 质量更好但性能大增
 
 开发者仓库的 **compute** 文件夹内（需要的显卡支持的OpenGL版本≥4.3）的版本比 **gather** 目录内的（OpenGL≥4.0）更快，后者比 **主目录下的 master** 的更快。
-  **vulkan** 内的需要 **mpv.conf** 内设置为 `--gpu-api=d3d11/vulkan` `--fbo-format=rgba16hf`
 
- 3x 变体直接放大三倍，适用于超低清源。  
+ 3x 变体直接放大三倍，适用于超低清源； ar 变体自带抗振铃处理。  
  无其它后缀的和 3x 变体的训练模型为动漫， lite 和 zoom 变体为通用模型。
 
+🔺 变体 ddx 专用于 `--vo=gpu --gpu-context=d3d11` （但不支持 `--vo=gpu --gpu-context=win` ），其它变体可在 `--vo=gpu-next` 下任意后端使用。  
 🔺 除了 chroma 变体（启用将覆盖 **mpv.conf** 中指定的 `--cscale=xxxxx` 算法），其它只处理(YUV)luma通道（启用将覆盖 **mpv.conf** 中指定的 `--scale=xxxxx` 算法）  
 🔺 lite 变体最快最锐利但无半像素偏移，可能产生锯齿和晕轮/振铃。 rgb 和 yuv 变体在 `--cscale` 执行完之后开始作用，但 yuv 变体无法处理RGB的源（例如PNG图片）  
 🔺 关于半像素偏移，除了 lite 和 chroma 变体，其它ravu和nnedi3和sxbr中都存在。可以用 **mpv.conf** 中的 `--scaler-resizes-only=no` 修正它，但是没必要（感知不强）
 
 🔺 sxbr没有触发倍率限制；  
-无其它后缀的和 lite 变体的最小缩放触发倍率约为1.414， 3x 变体最小缩放触发倍率约为2.121。 zoom 变体直接放大到目标分辨率，触发倍率＞1；  
-nnedi3最小缩放触发倍率约为1.414，对性能要求极高（临时加载可能导致假死）， nns128 级别以上的因速度极慢而很难即时观看时使用。
+无其它后缀的和 lite 变体的最小缩放触发倍率约为1.2， 3x 变体最小缩放触发倍率约为2.2。 zoom 变体直接放大到目标分辨率，触发倍率＞1；  
+nnedi3最小缩放触发倍率约为1.2，对性能要求很高（临时加载可能导致假死）， nns128 级别以上的因速度很慢而很难即时观看时使用。
 
 仓库主分支内精简并保留的部分列表（已统一修改后缀格式名为glsl）：  
-来自 vulkan/compute  
+来自 compute 目录  
 ```
 ravu_3x_r2.glsl
 ravu_3x_r2_rgb.glsl
@@ -319,6 +359,9 @@ ravu_3x_r4_yuv.glsl
 ravu_lite_r2.glsl
 ravu_lite_r3.glsl
 ravu_lite_r4.glsl
+ravu_lite_ar_r2.glsl
+ravu_lite_ar_r3.glsl
+ravu_lite_ar_r4.glsl
 ravu_r2.glsl
 ravu_r2_rgb.glsl
 ravu_r2_yuv.glsl
@@ -328,18 +371,21 @@ ravu_r3_yuv.glsl
 ravu_r4.glsl
 ravu_r4_rgb.glsl
 ravu_r4_yuv.glsl
-ravu-zoom_r2.glsl
-ravu-zoom_r2_chroma.glsl
-ravu-zoom_r2_rgb.glsl
-ravu-zoom_r2_yuv.glsl
-ravu-zoom_r3.glsl
-ravu-zoom_r3_chroma.glsl
-ravu-zoom_r3_rgb.glsl
-ravu-zoom_r3_yuv.glsl
-```
+ravu_zoom_r2.glsl
+ravu_zoom_r2_chroma.glsl
+ravu_zoom_r2_rgb.glsl
+ravu_zoom_r2_yuv.glsl
+ravu_zoom_r3.glsl
+ravu_zoom_r3_chroma.glsl
+ravu_zoom_r3_rgb.glsl
+ravu_zoom_r3_yuv.glsl
+ravu_zoom_ar_r2.glsl
+ravu_zoom_ar_r2_rgb.glsl
+ravu_zoom_ar_r2_yuv.glsl
+ravu_zoom_ar_r3.glsl
+ravu_zoom_ar_r3_rgb.glsl
+ravu_zoom_ar_r3_yuv.glsl
 
-来自 compute  
-```
 nnedi3_nns16_win8x4.glsl
 nnedi3_nns16_win8x6.glsl
 nnedi3_nns32_win8x4.glsl
@@ -357,6 +403,48 @@ nnedi3_nns256_win8x6.glsl
 superxbr.glsl
 superxbr_rgb.glsl
 superxbr_yuv.glsl
+```
+
+来自 rgba16hf 分支
+```
+ravu_3x_r2_ddx.glsl
+ravu_3x_r2_rgb_ddx.glsl
+ravu_3x_r2_yuv_ddx.glsl
+ravu_3x_r3_ddx.glsl
+ravu_3x_r3_rgb_ddx.glsl
+ravu_3x_r3_yuv_ddx.glsl
+ravu_3x_r4_ddx.glsl
+ravu_3x_r4_rgb_ddx.glsl
+ravu_3x_r4_yuv_ddx.glsl
+ravu_lite_r2_ddx.glsl
+ravu_lite_r3_ddx.glsl
+ravu_lite_r4_ddx.glsl
+ravu_lite_ar_r2_ddx.glsl
+ravu_lite_ar_r3_ddx.glsl
+ravu_lite_ar_r4_ddx.glsl
+ravu_r2_ddx.glsl
+ravu_r2_rgb_ddx.glsl
+ravu_r2_yuv_ddx.glsl
+ravu_r3_ddx.glsl
+ravu_r3_rgb_ddx.glsl
+ravu_r3_yuv_ddx.glsl
+ravu_r4_ddx.glsl
+ravu_r4_rgb_ddx.glsl
+ravu_r4_yuv_ddx.glsl
+ravu_zoom_r2_chroma_ddx.glsl
+ravu_zoom_r2_ddx.glsl
+ravu_zoom_r2_rgb_ddx.glsl
+ravu_zoom_r2_yuv_ddx.glsl
+ravu_zoom_r3_chroma_ddx.glsl
+ravu_zoom_r3_ddx.glsl
+ravu_zoom_r3_rgb_ddx.glsl
+ravu_zoom_r3_yuv_ddx.glsl
+ravu_zoom_ar_r2_ddx.glsl
+ravu_zoom_ar_r2_rgb_ddx.glsl
+ravu_zoom_ar_r2_yuv_ddx.glsl
+ravu_zoom_ar_r3_ddx.glsl
+ravu_zoom_ar_r3_rgb_ddx.glsl
+ravu_zoom_ar_r3_yuv_ddx.glsl
 ```
 
 ☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲
@@ -427,48 +515,62 @@ NVSharpen_rgb.glsl
 
 ☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲
 
+### guided
+
+快速降噪。
+
+相关列表（精简）：  
+```
+guided.glsl
+guided_fast.glsl
+guided_s.glsl
+```
+
+### hdeband
+
+高质量去色带。
+
+相关列表（精简）：  
+```
+hdeband.glsl
+```
+
 ### NL Means
 
 移植自FFmpeg的nlmeans滤镜。非局部均值降噪
 
-相关列表：[AN3223-nlmeans](https://github.com/AN3223/dotfiles/tree/master/.config/mpv/shaders)  
+以上三项由同一开发者移植，在项目中提供了更多说明[AN3223-nlmeans](https://github.com/AN3223/dotfiles/tree/master/.config/mpv/shaders)
+
+相关列表（精简）：  
 ```
 nlmeans.glsl
-nlmeans_anime.glsl
-nlmeans_anime_hq.glsl
-nlmeans_anime_hq_medium.glsl
-nlmeans_anime_medium.glsl
-nlmeans_heavy.glsl
-nlmeans_hq.glsl
-nlmeans_hq_heavy.glsl
-nlmeans_hq_medium.glsl
-nlmeans_hq_sharpen_denoise.glsl
-nlmeans_hq_sharpen_only.glsl
-nlmeans_hqx.glsl
 nlmeans_lq.glsl
-nlmeans_luma.glsl
-nlmeans_medium.glsl
-nlmeans_sharpen_denoise.glsl
-nlmeans_sharpen_only.glsl
 nlmeans_temporal.glsl
-nlmeans_temporal_sharpen_denoise.glsl
-nlmeans_temporal_sharpen_only.glsl
 ```
 
-🔺变体 temporal 只能在 --vo=gpu-next 下使用（可利用时域信息进行处理）
+相关列表：MOD （变体 dx 用于避免 `--gpu-context=d3d11` 下运行时的冻结问题）  
+```
+nlmeans_dx.glsl
+nlmeans_lq_dx.glsl
+nlmeans_temporal_dx.glsl
+```
+
+作者仓库存在大量其它变体，但几乎只是预设参数不同的区别。
+
+🔺变体 temporal 只能在 `--vo=gpu-next` 下使用（可利用时域信息进行处理）  
 
 ☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲
 
 ### Noise Static
 
-优化静态的亮度/色度噪点。
+优化静态的色度/亮度噪点。
 
 🔺 需要 **mpv.conf** 中设置为 `--deband-grain=0` 的前提下使用
 
 相关列表：[pastebin-hook1](https://pastebin.com/yacMe6EZ) & [pastebin-hook2](https://pastebin.com/15ZTaaUC)  
 ```
-noise_static_luma.glsl
 noise_static_chroma.glsl
+noise_static_luma.glsl
 ```
 
 ☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲☲
@@ -477,26 +579,41 @@ noise_static_chroma.glsl
 
 相关列表：  
 _来源非全部可查_  
+[garamond13-hooks](https://github.com/garamond13/Unsharp-mask-and-Gaussian-blur)  
 [Tsubajashi-hooks](https://github.com/Tsubajashi/mpv-settings/tree/master/shaders)  
-[voltmtr-lumasharpen](https://gist.github.com/voltmtr/8b4404b4e23129b226b9e64863d3e28b)  
+[voltmtr-lumasharpen](https://gist.github.com/voltmtr/8b4404b4e23129b226b9e64863d3e28b)
 
 ```
 color_alt_luma.glsl                  -- 色彩黑白翻转（亮度通道）
+color_alt_rgb.glsl                   -- 色彩黑白翻转
 colorlevel_expand.glsl               -- 色彩范围扩展
 colorlevel_expand_chroma.glsl        -- 色彩范围扩展（色度通道）
 colorlevel_expand_luma.glsl          -- 色彩范围扩展（亮度通道）
 colorlevel_shrink.glsl               -- 色彩范围收缩
 colorlevel_shrink_chroma.glsl        -- 色彩范围收缩（色度通道）
 colorlevel_shrink_luma.glsl          -- 色彩范围收缩（亮度通道）
+eq_rgb.glsl                          -- 色彩偏移
+eq_rgb_next.glsl
+flip_h.glsl                          -- 水平翻转
+flip_v.glsl                          -- 垂直翻转
+gray_chroma.glsl                     -- 灰度化（色度通道）
+gray_rgb_601.glsl                    -- 灰度化（bt601）
+gray_rgb_709.glsl 
+gray_rgb_2020.glsl
+gray_rgb_dp3.glsl
+rotate_180.glsl
+
 fake_hdr.glsl                        -- 伪HDR，过饱和
 faux_hdr.glsl                        -- 伪HDR，过饱和
+fast_gaussian_blur_next.glsl         -- 快速高斯模糊
 LumaSharpen.glsl                     -- 亮度通道的锐化
+gaussianBlur_next.glsl               -- 通用高斯模糊
+unsharpMask_next.glsl                -- 通用锐化
 minblur_usm.glsl                     -- 通用锐化，程度细微
 saturate.glsl                        -- 通用过饱和
-TsubaDS.glsl                         -- 基于SSIMDS
 TsubaUP.glsl                         -- 基于FSRCNNX
 unsharp.glsl                         -- 通用锐化，程度轻微
-unsharp_masking_next.glsl            -- 通用锐/糊化（ --vo=gpu-next 专用）
+unsharp_masking_next.glsl            -- 通用锐/糊化
 YIQ_converter.glsl                   -- YIQ转换，过饱和
 ```
 
@@ -548,7 +665,6 @@ YIQ_converter.glsl                   -- YIQ转换，过饱和
 | -pre | 增加一个或多个着色器到着色器列表的前方 (同 `-set` 的注意点) |
 | -clr | 清空着色器列表 |
 | -remove | 移除一个列表中已存在的着色器 |
-| -del | 移除一个或多个列表中已存在的着色器（不推荐） |
 | -toggle | 追加一个着色器到着色器列表的后方，如果已存在则移除它 |
 
 支持使用mpv的相对路径（比如 `~~/` 指向主设置文件夹）  
@@ -562,7 +678,7 @@ CTRL+1 change-list glsl-shaders set "~~/shaders/KrigBilateral.glsl;~~/shaders/ra
 
 ## 速度的对比参考
 
-🔺 （此节的信息可能已过时。我对部分着色器的跑分测试参见 [此处](https://github.com/hooke007/MPV_lazy/discussions/255#discussioncomment-4685344)）
+🔺 （此节的信息已过时。我对部分着色器的跑分测试参见 [此处](https://github.com/hooke007/MPV_lazy/discussions/255#discussioncomment-4685344)）
 
 使用个别着色器进行两倍放大，计算每秒所能生成的最大帧数。数值越大说明速度越快，越适合实际观看时使用，数值低于视频原始帧率即完全不可用。  
 实际速度**极大**取决于视频的质量、缩放倍率和你的显卡性能，因此两表中同一个 fsrcnnx16 的性能结果差异不符合常理也不奇怪，数据仅供大概参考。

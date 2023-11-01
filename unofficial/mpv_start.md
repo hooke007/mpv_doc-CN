@@ -1,6 +1,6 @@
 # mpv播放器的使用引导
 
-_ver.20230212_
+_ver.20231101_
 
 
 - 极短的介绍
@@ -65,11 +65,11 @@ mpv的默认读取的高优先级的设置目录为 <font color=green>**C:/Users
 #log-file="~~desktop/mpv.log"            # 输出log日志在桌面
  keep-open=yes                           # 播放列表中的最后一个条目播放完毕后暂停
  save-position-on-quit=yes               # 退出时保存当前的播放状态
- watch-later-options=start,vid,aid,sid   # 限制保存播放状态的属性列表（示例表示：播放位置、视频 音频 字幕轨号）
+ watch-later-options=start,vid,aid,sid   # 指定保存播放状态的属性列表（示例表示：播放位置、视频 音频 字幕轨号）
  audio-file-auto=fuzzy                   # 自动加载近似名的外置音轨
  sub-auto=fuzzy                          # 自动加载近似名的外置字幕
-#profile=gpu-hq                          # 使用一个内置的画质方案预设
- screenshot-directory="~~desktop/"       # 截图的输出路径在桌面
+#profile=high-quality                    # 使用一个内置的画质方案预设
+ screenshot-dir="~~desktop/"             # 截图的输出路径在桌面
 ```
 
 辅助理解：  
@@ -78,7 +78,7 @@ mpv的默认读取的高优先级的设置目录为 <font color=green>**C:/Users
 
 部分被注释掉的参数：  
   `--log-file` 用于输出日志查错，一般人用不到也看不懂  
-  `--profile=gpu-hq` 如果你的显卡不太差，可以使用这个内建的方案（不要被名字里所谓的hq迷惑）
+  `--profile=high-quality` 如果你的显卡不太差，可以使用这个内建的方案（不要被名字里所谓的HQ迷惑）
 
 🔺 由于主设置文件的书写规范最为宽松：  
 ===你可以在参数后直接注释中文解释 `hwdec=auto # 优先使用硬解（原生模式）` ；  
@@ -106,13 +106,16 @@ mpv的默认读取的高优先级的设置目录为 <font color=green>**C:/Users
 
 <font color=purple>入门教程到此结束。</font>
 
-
-
-
-
-
-
-
+O  
+O  
+O  
+O  
+O  
+O  
+O  
+O  
+O  
+O  
 
 ## mpv 播放器的使用【进阶】
 
@@ -226,8 +229,9 @@ mpv集成的 **ytdl_hook.lua** 脚本加强了网络串流的播放能力。
 该脚本兼容ytdl的热门分支yt-dlp  
 需要 **mpv.exe** 所在目录存在 **yt-dlp.exe** [官方发布地址](https://github.com/yt-dlp/yt-dlp/releases)
 
-如何指定使用的程序可参考 [此处](https://github.com/hooke007/MPV_lazy/blob/main/portable_config/script-opts/ytdl_hook.conf)  
-（注意mpv0.34.0及之后的版本默认优先使用yt-dlp，且youtube-dl项目已转入维护阶段，无非特殊情况应使用yt-dlp）
+如何指定使用的程序可参考 [此处](https://github.com/hooke007/MPV_lazy/blob/main/portable_config/script-opts/ytdl_hook.conf)
+
+🔺 注意： mpv0.34.0及之后的版本默认优先使用yt-dlp，且youtube-dl项目已转入维护阶段，非特殊情况应始终使用yt-dlp
 
 
 #### 3.2.外置脚本
@@ -277,8 +281,9 @@ vf=滤镜①=参数❶=值:参数❷=值,滤镜②...   # 不同滤镜间用","�
 
 但是为了避免运行时被覆盖，使用 `-append` 后缀，意为追加视频滤镜。可以存在多个 `vf-append` 且不影响 `vf=xxxxx` 指定的滤镜
 
-🔺 带 `-append` `-del` 之类后缀的参数只能一条带一个滤镜/着色器
+🔺 带 `-append` 之类后缀的参数只能一条带一个滤镜/着色器
 
+🔺 关于该部分内容，重写的 [快捷键文档](https://hooke007.github.io/unofficial/mpv_filters.html) 中记录的更具体和完善。
 
 #### 4.2.运行时启用
 
@@ -297,8 +302,6 @@ Ctrl+UP  vf toggle vflip
 首次按下 <kbd>Ctrl</kbd> + <kbd>↑</kbd> 将插入垂直翻转滤镜，再次按下将撤销该滤镜。
 
 关于滤镜类的全部可用后缀，参见 [此处](https://mpv.io/manual/master/#filter-options) 。
-
-🔺 关于该部分内容，重写的 [快捷键文档](https://hooke007.github.io/unofficial/mpv_filters.html) 中记录的更具体和完善。
 
 
 ### 5.第三方着色器
@@ -377,7 +380,7 @@ mpv未集成该部分，需要手动安装（以下步骤出于绿色化考虑�
 
 <img src="_assets/mpv_start-11.webp" style="zoom:40%;" />
 
-🔺 官方的VapourSyhth版本需要使用匹配的Python版本才能正常工作，例如 R53-R57 对应 3.8.x 或 3.9.x ，R58-R60 对应 3.8.x 或 3.10.x ，如果使用最新版本则查询 [vs的文档](http://vapoursynth.com/doc/installation.html#prerequisites)。
+🔺 官方的VapourSyhth版本需要使用匹配的Python版本才能正常工作，例如 R53-R57 对应 3.8.x 或 3.9.x ，R58-R61 对应 3.8.x 或 3.10.x ，R62-R65 对应 3.8.x 或 3.11.x ，如果使用最新版本则查询 [vs的文档](http://vapoursynth.com/doc/installation.html#prerequisites)。
 
 
 #### 6.2.mvtools 补帧法
@@ -402,7 +405,7 @@ VS滤镜参与mpv的播放流程至少需要三个部分： ***dll库 + 对应�
 获取对应的vpy脚本，无所谓扩展名是 `.py` 或者 `.vpy` ，脚本也无命名要求规范
 
 [这里](https://gist.github.com/KCCat/1b3a7b7f085a066af3719859f88ded02) 是KCCat大佬的版本  
-或者选择我在懒人包 [使用的版本](https://github.com/hooke007/MPV_lazy/blob/main/portable_config/vs/mvtools_2x.vpy)
+或者选择我在懒人包 [使用的旧版本](https://github.com/hooke007/MPV_lazy/blob/a8c9413fb3c352851ebf87d34a97d428c0d63100/portable_config/vs/mvtools_2x.vpy) （懒人包的新版本使用了k7sfunc包装器，属于进阶用法，因此不作为示例推荐给用户）
 
 放置位置也随意，按照前文的推荐放在 <font color=green>**X:/xxxxx/你的MPV文件夹/portable_config/**</font> 内便于调用
 
@@ -425,9 +428,23 @@ CTRL+v vf toggle vapoursynth="~~/xxxxx.vpy"
 VS工作状态的检验可多方结合，例如在统计信息中的滤镜列表、控制台有无报错信息、实际画面有无符合预期的变化。
 
 
+#### 6.3.K7sFunc
+
+> 此节为 mpv-VapourSynth 滤镜进阶
+
+k7sfunc 是为简化mpv中vs工具链部署而产生的方案，提供模块化的接近开箱即用的多个滤镜组，更多详细说明参见 [它的维基](https://github.com/hooke007/MPV_lazy/wiki/3_K7sfunc) 。
 
 
-
+O  
+O  
+O  
+O  
+O  
+O  
+O  
+O  
+O  
+O  
 
 
 ## FAQ 常见问题解答
@@ -461,7 +478,7 @@ _首先你要解决依赖问题，以确保几乎本文记录的所有功能在�
 
 因为它没有设计官方的前端（GUI）。
 
-- **有无可用的第三方前端？**
+- **有无可用的第三方中文前端？**
 
 Windows:  
 [KikoPlay](https://KikoPlayProject.github.io) 特殊功能用途（弹幕），简易库管理  
