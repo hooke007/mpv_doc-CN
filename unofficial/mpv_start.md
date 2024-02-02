@@ -372,7 +372,7 @@ mpv未集成该部分，需要手动安装（以下步骤出于绿色化考虑�
 
 <img src="_assets/mpv_start-09.webp" style="zoom:40%;" />
 
-在 [此处](https://github.com/vapoursynth/vapoursynth/releases) 获取VapourSyhth，选择64位便携包下载：
+在 [此处](https://github.com/vapoursynth/vapoursynth/releases) 获取VapourSynth，选择64位便携包下载：
 
 <img src="_assets/mpv_start-10.webp" style="zoom:40%;" />
 
@@ -380,7 +380,7 @@ mpv未集成该部分，需要手动安装（以下步骤出于绿色化考虑�
 
 <img src="_assets/mpv_start-11.webp" style="zoom:40%;" />
 
-🔺 官方的VapourSyhth版本需要使用匹配的Python版本才能正常工作，例如 R53-R57 对应 3.8.x 或 3.9.x ，R58-R61 对应 3.8.x 或 3.10.x ，R62-R65 对应 3.8.x 或 3.11.x ，如果使用最新版本则查询 [vs的文档](http://vapoursynth.com/doc/installation.html#prerequisites)。
+🔺 官方的VapourSynth版本需要使用匹配的Python版本才能正常工作，例如 R53-R57 对应 3.8.x 或 3.9.x ，R58-R61 对应 3.8.x 或 3.10.x ，R62-R65 对应 3.8.x 或 3.11.x ，如果使用最新版本则查询 [vs的文档](http://vapoursynth.com/doc/installation.html#prerequisites)。
 
 
 #### 6.2.mvtools 补帧法
