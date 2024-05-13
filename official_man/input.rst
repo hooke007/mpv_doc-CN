@@ -38,7 +38,7 @@ input.conf语法
 
 ``[Shift+][Ctrl+][Alt+][Meta+]<key> [{<section>}] <command> ( ; <command> )*``
 
-注意，默认情况下，右Alt键可以被创建为特殊字符，因此两个Alt不会注册为单个修饰键。选项 ``--no-input-right-alt-gr`` 可以改变这一行为。
+注意，默认情况下，右Alt键可以被创建为特殊字符，因此两个Alt不会注册为单个修饰键。选项 ``--input-right-alt-gr`` 可以改变这一行为。
 
 换行总是开始一个新的绑定。 ``#`` 开始一个注释（在被引用的字符串参数之外）。为了将命令与 ``#`` 键绑定，可以使用 ``SHARP``
 
@@ -172,7 +172,7 @@ Flat命令语法
 记住在input.conf中引用字符串参数（参见 `Flat命令语法`_ ）
 
 ``ignore``
-    用它来“屏蔽”应该被取消绑定的按键，不触发任何命令。对禁用部分默认绑定很有用，而不必用 ``--no-input-default-bindings`` 禁用所有绑定。
+    用它来“屏蔽”应该被取消绑定的按键，不触发任何命令。对禁用部分默认绑定很有用，而不必用 ``--input-default-bindings=no`` 禁用所有绑定。
 
 ``seek <target> [<flags>]``
     变更播放位置。默认情况下，以相对的秒数来跳转。
@@ -303,7 +303,7 @@ Flat命令语法
 
     设置 ``playlist-pos`` 或类似的属性可以产生与此命令近似的效果。然而它更明确，例如，新的播放列表条目与旧的相同，它将保证重启播放。
 
-``loadfile <url> [<flags> [<options>]]``
+``loadfile <url> [<flags> [<index> [<options>]]]``
     加载指定的文件或URL并播放它。从技术上讲，这只是一个播放列表的操作命令（它要么替换播放列表，要么添加一个条目）。实际的文件加载是独立发生的。例如，一个用新文件替换当前文件的 ``loadfile`` 命令会在当前文件停止之前返回，而后才开始加载新文件。
 
     第二个参数：
@@ -314,10 +314,20 @@ Flat命令语法
         将文件追加到播放列表中
     <append-play>
         添加文件，如果当前没有文件播放，则开始播放（始终从添加的文件开始播放，即使在运行这个命令之前的播放列表不是空的）
+    <insert-next>
+        将文件直接插入播放列表的当前条目之后。
+    <insert-next-play>
+        将文件插入下一个，如果当前没有播放，则开始播放。(总是从添加的文件开始播放，即使运行此命令前播放列表不是空的也是如此）。
+    <insert-at>
+        在第三个参数给定的索引处将文件插入播放列表。
+    <insert-at-play>
+        在第三个参数给定的索引处插入文件，如果当前没有播放，则开始播放。(总是从添加的文件开始播放，即使播放列表在运行此命令前不是空的）。
 
-    第三个参数是一个选项和值的列表，应该在文件播放时设置。它的形式是 ``opt1=value1,opt2=value2,..`` 。当使用client API时，这可以是一个 ``MPV_FORMAT_NODE_MAP`` （或一个Lua表），但当前的值本身必须是字符串。这些选项在播放过程中设置，并在播放结束时恢复到之前的值（参见 `单文件选项`_ ）。
+    第三个参数是插入索引，仅用于 ``insert-at`` 和 ``insert-at-play`` 操作。与这些操作一起使用时，新项目将被插入播放列表中的索引位置，如果索引小于 0 或大于播放列表的大小，则会被追加到末尾。所有其他操作都将忽略此参数。
 
-``loadlist <url> [<flags>]``
+    第四个参数是一个选项和值的列表，应该在文件播放时设置。它的形式是 ``opt1=value1,opt2=value2,..`` 。当使用client API时，这可以是一个 ``MPV_FORMAT_NODE_MAP`` （或一个Lua表），但当前的值本身必须是字符串。这些选项在播放过程中设置，并在播放结束时恢复到之前的值（参见 `单文件选项`_ ）。
+
+``loadlist <url> [<flags> [<index>]]``
     加载指定的列表文件或URL（类似 ``--playlist`` ）。
 
     第二个参数：
@@ -328,6 +338,16 @@ Flat命令语法
         在当前的内部播放列表的末尾追加新的播放列表
     <append-play>
         追加新的播放列表，如果当前没有文件播放，则开始播放（始终从新的列表开始播放，即使在运行这个命令之前的内部播放列表不是空的）
+    <insert-next>
+        将新播放列表直接插入当前内部播放列表的当前条目之后。
+    <insert-next-play>
+        插入新的播放列表，如果当前没有播放列表，则开始播放。(总是从新的播放列表开始播放，即使运行此命令前内部播放列表不是空的也是如此）。
+    <insert-at>
+        在第三个参数给定的索引处插入新的播放列表。
+    <insert-at-play>
+        在第三个参数给定的索引处插入新的播放列表，如果当前没有播放列表，则开始播放。(总是从新的播放列表开始播放，即使运行此命令前内部播放列表不是空的）。
+
+    第三个参数是插入索引，仅用于 ``insert-at`` 和 ``insert-at-play`` 操作。与这些操作一起使用时，新的播放列表将插入到内部播放列表中的索引位置，如果索引小于 0 或大于内部播放列表的大小，则附加到末尾。所有其他操作都将忽略此参数。
 
 ``playlist-clear``
     清除播放列表，除了当前播放的文件。
@@ -424,7 +444,7 @@ Flat命令语法
 
     .. note:: 如果子进程不是以分离模式启动的，即使 ``playback_only`` 为false，它也会在播放器退出时被终止。
 
-    .. admonition:: 警告
+    .. warning::
 
         如果你想在播放器处于空闲状态时运行命令，或者你不想让播放结束时终结命令，不要忘记设置 ``playback_only`` 的字段为false
 
@@ -490,7 +510,9 @@ Flat命令语法
         在次字幕中步进
 
 ``sub-seek <skip> <flags>``
-    跳转到下一个（skip设置为1）或上一个（skip设置为-1）字幕。这类似于 ``sub-step`` ，只是它跳转视频和音频，而不是调整字幕延迟。
+    跳转视频和音频位置，以便显示 ``<skip>`` 字幕事件之后的字幕事件。例如， ``sub-seek 1`` 跳到下一个字幕， ``sub-seek -1`` 跳到上一个字幕， ``sub-seek 0`` 则跳到当前字幕的开头。
+
+    这类似于 ``sub-step`` ，只是它跳转视频和音频，而不是调整字幕延迟。
 
     第二个参数：
 
@@ -499,13 +521,13 @@ Flat命令语法
     secondary
         通过次字幕步进
 
-    对于嵌入式字幕（如Matroska），这只适用于已经显示过的字幕事件，或在一个短的预取范围内。
+    对于嵌入式字幕（如Matroska），这只适用于已经显示过的字幕事件，或在一个短的预取范围内。有关如何控制可用预取范围的详细信息，详见 `缓存`_ 部分。
 
 ``print-text <text>``
     输出文本到stdout。字符串可以包含属性（参见 `属性扩展`_ ）。注意把参数放在引号里。
 
 ``show-text <text> [<duration>|-1 [<level>]]``
-    在OSD上显示文本。字符串可以包含属性，如 `属性扩展`_ 中所述。这可以用来显示播放时间、文件名，等等。
+    在OSD上显示文本。字符串可以包含属性，如 `属性扩展`_ 中所述。这可以用来显示播放时间、文件名，等等。 ``no-osd`` 对该命令无效。
 
     <duration>
         显示信息的时间，单位是ms。默认情况下，它使用与 ``--osd-duration`` 相同的值
@@ -513,10 +535,10 @@ Flat命令语法
     <level>
         显示文本的最小OSD层级（参见 ``--osd-level`` ）
 
-``expand-text <string>``
+``expand-text <text>``
     对参数进行属性扩展，并返回扩展后的字符串。这只能通过client API或脚本中的 ``mp.command_native`` 来使用。（见 `属性扩展`_ ）
 
-``expand-path "<string>"``
+``expand-path "<text>"``
     将一个路径的double-tilde占位符扩展为一个特定平台的路径。与 ``expand-text`` 一样，这只能通过client API或脚本中的 ``mp.command_native`` 来使用。
 
     .. admonition:: 示例
@@ -525,8 +547,26 @@ Flat命令语法
 
         这一行Lua将在OSD上显示用户的mpv设置目录的位置。
 
+``normalize-path <filename>``
+    通过将路径 ``filename`` 转换为绝对路径、删除连续的斜线、删除 ``.`` 部分、解析 ``..`` 组件以及在 Windows 上将斜线转换为反斜线，返回路径 ``filename`` 的规范表示。除非平台是 Unix-like，且路径组件之一是 ``..``，否则不会解析符号链接。如果 ``filename`` 是一个 URL，则会原封不动地返回。只能通过client API 或使用 ``mp.command_native`` 的脚本使用。
+
+    .. admonition:: 示例
+
+        ``mp.osd_message(mp.command_native({"normalize-path", "/foo//./bar"}))``
+
+        这行Lua在OSD上输出 "/foo/bar"
+
+``escape-ass <text>``
+    修改 ``text`` 以便解析 ASS 标记的命令和函数，如 ``osd-overlay`` 和 ``mp.create_osd_overlay`` 会逐字显示并返回。只能通过client API 或使用 ``mp.command_native`` 的脚本使用。
+
+    .. admonition:: 示例
+
+        ``mp.osd_message(mp.command_native({"escape-ass", "foo {bar}"}))``
+
+        这行Lua在OSD上输出 "foo \\{bar}"
+
 ``show-progress``
-    在OSD上显示进度条、已用时间和文件的总时间。
+    在OSD上显示进度条、已用时间和文件的总时间。 ``no-osd`` 对该命令无效
 
 ``write-watch-later-config``
     写入 ``quit-watch-later`` 命令所写的恢复设置文件，但继续正常播放。
@@ -559,8 +599,8 @@ Flat命令语法
     <double>
         鼠标事件代表双击
 
-``keypress <name>``
-    通过mpv的输入处理程序发送一个key event，触发为该按键设置的任何行为。 ``name`` 使用 ``input.conf`` 的命名方案来命名按键和修饰键。对client API很有用：key events可以被发送到libmpv内部来处理。
+``keypress <name> [<scale>]``
+    通过mpv的输入处理程序发送一个key event，触发为该按键设置的任何行为。 ``name`` 使用 ``input.conf`` 的命名方案来命名按键和修饰键。 ``scale`` 用于缩放由绑定命令引起的数值变化（与精确滚动机制相同）。对client API 非常有用：key events可以发送到 libmpv，由 libmpv 在内部处理。
 
 ``keydown <name>``
     类似于 ``keypress`` ，但设置了 ``KEYDOWN`` 标志，因此，如果按键被绑定到一个可重复的命令，它将随着mpv的按键重复计时重复运行，直到 ``keyup`` 命令被再次调用。
@@ -603,6 +643,9 @@ Flat命令语法
     <keep-selection>
         不改变当前的音轨选择
 
+``context-menu``
+    在视频窗口上显示上下文菜单。详见 `上下文菜单`_ 部分。
+
 
 可能变更的输入命令
 ------------------
@@ -630,9 +673,6 @@ Flat命令语法
 
     <remove>
         类似 ``toggle`` ，但始终移除滤镜链上的指定滤镜
-
-    <del>
-        从视频链中移除指定的滤镜。与其他情况不同，第二个参数是一个用逗号分隔的滤镜名称或整数索引列表。 ``0`` 将表示第一个滤镜。负数的索引从最后一个滤镜开始， ``-1`` 表示最后一个滤镜。已过时，使用 ``remove`` 。
 
     <clr>
         移除所有滤镜。注意，和其他子命令一样，这并不能控制自动插入的滤镜
@@ -704,7 +744,7 @@ Flat命令语法
 
     这个命令可以用来给脚本或客户端API用户分配任意的键。如果输入部分定义了 ``script-binding`` 的命令，也可以获得单独的按键up/down事件，以及相对详细的按键状态信息。特殊的键名 ``unmapped`` 可以用来匹配任何未映射的按键。
 
-``overlay-add <id> <x> <y> <file> <offset> <fmt> <w> <h> <stride>``
+``overlay-add <id> <x> <y> <file> <offset> <fmt> <w> <h> <stride> <dw> <dh>``
     添加一个来自原始数据的OSD叠加层。这对控制mpv的脚本和应用程序可能很有用，它们想在视频窗口上面显示内容。
 
     叠加层通常是以屏幕分辨率显示的，但对于某些视频输出驱动来说，分辨率会降低到视频的分辨率。你可以阅读 ``osd-width`` 和 ``osd-height`` 属性。至少对于 ``--vo-xv`` 和变形视频（如DVD）， ``osd-par`` 也应该被读取，并且覆盖层应该遵循是宽高比补偿的。
@@ -724,6 +764,8 @@ Flat命令语法
     ``fmt`` 是一个标识图像格式的字符串。目前，只有 ``bgra`` 被定义。这种格式每个像素有4个字节，每个部分有8位。最不重要的8位是蓝色，最重要的8位是alpha（在little endian中，组成是B-G-R-A，B是第一个字节）。这使用了预乘alpha：每个颜色分量都已经与alpha分量相乘。这意味着每个分量的数值都等于或小于alpha分量（违反这个规则会导致不同视频输出驱动的不同结果：由于混合损坏的alpha值而导致的数值溢出被认为是不应该发生的事情，因此，在这种情况下，该实现并不能确保你得到可预测的行为）。
 
     ``w`` , `h`` 和 ``stride`` 指定覆盖层的尺寸。 ``w`` 是覆盖层的可见宽度，而 ``stride`` 给出的是内存中的字节宽度。在简单的情况下，使用 ``bgra`` 格式， ``stride==4*w`` 。一般来说，访问的内存总量是 ``stride * h`` （从技术上讲，最小的尺寸是 ``stride * (h - 1) + w * 4`` ，但是为了简单起见，播放器将访问所有 ``stride * h`` 的字节）。
+
+    ``dw`` 和 ``dh`` （可选）指定叠加层的显示尺寸。叠加层的可见部分（ ``w`` 和 ``h`` ）在显示时会根据 ``dw`` 和 ``dh`` 按比例缩放。 如果没有参数，则使用 ``w`` 和 ``h`` 的值。
 
     .. note::
 
@@ -864,6 +906,12 @@ Flat命令语法
     ``restore``
         恢复执行 ``apply-profile`` 命令应用该配置预设之前的选项。只有当配置预设的 ``profile-restore`` 设置为相关的模式时才有效。如果没有操作执行，则输出一个警告。详情参见 `运行时的配置预设`_
 
+``load-config-file <filename>``
+    加载配置文件，类似于 ``--include`` 选项。如果文件已经包含，则在重新解析前不会重置其先前的选项。
+
+``load-input-conf <filename>``
+    加载输入配置文件，类似于 ``--input-conf`` 选项。如果该文件已被包含，则在重新解析前不会重置其先前的绑定。
+
 ``load-script <filename>``
     加载一个脚本，类似于 ``--script`` 选项。这是否等待脚本完成初始化已被改变了多次，未来的行为未被定义。
 
@@ -912,6 +960,9 @@ Flat命令语法
     在 ``ab-loop-dump-cache`` 命令将（可能）转储的缓存内，重新调整A/B循环点的起点和终点。基本上，它将关键帧上的时间对齐。猜测可能会有偏差，特别是在结尾处（由于重新转换带来的精度问题）。如果缓存在此期间缩小了，该命令设置的点也不会是有效参数。
 
     这个命令的未来比 ``ab-loop-dump-cache`` 更不确定，如果作者认为它没有用，可能会消失而不被替换。
+
+``begin-vo-dragging``
+    如果当前 VO 支持，则开始拖动窗口。该命令只能在按下鼠标键时调用，否则将被忽略。该命令的具体效果取决于 VO 对窗口拖动的实现。例如，在 Windows 中，只有鼠标左键可以开始拖动窗口，而 X11 和 Wayland 则允许使用其他鼠标键。
 
 未记录的命令： ``ao-reload`` （实验性的/内部的）。
 
@@ -1417,6 +1468,9 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 ``af-metadata/<filter-label>``
     相当于 ``vf-metadata/<filter-label>`` ，但用于音频滤镜。
 
+``deinterlace-active``
+    如果 mpv 的去隔行扫描滤波器处于活动状态，则返回 ``yes``/true 。请注意，它不会检测任何通过 ``--vf`` 手动插入的隔行扫描滤波器。
+
 ``idle-active``
     如果没有文件被加载，但由于 ``--idle`` 选项，播放器在附近驻留，返回 ``yes`` /true。
 
@@ -1460,6 +1514,8 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
     ``raw-input-rate`` 是网络层（或任何其他层级向字节的输入层）的估计输入率，单位是字节每秒。可能不准确或丢失。
 
+    ``ts-per-stream`` 是一个数组，包含视频、音频和字幕等每种流类型的条目。对于每种数据流类型，该数据流类型的解串器缓存详情可作为 ``cache-duration`` 、``reader-pts`` 和 ``cache-end`` 提供。
+
     当用client API用 ``MPV_FORMAT_NODE`` 查询该属性时，或用Lua ``mp.get_property_native`` ，这将返回一个mpv_node，内容如下：
 
     ::
@@ -1477,6 +1533,12 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
             "reader-pts"        MPV_FORMAT_DOUBLE
             "cache-duration"    MPV_FORMAT_DOUBLE
             "raw-input-rate"    MPV_FORMAT_INT64
+            "ts-per-stream"     MPV_FORMAT_NODE_ARRAY
+                MPV_FORMAT_NODE_MAP
+                      "type"            MPV_FORMAT_STRING
+                      "cache-duration"  MPV_FORMAT_DOUBLE
+                      "reader-pts"      MPV_FORMAT_DOUBLE
+                      "cache-end"       MPV_FORMAT_DOUBLE
 
     其他字段（将来可能被改变或删除）：
 
@@ -1520,12 +1582,6 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
 ``ao-mute`` (RW)
     与 ``ao-volume`` 相似，但控制静音状态。即使 ``ao-volume`` 起效，也可能未实现。
-
-``audio-codec``
-    被选择用于解码的音频编解码器。
-
-``audio-codec-name``
-    音频编解码器。
 
 ``audio-params``
     由音频解码器输出的音频格式。这有一系列子属性：
@@ -1585,12 +1641,6 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
     这不一定使用与 ``hwdec`` 相同的值。同一硬件解码器可以有多个interop驱动，这取决于平台和视频输出。
 
-``video-format``
-    视频格式的字符串。
-
-``video-codec``
-    被选择的用于解码的视频编解码器。
-
 ``width``, ``height``
     视频尺寸。这使用解码后的视频尺寸，或者如果还没有解码的视频帧，则使用（可能不正确的）容器显示的尺寸。
 
@@ -1627,6 +1677,12 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     ``video-params/par``
         像素长宽比
 
+    ``video-params/sar``
+        存储长宽比
+
+    ``video-params/sar-name``
+        字符串形式的存储宽高比名称
+
     ``video-params/colormatrix``
         使用中的色彩矩阵的字符串（精确值可能会变化）
 
@@ -1640,7 +1696,7 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
         使用中的伽马函数的字符串（精确值可能会变化）
 
     ``video-params/sig-peak``
-        视频文件标记的信号峰值，以浮点数表示
+        视频文件标记的信号峰值，以浮点数表示（已过时）
 
     ``video-params/light``
         使用中的亮度类型的字符串（精确值可能会变化）
@@ -1656,6 +1712,33 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
     ``video-params/alpha``
         透明度类型。如果格式没有透明通道，这将是不可用的（但在未来的版本中，它可能变为 ``no`` ）。如果有，这将被设置为 ``straight`` 或 ``premul``
+
+    ``video-params/min-luma``
+        HDR10 元数据报告的最低亮度（单位：cd/m²）
+
+    ``video-params/max-luma``
+        HDR10 元数据报告的最高亮度（单位：cd/m²）
+
+    ``video-params/max-cll``
+        HDR10 元数据报告的最大内容亮度（单位：cd/m²）
+
+    ``video-params/max-fall``
+        HDR10 元数据报告的最大帧平均亮度（单位：cd/m²）
+
+    ``video-params/scene-max-r``
+        由 HDR10+ 元数据报告的场景 R 分量的最大 RGB 值（单位：cd/m²）
+
+    ``video-params/scene-max-g``
+        由 HDR10+ 元数据报告的场景 G 分量的最大 RGB 值（单位：cd/m²）
+
+    ``video-params/scene-max-b``
+        由 HDR10+ 元数据报告的场景 B 分量的最大 RGB 值（单位：cd/m²）
+
+    ``video-params/max-pq-y``
+        帧的最大 PQ 亮度，由峰值检测报告（单位 PQ，0-1）
+
+    ``video-params/avg-pq-y``
+        帧的平均 PQ 亮度，由峰值检测报告（单位 PQ，0-1）
 
     当使用client API的 ``MPV_FORMAT_NODE`` 查询该属性时，或者用Lua ``mp.get_property_native`` ，将返回一个mpv_node，内容如下：
 
@@ -1681,51 +1764,15 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
             "stereo-in"         MPV_FORMAT_STRING
             "average-bpp"       MPV_FORMAT_INT64
             "alpha"             MPV_FORMAT_STRING
-
-``hdr-metadata``
-    视频每帧的 HDR 元数据，包括峰值亮度检测的结果。它有许多子属性：
-
-    ``hdr-metadata/min-luma``
-        HDR10 元数据报告的最小亮度（单位 cd/m²）
-
-    ``hdr-metadata/max-luma``
-        HDR10 元数据报告的最大亮度（单位 cd/m²）
-
-    ``hdr-metadata/max-cll``
-        HDR10 元数据报告的最大内容光照度（单位 cd/m²）
-
-    ``hdr-metadata/max-fall``
-        HDR10 元数据报告的最大帧平均光亮度（单位 cd/m²）
-
-    ``hdr-metadata/scene-max-r``
-        HDR10+ 元数据报告的场景中R分量的最大RGB值（单位 cd/m²）
-
-    ``hdr-metadata/scene-max-g``
-        HDR10+ 元数据报告的场景中G分量的最大RGB值（单位 cd/m²）
-
-    ``hdr-metadata/scene-max-b``
-        HDR10+ 元数据报告的场景中B分量的最大RGB值（单位 cd/m²）
-
-    ``hdr-metadata/max-pq-y``
-        峰值检测报告的帧的最大PQ亮度（以PQ单位，0-1表示）
-
-    ``hdr-metadata/avg-pq-y``
-        由峰值检测报告的帧的平均PQ亮度（以PQ单位，0-1表示）
-
-    当使用客户端API使用 ``MPV_FORMAT_NODE`` 查询属性，或者使用 Lua 的 ``mp.get_property_native`` 查询属性时，将返回一个包含以下内容的 mpv_node ：
-
-    ::
-
-        MPV_FORMAT_NODE_MAP
-            "min-luma"     MPV_FORMAT_DOUBLE
-            "max-luma"     MPV_FORMAT_DOUBLE
-            "max-cll"      MPV_FORMAT_DOUBLE
-            "max-fall"     MPV_FORMAT_DOUBLE
-            "scene-max-r"  MPV_FORMAT_DOUBLE
-            "scene-max-g"  MPV_FORMAT_DOUBLE
-            "scene-max-b"  MPV_FORMAT_DOUBLE
-            "max-pq-y"     MPV_FORMAT_DOUBLE
-            "avg-pq-y"     MPV_FORMAT_DOUBLE
+            "min-luma"          MPV_FORMAT_DOUBLE
+            "max-luma"          MPV_FORMAT_DOUBLE
+            "max-cll"           MPV_FORMAT_DOUBLE
+            "max-fall"          MPV_FORMAT_DOUBLE
+            "scene-max-r"       MPV_FORMAT_DOUBLE
+            "scene-max-g"       MPV_FORMAT_DOUBLE
+            "scene-max-b"       MPV_FORMAT_DOUBLE
+            "max-pq-y"          MPV_FORMAT_DOUBLE
+            "avg-pq-y"          MPV_FORMAT_DOUBLE
 
 ``dwidth``, ``dheight``
     视频显示尺寸。这是应用了滤镜和长宽比缩放之后的视频尺寸。实际的视频窗口大小仍可能与此不同，例如，如果用户手动调整视频窗口的大小。
@@ -1737,6 +1784,11 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
 ``video-out-params``
     与 ``video-params`` 相同，但在视频滤镜被应用后。如果没有使用视频滤镜，这将包含与 ``video-params`` 相同的值。请注意，这仍然不一定是视频窗口所使用的，因为用户可以改变窗口的大小，所有真正的视频输出驱动都独立于滤镜链而自行缩放。
+
+    拥有与 ``video-params`` 相同的子属性。
+
+``video-target-params``
+    类似 ``video-params`` ，但与 VO 输出的目标属性有关。
 
     拥有与 ``video-params`` 相同的子属性。
 
@@ -1765,25 +1817,16 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 ``estimated-vf-fps``
     视频滤镜链输出的估计/测量的FPS（如果没有使用滤镜，这对应解码器输出）。这使用过去10帧的平均时间来计算FPS。如果涉及到丢帧，它将是不准确的（比如当明确的启用了framedrop，或在精确跳转之后）。具有不精确时间戳的文件（如Matroska）可能导致不稳定的结果。
 
-``window-scale`` (RW)
-    窗口大小的乘数。设置它将调整视频窗口的大小，使之与 ``dwidth`` 和 ``dheight`` 中包含的值相乘，并与此属性设置的值相乘。设置 ``1`` 将调整到原始视频尺寸（或者准确地说，视频滤镜输出的尺寸）。 ``2`` 将设置双倍大小， ``0.5`` 将减半。
-
-    注意，设置一个与之前相同的值不会调整窗口的大小。这是因为这个属性反映了 ``window-scale`` 选项，设置一个选项为它之前的值会被忽略。如果这个值是在窗口处于全屏状态时设置的，那么乘数不会被应用，直到窗口脱离该状态。在一个最大化的窗口中写入这个属性，可以使窗口取消最大化，这取决于操作系统和窗口管理器。如果该窗口没有取消最大化，那么如果用户之后取消最大化，倍数将被应用。
-
-    参见 ``current-window-scale`` 以了解从实际窗口大小得出的数值。
-
-    从mpv0.31.0开始，这总是返回先前设置的值（或默认值），而不是实际窗口大小所暗示的值。在mpv0.31.0之前，在窗口创建后，它返回 ``current-window-scale`` 的值。
-
 ``current-window-scale`` (RW)
     根据当前窗口大小计算的 ``window-scale`` 值。如果窗口大小在设置选项后没有改变，并且窗口大小没有受到其他方面的限制，那么这个值与 ``window-scale`` 相同。如果窗口是全屏的，这将返回从窗口的最后一次非全屏尺寸计算出来的比例值。如果没有视频被激活，该属性不可用。
 
-    在全屏或最大化状态下设置该属性时，其行为与window-scale相同。在所有这些情况下，设置该属性的值将始终调整窗口的大小。这不影响 ``window-scale`` 的值。
+    也可以写入该属性。这与写入 ``window-scale`` 的行为相同。请注意，写入 ``current-window-scale`` 不会影响 ``window-scale`` 的值。
 
 ``focused``
     窗口是否处于焦点。可能并非所有视频输出驱动都支持。
 
 ``display-names``
-    mpv窗口所包含的显示器的名称。在X11上，这些是xrandr名称（LVDS1, HDMI1, DP1, VGA1, 等等）。在Windows上，这些是GDI名称（\\.\DISPLAY1，\\.\DISPLAY2，等等），列表中的第一个显示器将是Windows认为与该窗口相关的（由MonitorFromWindow API决定）。 在macOS上，这些是系统信息中使用的显示产品名称，只有一个显示名称被返回，因为一个窗口只能在一个屏幕上。
+    mpv窗口所包含的显示器的名称。在X11上，这些是xrandr名称（LVDS1, HDMI1, DP1, VGA1, 等等）。在Windows上，这些是GDI名称（\\.\DISPLAY1，\\.\DISPLAY2，等等），列表中的第一个显示器将是Windows认为与该窗口相关的（由MonitorFromWindow API决定）。在 macOS 上，这些是系统信息中使用的显示产品名称，括号中是序列号，由于一个窗口只能在一个屏幕上显示，因此只返回一个显示名称。在 Wayland 上，如果使用的协议版本 >= 4（LVDS-1、HDMI-A-1、X11-1 等），这些是 wl_output 名称；如果使用的协议版本 <4，这些是 geometry 事件报告的 wl_output 模型。
 
 ``display-fps``
     当前显示器的刷新率。目前，这是视频涵盖的任何显示器的最低FPS，由底层系统API检索（例如X11的xrandr）。它不是测量的FPS。它不一定在所有平台上都可用。注意，任何列出的事实都可能在没有警告的情况下随时改变。
@@ -1832,6 +1875,18 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
     如果视频输出窗口没有被创建或不可见，这些属性中的任何一个都可能不可用或被设为伪值。
 
+``term-size``
+    当前终端尺寸。
+
+    它有两个子属性。
+
+    ``term-size/w``
+        终端宽度，以单元格为单位
+    ``term-size/h``
+        终端高度，以单元格为单位
+
+    此属性不可观测。响应尺寸变化需要轮询。
+
 ``window-id``
     只读的 - mpv的窗口ID。可能并不总是可用的，例如，由于窗口尚未被打开或不被视频输出驱动支持。
 
@@ -1846,28 +1901,70 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     ``mouse-pos/hover``
         布尔值 —— 鼠标指针是否悬停在视频窗口上。当此值为false时，坐标应被忽略，因为视频后端只有在指针悬停窗口时才会更新坐标
 
+``touch-pos``
+    只读 - 最后已知的触摸点位置，按 OSD 尺寸标准化。
+
+    它有多个子属性。将 ``N`` 替换为基于 0 的触摸点索引。每当有新的手指触摸屏幕时，就会有一个新的触摸点被添加到触摸点列表中，其中可用的未使用的 ``N`` 最小。
+
+    ``touch-pos/count``
+        活动触摸点的数量。
+
+    ``touch-pos/N/x`` , ``touch-pos/N/y``
+        第 N 个触摸点的位置。
+
+    ``touch-pos/N/id``
+        触摸点的唯一标识符。当单个触摸点的索引发生变化时，该标识符可用于识别单个触摸点。
+
+    在client API 中使用 ``MPV_FORMAT_NODE`` 或 Lua ``mp.get_property_native`` 查询属性时，将返回一个 mpv_node 并包含以下内容：
+
+    ::
+
+        MPV_FORMAT_NODE_ARRAY
+            MPV_FORMAT_NODE_MAP (for each touch point)
+                "x"        MPV_FORMAT_INT64
+                "y"        MPV_FORMAT_INT64
+                "id"       MPV_FORMAT_INT64
+
 ``sub-ass-extradata``
     当前 ASS 字幕轨道的额外数据。不进行格式化。额外数据将以字符串形式按原样返回。此属性不适用于非 ASS 类的字幕轨。
 
 ``sub-text``
     当前的字幕文本，不管字幕是否可见。格式被剥离。如果字幕不是基于文本的（例如DVD/BD字幕），将返回一个空字符串。
 
-``sub-text-ass``
-    类似 ``sub-text`` ，但返回ASS格式的文本。其他格式的文本字幕会被转换。对于原生ASS字幕，不包含任何文本（但是矢量图等）的事件不会被过滤掉。如果多个事件与当前播放时间相匹配，它们会用换行符连接起来。只包含事件的“文本”部分。
+    它有不同格式的子属性：
 
-    这个属性不足以正确渲染ASS字幕，因为ASS header和每个事件的元数据没有被返回。你可能需要对返回的字符串做进一步的过滤以使其有用。
+    ``sub-text/ass``
+        类似 ``sub-text`` ，但返回ASS格式的文本。其他格式的文本字幕会被转换。对于原生ASS字幕，不包含任何文本（但是矢量图等）的事件不会被过滤掉。如果多个事件与当前播放时间相匹配，它们会用换行符连接起来。只包含事件的“文本”部分。
+
+    这个属性不足以正确渲染ASS字幕，因为ASS header和每个事件的元数据没有被返回。使用 ``/ass-full`` 作为取代方案。
+
+    ``sub-text/ass-full``
+        类似于 ``sub-text-ass`` ，但返回包含所有字段的完整事件，格式为 .ass 文本文件中的行。与 ``sub-ass-extradata`` 一起使用可获得样式信息。
+
+``sub-text-ass`` （已过时）
+    已过时的 ``sub-text/ass`` 的别名。
 
 ``secondary-sub-text``
-    与 ``sub-text`` 相同，但用于次字幕。
+    与 ``sub-text`` 相同（子属性也如此），但用于次字幕。
 
 ``sub-start``
     当前字幕的开始时间（以秒为单位）。如果有多个当前字幕，返回第一个的开始时间。如果没有当前的字幕被呈现，将返回null。
+
+    它有一个子属性：
+
+    ``sub-start/full``
+        ``sub-start`` 以毫秒为单位
 
 ``secondary-sub-start``
     与 ``sub-start`` 相同，但用于次字幕。
 
 ``sub-end``
     当前字幕的结束时间（以秒为单位）。如果有多个当前字幕，返回最后的结束时间。如果没有当前的字幕被呈现，或者有呈现但持续时间未知或不正确，则返回null。
+
+    它有一个子属性：
+
+    ``sub-end/full``
+        ``sub-end`` 以毫秒为单位
 
 ``secondary-sub-end``
     与 ``sub-end`` 相同，但用于次字幕。
@@ -1980,6 +2077,12 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     ``track-list/N/codec``
         该轨道使用的编解码器名称，例如 ``h264`` 。在某些罕见情况下不可用
 
+    ``track-list/N/codec-desc``
+        此音轨使用的编解码器描述性名称
+
+    ``track-list/N/codec-profile``
+        此音轨使用的编解码器配置文件。仅在音轨已被解码的情况下可用
+
     ``track-list/N/external``
         如果该轨道是一个外部文件，则为 ``yes`` /true，否则为 ``no`` /false或不可用。这是为独立的字幕文件设置的
 
@@ -1994,6 +2097,9 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
     ``track-list/N/ff-index``
         通常由FFmpeg工具使用的流索引。注意，如果使用libavformat（ ``--demuxer=lavf`` ）以外的解复用器，可能会出现错误。对于mkv文件，即使使用默认（内置）的解复用器，索引通常也会匹配，但并不能保证
+
+    ``track-list/N/decoder``
+        如果正在解码此轨道，则为简短的解码器名称
 
     ``track-list/N/decoder-desc``
         如果这个轨道正在被解码，则是人性化的可读的解码器名称
@@ -2028,6 +2134,9 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     ``track-list/N/demux-par``
         像素长宽比
 
+    ``track-list/N/format-name``
+        ffmpeg 格式的简短名称。如果音轨是音频，这将是采样格式的名称。如果音轨是视频，这将是像素格式的名称。
+
     ``track-list/N/audio-channels`` （已过时）
         过时的 ``track-list/N/demux-channel-count`` 的别名
 
@@ -2037,46 +2146,53 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     ``track-list/N/replaygain-album-peak``, ``track-list/N/replaygain-album-gain``
         每张专辑的回放增益值。如果文件有每个音轨但没有每个专辑的信息，每个专辑的值将从目前的每个音轨的值中复制。在这种情况下，未来的mpv版本有可能使这些属性反而不可用。
 
+    ``track-list/N/dolby-vision-profile``, ``track-list/N/dolby-vision-level``
+        Dolby Vision 配置文件和级别。如果容器不提供此信息，则可能不可用。
+
     当用client API的 ``MPV_FORMAT_NODE`` 查询该属性时，或用Lua ``mp.get_property_native`` ，这将返回一个mpv_node，内容如下：
 
     ::
 
         MPV_FORMAT_NODE_ARRAY
             MPV_FORMAT_NODE_MAP (for each track)
-                "id"                MPV_FORMAT_INT64
-                "type"              MPV_FORMAT_STRING
-                "src-id"            MPV_FORMAT_INT64
-                "title"             MPV_FORMAT_STRING
-                "lang"              MPV_FORMAT_STRING
-                "image"             MPV_FORMAT_FLAG
-                "albumart"          MPV_FORMAT_FLAG
-                "default"           MPV_FORMAT_FLAG
-                "forced"            MPV_FORMAT_FLAG
-                "selected"          MPV_FORMAT_FLAG
-                "main-selection"    MPV_FORMAT_INT64
-                "external"          MPV_FORMAT_FLAG
-                "external-filename" MPV_FORMAT_STRING
-                "codec"             MPV_FORMAT_STRING
-                "ff-index"          MPV_FORMAT_INT64
-                "decoder-desc"      MPV_FORMAT_STRING
-                "demux-w"           MPV_FORMAT_INT64
-                "demux-h"           MPV_FORMAT_INT64
-                "demux-crop-x"      MPV_FORMAT_INT64
-                "demux-crop-y"      MPV_FORMAT_INT64
-                "demux-crop-w"      MPV_FORMAT_INT64
-                "demux-crop-h"      MPV_FORMAT_INT64
-                "demux-channel-count" MPV_FORMAT_INT64
-                "demux-channels"    MPV_FORMAT_STRING
-                "demux-samplerate"  MPV_FORMAT_INT64
-                "demux-fps"         MPV_FORMAT_DOUBLE
-                "demux-bitrate"     MPV_FORMAT_INT64
-                "demux-rotation"    MPV_FORMAT_INT64
-                "demux-par"         MPV_FORMAT_DOUBLE
-                "audio-channels"    MPV_FORMAT_INT64
+                "id"                    MPV_FORMAT_INT64
+                "type"                  MPV_FORMAT_STRING
+                "src-id"                MPV_FORMAT_INT64
+                "title"                 MPV_FORMAT_STRING
+                "lang"                  MPV_FORMAT_STRING
+                "image"                 MPV_FORMAT_FLAG
+                "albumart"              MPV_FORMAT_FLAG
+                "default"               MPV_FORMAT_FLAG
+                "forced"                MPV_FORMAT_FLAG
+                "selected"              MPV_FORMAT_FLAG
+                "main-selection"        MPV_FORMAT_INT64
+                "external"              MPV_FORMAT_FLAG
+                "external-filename"     MPV_FORMAT_STRING
+                "codec"                 MPV_FORMAT_STRING
+                "codec-desc"            MPV_FORMAT_STRING
+                "codec-profile"         MPV_FORMAT_STRING
+                "ff-index"              MPV_FORMAT_INT64
+                "decoder-desc"          MPV_FORMAT_STRING
+                "demux-w"               MPV_FORMAT_INT64
+                "demux-h"               MPV_FORMAT_INT64
+                "demux-crop-x"          MPV_FORMAT_INT64
+                "demux-crop-y"          MPV_FORMAT_INT64
+                "demux-crop-w"          MPV_FORMAT_INT64
+                "demux-crop-h"          MPV_FORMAT_INT64
+                "demux-channel-count"   MPV_FORMAT_INT64
+                "demux-channels"        MPV_FORMAT_STRING
+                "demux-samplerate"      MPV_FORMAT_INT64
+                "demux-fps"             MPV_FORMAT_DOUBLE
+                "demux-bitrate"         MPV_FORMAT_INT64
+                "demux-rotation"        MPV_FORMAT_INT64
+                "demux-par"             MPV_FORMAT_DOUBLE
+                "audio-channels"        MPV_FORMAT_INT64
                 "replaygain-track-peak" MPV_FORMAT_DOUBLE
                 "replaygain-track-gain" MPV_FORMAT_DOUBLE
                 "replaygain-album-peak" MPV_FORMAT_DOUBLE
                 "replaygain-album-gain" MPV_FORMAT_DOUBLE
+                "dolby-vision-profile"  MPV_FORMAT_INT64
+                "dolby-vision-level"    MPV_FORMAT_INT64
 
 ``current-tracks/...``
     这可以访问当前选择的轨道。它重定向到 ``track-list`` 中的正确条目。
@@ -2257,30 +2373,57 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 ``current-vo``
     当前的视频输出驱动（与 ``--vo`` 一起使用的名称）。
 
+``current-gpu-context``
+    VO的当前 GPU 上下文（与 ``--gpu-context`` 一起使用的名称）。对 ``--vo=gpu`` 和 ``--vo=gpu-next` 有效。
+
 ``current-ao``
     当前的音频输出驱动（与 ``--ao`` 一起使用的名称）。
 
-``shared-script-properties`` (RW)
-    这是一个提供通用的任意字符串的按键/值映射，在脚本之间共享。播放器本身不使用其中的任何数据（尽管一些内置脚本可能会）。该属性在播放器重新启动时不会被保存。
-
-    这是非常原始的，低效的，而且使用起来很烦人。这是一个临时的解决方案，随时可能消失（例如，当一个更好的解决方案出现时）。这也是为什么这个属性有一个令人讨厌的名字。你应该避免使用它，除非你绝对需要。
-
-    Lua脚本有以 ``utils.shared_script_property_`` 开头的辅助工具。它们是没有文档的，因为你不应该使用这个属性。如果你仍然认为你必须使用，你应该使用辅助工具而不是直接使用这个属性。
-
-    你应该使用 ``change-list`` 命令来修改内容。如果两个脚本同时更新不同的按键，由于缺乏同步性，手动读取、修改和写入属性可能会造成数据丢失。Lua辅助工具可以解决这个问题。
-
-    （如果两个脚本试图同时更新同一个按键，则没有办法确保同步性）
-
 ``user-data`` (RW)
     这是一个在客户端之间共享的任意节点的递归按键/值图表，以供一般使用（即脚本、IPC客户端、主机应用程序等）。播放器自身不使用其中的任何数据（尽管一些内置脚本可能使用）。该属性在播放器重新启动后不会被保留。
-
-    这是比 ``shared-script-properties`` 更强大的替代品。
 
     子路径可以被直接访问；例如， ``user-data/my-script/state/a`` 可被读取、写入或观测。
 
     top-level 对象本身不能被直接写入；而是写入到子路径。
 
     将此属性或其子属性转换为字符串，这将得到一个JSON的呈现。如果转换一个 leaf-level 对象（即不是图表或数组）并且不使用 raw 模式，将给出底层内容（例如，字符串将被直接输出，而没有引号或JSON转义）。
+
+``menu-data`` (RW)
+    此属性存储原始菜单定义。详情请参阅 `上下文菜单`_ 部分。
+
+    ``type``
+        菜单项类型。可以是 ``separator`` , ``submenu`` 或空。
+
+    ``title``
+        菜单项标题。如果类型不是 ``separator`` 则必须填写。
+
+    ``cmd``
+        点击菜单项时要执行的命令。
+
+    ``shortcut``
+        菜单项右侧显示的菜单项快捷键。
+        快捷键不一定要有功能，它只是一个视觉提示。
+
+    ``state``
+        菜单项的状态。可以是 ``checked`` , ``disabled``, ``hidden`` 或空。
+
+    ``submenu``
+        子菜单项，类型为 ``submenu`` 时必须填写。
+
+    使用client API ``MPV_FORMAT_NODE`` 或 Lua ``mp.get_property_native`` 查询属性时，将返回一个 mpv_node，内容如下：
+
+    ::
+
+        MPV_FORMAT_NODE_ARRAY
+            MPV_FORMAT_NODE_MAP (menu item)
+                "type"           MPV_FORMAT_STRING
+                "title"          MPV_FORMAT_STRING
+                "cmd"            MPV_FORMAT_STRING
+                "shortcut"       MPV_FORMAT_STRING
+                "state"          MPV_FORMAT_NODE_ARRAY[MPV_FORMAT_STRING]
+                "submenu"        MPV_FORMAT_NODE_ARRAY[menu item]
+
+    如果 mpv 视频输出当前处于活动状态，则使用client API ``MPV_FORMAT_NODE`` 或 Lua ``mp.set_property_native`` 写入此属性将触发菜单的立即更新。您可以通过观察 ``current-vo`` 属性来检查情况。
 
 ``working-directory``
     mpv进程的工作目录。对JSON IPC用户可能有用，因为命令行播放器通常使用相对路径。
@@ -2326,7 +2469,7 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     传递给构建系统的配置参数。如果用于编译mpv的meson版本低于1.1.0，那么就会显示一条由多个任意选项组成的硬编码字符串。
 
 ``ffmpeg-version``
-    ``av_version_info()`` API调用的内容。这是一个以某种方式标识构建的字符串，可以是发布版本号，也可以是git哈希值。这也适用于Libav（这个属性的名字还是一样的）。如果mpv与较早的FFmpeg和Libav版本链接，这个属性就不可用。
+    ``av_version_info()`` API调用的内容。这是一个以某种方式标识构建的字符串，可以是发布版本号，也可以是git哈希值。如果mpv与较早的FFmpeg版本链接，这个属性就不可用。
 
 ``libass-version``
     ``ass_library_version()`` 的值。这是一个整数，以有点奇怪的形式编码（显然是 "hex BCD"），表示链接到mpv的libass库的发布版本。
@@ -2360,6 +2503,9 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
     ``option-info/<name>/set-locally``
         该选项是否按单文件设置。自动加载的设置文件、文件-目录的设置和其他情况都是如此。这意味着当播放结束时，选项的值将被恢复到播放开始前的值
+
+    ``option-info/<name>/expects-file``
+        选项是否将文件路径作为参数
 
     ``option-info/<name>/default-value``
         该选项的默认值。可能并非总是可用
@@ -2472,11 +2618,15 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 原始和格式化的属性
 ------------------
 
-通常情况下，属性被格式化为人性化的可读文本，旨在显示在OSD或终端上。通过在属性名称前加上 ``=`` ，可以从一个属性中获取未格式化的（原始）值。这些原始值可以被其他程序解析，并遵循与属性相关的选项相同的惯例。
+通常情况下，属性被格式化为人性化的可读文本，旨在显示在OSD或终端上。通过在属性名称前加上 ``=`` ，可以从一个属性中获取未格式化的（原始）值。这些原始值可以被其他程序解析，并遵循与属性相关的选项相同的惯例。此外，还有一个 ``>`` 前缀，用于格式化人类可读的文本，浮点数值采用固定精度。这对于输出需要恒定宽度的数值非常有用。
 
 .. admonition:: 示例
 
     - ``${time-pos}`` 扩展为 ``00:14:23`` （如果播放位置在14分23秒）
     - ``${=time-pos}``扩展为 ``863.4`` （同样的时间，加上400毫秒 —— 在格式化的情况下通常不显示毫秒）
+
+    - ``${avsync}`` 扩展为 ``+0.003``
+    - ``${>avsync}`` 扩展为 ``+0.0030``
+    - ``${=avsync}`` 扩展为 ``0.003028``
 
 有时，原始属性值和格式化的属性值所携带的信息量的差异可能相当大。在某些情况下，原始值有更多的信息，比如比秒更精确的 ``time-pos`` 。有时情况正好相反，例如 ``aid`` 在格式化的情况下显示音轨标题和语言，但如果是原始值，则只显示音轨号码。

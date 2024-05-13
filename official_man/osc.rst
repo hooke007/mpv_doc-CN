@@ -122,18 +122,7 @@ del             循环 OSC可见性 始终隐藏/自动显示/始终显示
 设置
 ----
 
-OSC通过放置在mpv用户目录下的设置文件 ``script-opts/osc.conf`` 和 ``--script-opts`` 命令行选项提供有限的设置。通过命令行提供的选项将覆盖设置文件中的选项。
-
-设置语法
-~~~~~~~~
-
-设置文件必须严格遵循以下语法::
-
-    # 这是一个注释
-    optionA=value1
-    optionB=value2
-
-``#`` 只能用在一行的开头， ``=`` 周围或其它地方不能有空格。
+可以通过 mpv 用户目录下的设置文件 ``script-opts/osc.conf`` 和命令行选项 ``--script-opts`` 来定制该脚本。设置语法记录在 `mp.options functions`_ 部分。
 
 命令行语法
 ~~~~~~~~~~
@@ -183,6 +172,11 @@ OSC通过放置在mpv用户目录下的设置文件 ``script-opts/osc.conf`` 和
 
     可搜寻范围的透明度，0（不透明）到255（完全透明）
 
+``scrollcontrols``
+    默认： yes
+
+    默认情况下，如果鼠标悬停在 OSC 元素上，使用鼠标滚轮上下滚动会触发某些操作（例如seek）。设置为 ``no`` 可禁用任何特殊的鼠标滚轮行为。
+
 ``deadzonesize``
     默认： 0.5
 
@@ -217,11 +211,6 @@ OSC通过放置在mpv用户目录下的设置文件 ``script-opts/osc.conf`` 和
     默认： 1.0
 
     全屏时OSC的比例系数
-
-``scaleforcedwindow``
-    默认： 2.0
-
-    在强制（假）窗口上渲染时OSC的比例系数
 
 ``vidscale``
     默认： yes
@@ -261,7 +250,7 @@ OSC通过放置在mpv用户目录下的设置文件 ``script-opts/osc.conf`` 和
 ``title``
     默认： ${media-title}
 
-    支持属性扩展的字符串，将被显示为OSC标题。ASS标签被转义，换行和尾部斜杠被剥离。
+    支持属性扩展的字符串，将被显示为OSC标题。ASS标签被转义，换行被转换为空格。
 
 ``tooltipborder``
     默认： 1
@@ -325,6 +314,11 @@ OSC通过放置在mpv用户目录下的设置文件 ``script-opts/osc.conf`` 和
 
     ``left`` 和 ``right`` 支持将把控件放在左侧和右侧。
 
+``windowcontrols_title``
+    默认： ${media-title}
+
+    支持属性扩展的字符串，将显示为窗口控件的标题。ASS 标签会被转义，换行符和尾部斜杠会被剥离。
+
 ``greenandgrumpy``
     默认： no
 
@@ -335,10 +329,15 @@ OSC通过放置在mpv用户目录下的设置文件 ``script-opts/osc.conf`` 和
 
     在持续时间变化时更新章节标记的位置，例如，直播流。状态更新尚未优化 —— 考虑在非常低端的系统上禁用它。
 
-``chapters_osd`` ``playlist_osd``
+``chapters_osd`` , ``playlist_osd``
     默认： yes
 
     当左键单机OSC的下一个/上一个按钮时，是否分别在OSD上显示章节/播放列表。
+
+``playlist_media_title``
+    默认： yes
+
+    是否以媒体标题显示为播放列表的条目。如果设置为 ``no`` ，则使用文件名。请注意，文件的媒体标题只有在加载后才可用。
 
 ``chapter_fmt``
     默认： ``Chapter: %s``
@@ -349,6 +348,56 @@ OSC通过放置在mpv用户目录下的设置文件 ``script-opts/osc.conf`` 和
     默认： no
 
     在显示剩余播放时间时，使用Unicode减号而不是ASCII连字符。
+
+``background_color``
+    默认： #000000
+
+    Sets the background color of the OSC.
+
+``timecode_color``
+    默认： #FFFFFF
+
+    Sets the color of the timecode and seekbar, of the OSC.
+
+``title_color``
+    默认： #FFFFFF
+
+    Sets the color of the video title. Formatted as #RRGGBB.
+
+``time_pos_color``
+    默认： #FFFFFF
+
+    Sets the color of the timecode at hover position in the seekbar.
+
+``time_pos_outline_color``
+    默认： #FFFFFF
+
+    Sets the color of the timecode's outline at hover position in the seekbar. Also affects the timecode in the slimbox layout.
+
+``buttons_color``
+    默认： #FFFFFF
+
+    Sets the colors of the big buttons.
+
+``top_buttons_color``
+    默认： #FFFFFF
+
+    Sets the colors of the top buttons.
+
+``small_buttonsL_color``
+    默认： #FFFFFF
+
+    Sets the colors of the small buttons on the left in the box layout.
+
+``small_buttonsR_color``
+    默认： #FFFFFF
+
+    Sets the colors of the small buttons on the right in the box layout.
+
+``held_element_color``
+    默认： #999999
+
+    Sets the colors of the elements that are being pressed or held down.
 
 
 脚本命令

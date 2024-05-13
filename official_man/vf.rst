@@ -126,10 +126,13 @@
         可用的色彩空间有：
 
         :auto:          自动选择（默认）
-        :bt.601:        ITU-R BT.601 (SD)
-        :bt.709:        ITU-R BT.709 (HD)
-        :bt.2020-ncl:   ITU-R BT.2020 非恒定亮度系统
-        :bt.2020-cl:    ITU-R BT.2020 恒定亮度系统
+        :bt.601:        ITU-R Rec. BT.601 (SD)
+        :bt.709:        ITU-R Rec. BT.709 (HD)
+        :bt.2020-ncl:   ITU-R Rec. BT.2020 （非恒定亮度）
+        :bt.2020-cl:    ITU-R Rec. BT.2020 （恒定亮度）
+        :bt.2100-pq:    ITU-R Rec. BT.2100 ICtCp PQ 变体
+        :bt.2100-hlg:   ITU-R Rec. BT.2100 ICtCp HLG 变体
+        :dolbyvision:   Dolby Vision 杜比视界
         :smpte-240m:    SMPTE-240M
 
     ``<colorlevels>``
@@ -208,6 +211,9 @@
 
     ``<dolbyvision=yes|no>``
         是否包含杜比视界元数据（默认： yes）。如果禁用，将从帧中剥离任何杜比视界元数据。
+
+    ``<hdr10plus=yes|no>``
+        是否包含HDR10+元数据（默认： yes）。如果禁用，将从帧中剥离任何HDR10+元数据。
 
     ``<film-grain=yes|no>``
         是否包括胶片颗粒元数据（默认： yes）。如果禁用，任何胶片颗粒元数据都将从帧中剥离。
@@ -478,9 +484,17 @@
         输出计算的fingerprints到终端（默认： no）。这主要是为了测试之类的。脚本应该使用 ``vf-metadata`` 来读取这个滤镜的信息。
 
 ``gpu=...``
-    使用通常与 ``--vo=gpu`` 一起使用的OpenGL渲染器将视频转换为RGB。这需要EGL实现的支持默认显示器上的离屏渲染（Mesa就是这种情况）。
+    使用通常与 ``--vo=gpu`` 一起使用的Vulkan或OpenGL渲染器，将视频转换为RGB。对于OpenGL来说，这需要EGL实现的支持默认显示器上的离屏渲染（Mesa就是这种情况）。
 
     子选项：
+
+    ``api=<type>``
+        更改值 ``type`` 来选择渲染 API。 您还可以通过传递 ``help`` 获取已编译后端的完整列表。
+
+        egl
+            EGL （如果可用即默认）
+        vulkan
+            Vulkan
 
     ``w=<pixels>``, ``h=<pixels>``
         输出的尺寸，单位是像素（默认： 0）。如果不是正数，这将使用第一个过滤后的输入帧的大小

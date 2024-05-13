@@ -10,14 +10,40 @@
 
 .. note::
 
-    参见 ``--ao=help`` 获取已编译的音频输出驱动的列表。 ``--ao=alsa`` 是首选。 ``--ao=pulse`` 在使用PulseAudio的系统上是首选。在BSD系统上， ``--ao=oss`` 是首选。
+    参见 ``--ao=help`` 获取已编译的音频输出驱动的列表，按自动探测顺序排列。
 
 可用的音频输出驱动有：
 
-``alsa`` （Linux独占）
+``alsa``
     ALSA音频输出驱动
 
-    参见 `ALSA音频输出选项`_ 以查看它的特定选项。
+    该AO支持以下全局选项：
+
+    ``--alsa-resample=yes``
+        启用ALSA重采样插件。（默认禁用，因为一些驱动程序在某些情况下报告了不正确的音频延迟）。
+
+    ``--alsa-mixer-device=<device>``
+        设置与 ``ao-volume`` 一起使用的混音器设备（默认： ``default`` ）。
+
+    ``--alsa-mixer-name=<name>``
+        设置混音器元素的名称（默认： ``Master`` ）。例如，这是 ``PCM`` 或 ``Master``
+
+    ``--alsa-mixer-index=<number>``
+        设置混音器通道的索引（默认： 0）。考虑到 "``amixer scontrols``" 的输出，那么索引就是元素名称后面的数字。
+
+    ``--alsa-non-interleaved``
+        允许输出非交错格式（如果音频解码器使用这种格式）。目前默认禁用，因为一些流行的ALSA插件在使用非交错格式时完全失效。
+
+    ``--alsa-ignore-chmap``
+        不读取或设置ALSA设备的声道图 —— 只请求所需的声道数，然后将音频原封不动的传递给它。此选项很可能不应被使用。它在调试中可能很有用，或者对于有特殊设计的ALSA配置的静态设置（在这种情况下，你应该始终用 ``--audio-channels`` 强制使用相同的布局，否则它只对使用ALSA设备暗含布局的文件有效）。
+
+    ``--alsa-buffer-time=<microseconds>``
+        设置请求的缓冲时间，以微秒为单位。数值 0 可以跳过ALSA API的任何请求。该选项和 ``--alsa-periods`` 选项使用ALSA的 ``near`` 函数来设置请求的参数。如果这样做的结果是一个空的配置集，那么就跳过设置这些参数。
+
+    这两个选项都控制缓冲区的大小。过小的缓冲区会导致较高的CPU使用率和音频丢失，而过大的缓冲区则会导致音量变化和其它滤镜的延迟。
+
+    ``--alsa-periods=<number>``
+        从ALSA API请求的周期数。详见 ``--alsa-buffer-time`` 以了解更多。
 
     .. warning::
 
@@ -57,9 +83,15 @@
     ``--coreaudio-spdif-hack=<yes|no>``
         尝试将AC3/DTS数据作为PCM透传。这对不支持AC3的驱动很有用。它将 AC3 数据转换为浮点，并假定驱动程序将做逆向转换，这意味着传统的A/V接收机将把它作为压缩的IEC框架的AC3流来接收，而忽略它被标记为PCM 。这禁用了正常的AC3直通功能（即使设备报告支持它）。使用时要特别小心。
 
-
 ``coreaudio_exclusive`` （macOS独占）
     原生macOS音频输出驱动，使用直接设备访问和独占模式（绕过声音服务）
+
+``avfoundation`` (macOS only)
+    使用 AVFoundation 中 ``AVSampleBufferAudioRenderer`` 的原生 macOS 音频输出驱动程序，支持 `空间音频 <https://support.apple.com/102469>`_.
+
+    .. warning::
+
+        Turning on spatial audio may hang the playback if mpv is not started out of the bundle, though playback with spatial audio off always works.
 
 ``openal``
     OpenAL音频输出驱动
@@ -85,9 +117,7 @@
         以毫秒为单位设置音频缓冲区的大小。较高的值可以缓冲更多的数据，并且有较低的缓冲区不足的概率。较小的值使音频流反应更快，例如对播放速度变化的响应。 "native" 让声音服务自行设定缓冲
 
     ``--pulse-latency-hacks=<yes|no>``
-        启用hack来解决PulseAudio的时间错误（默认： no）。如果启用，mpv将自己进行详细的延迟计算。如果禁用，它将使用PulseAudio自动更新的时间信息。禁用这个功能可能对网络音频或一些插件有帮助，而启用它可能对一些未知的情况有帮助（在旧版PulseAudio中，它曾是良好运行必要条件）
-
-        如果你在使用pulse时有视频卡顿的情况，尝试启用这个选项。（或者尝试更新PulseAudio）
+        启用hack来解决PulseAudio的时间错误（默认： yes）。如果启用，mpv将自己进行详细的延迟计算。如果禁用，它将使用PulseAudio自动更新的时间信息。禁用这个功能可能对网络音频或一些插件有帮助，而启用它可能对一些未知的情况有帮助（由于 PulseAudio 16.0 的已知错误，目前已启用）
 
     ``--pulse-allow-suspended=<yes|no>``
         即使sink挂起也允许mpv使用PulseAudio（默认： no）。如果PulseAudio以桥接到jack的方式运行，而mpv的sink-input被设置为jack使用的输入，则会很有用。
@@ -107,7 +137,7 @@
         指定 ``ao-volume`` 属性是否应该应用于声道音量或全局音量。默认为全局音量。
 
 ``sdl``
-    SDL 1.2+音频输出驱动。应该在任何受SDL 1.2支持的平台上工作，但可能需要为你的系统正确的设置 ``SDL_AUDIODRIVER`` 环境变量。
+    SDL 2.0+音频输出驱动。应该在任何受SDL 2.0支持的平台上工作，但可能需要为你的系统正确的设置 ``SDL_AUDIODRIVER`` 环境变量。
 
     .. note:: 该驱动是为了与极其陌生的环境兼容，例如其他驱动程序都无法使用的系统。
 
@@ -167,3 +197,10 @@
 
 ``wasapi``
     音频输出到Windows音频会话API
+
+    该AO支持以下全局选项：
+
+    ``--wasapi-exclusive-buffer=<default|min|1-2000000>``
+        设置独占模式下的缓冲区持续时间（即使用 ``--audio-exclusive=yes`` 时）。 ``default`` 和 ``min`` 分别使用 WASAPI 报告的默认和最小设备周期。你也可以直接以微秒为单位指定缓冲持续时间，在这种情况下，短于最小设备周期的持续时间将四舍五入为最小周期。
+
+        默认的缓冲持续时间在大多数情况下都能提供稳定的播放，但据报告，在某些设备上，默认设置下的流重置会出现故障。在这种情况下，指定更短的持续时间可能会有帮助。

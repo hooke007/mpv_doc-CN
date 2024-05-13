@@ -162,7 +162,7 @@
 ``null``
     无视频输出。对于基准测试很有用。
 
-    通常情况下，用 ``--no-video`` 来禁用视频更好。
+    通常情况下，用 ``--video=no`` 来禁用视频更好。
 
     支持以下全局选项：
 
@@ -172,6 +172,20 @@
 ``caca``
     Color ASCII art video output driver that works on a text console.
 
+    This driver reserves some keys for runtime configuration. These keys are hardcoded and cannot be bound:
+
+    d and D
+        Toggle dithering algorithm.
+
+    a and A
+        Toggle antialiasing method.
+
+    h and H
+        Toggle charset method.
+
+    c and C
+        Toggle color method.
+
     .. note:: This driver is a joke.
 
 ``tct``
@@ -179,7 +193,7 @@
 
     从mpv 0.30.0开始，你可能需要使用 ``--profile=sw-fast`` 来获得合格的性能。
 
-    注意：TCT图像输出与mpv的其他终端输出不同步，这可能导致图像破碎。选项 ``--no-terminal`` 或 ``--really-quiet`` 有助于解决这个问题。
+    注意：TCT图像输出与mpv的其他终端输出不同步，这可能导致图像破碎。选项 ``--terminal=no`` 或 ``--really-quiet`` 有助于解决这个问题。
 
     ``--vo-tct-algo=<algo>``
         选择如何将像素写入到终端
@@ -188,6 +202,18 @@
             使用unicode LOWER HALF BLOCK字符来实现更高的垂直分辨率（默认）
         plain
             使用空格。导致垂直分辨率下降两重，但理论上在更多地方起作用
+
+    ``--vo-tct-buffering=<pixel|line|frame>``
+        Specifies the size of data batches buffered before being sent to the terminal.
+
+        TCT image output is not synchronized with other terminal output from mpv, which can lead to broken images. Sending data to the terminal in small batches may improve parallelism between terminal processing and mpv processing but incurs a static overhead of generating tens of thousands of small writes. Also, depending on the terminal used, sending frames in one chunk might help with tearing of the output, especially if not used with ``--really-quiet`` and other logs interrupt the data stream.
+
+        pixel
+            Send data to terminal for each pixel.
+        line
+            Send data to terminal for each line. (Default)
+        frame
+            Send data to terminal for each frame.
 
     ``--vo-tct-width=<width>`` ``--vo-tct-height=<height>``
         假设终端有指定的字符宽度和/或高度。如果不能检测终端尺寸，这些默认为80x25
@@ -329,23 +355,6 @@
     用于libmpv的直接嵌入。作为一个特例，在macOS上，它被当作mpv(cocoa-cb)中的一个普通视频输出使用。否则在其他情况下是无用的（参见 ``<mpv/render.h>`` ）。
 
     这也支持许多 ``gpu`` 视频输出的选项，取决于后端。
-
-``rpi`` （树莓派）
-    在树莓派上使用MMAL API进行原生视频输出。
-
-    支持以下的全局选项：
-
-    ``--rpi-display=<number>``
-        选择视频overlay应显示的显示器号码（默认： 0）
-
-    ``--rpi-layer=<number>``
-        选择视频overlay应显示的dispmanx层（默认： -10）。注意，mpv也将使用所选层上面的2个层，来处理窗口背景和OSD。实际的视频渲染将发生在所选层上面的那一层。
-
-    ``--rpi-background=<yes|no>``
-        是否在视频后面渲染一个黑色背景（默认： no）。通常情况下，最好结束控制台的framebuffer，这样会有更好的性能。
-
-    ``--rpi-osd=<yes|no>``
-        默认情况下启用。如果用 ``no`` 禁用，就不会创建OSD层。这也意味着将不会有字幕被渲染。
 
 ``drm`` (Direct Rendering Manager)
     https://mpv.io/manual/master/#video-output-drivers-drm
