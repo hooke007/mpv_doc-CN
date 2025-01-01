@@ -12,6 +12,8 @@
 
     参见 ``--ao=help`` 获取已编译的音频输出驱动的列表，按自动探测顺序排列。
 
+    请注意，默认音频输出驱动程序可能会发生变化，不得依赖。如果需要使用某个AO，则必须明确指定。
+
 可用的音频输出驱动有：
 
 ``alsa``
@@ -86,12 +88,15 @@
 ``coreaudio_exclusive`` （macOS独占）
     原生macOS音频输出驱动，使用直接设备访问和独占模式（绕过声音服务）
 
-``avfoundation`` (macOS only)
+``avfoundation`` （macOS独占）
     使用 AVFoundation 中 ``AVSampleBufferAudioRenderer`` 的原生 macOS 音频输出驱动程序，支持 `空间音频 <https://support.apple.com/102469>`_.
 
     .. warning::
 
-        Turning on spatial audio may hang the playback if mpv is not started out of the bundle, though playback with spatial audio off always works.
+        如果不是以bundle的形式启动 mpv，启用空间音频可能会挂起播放，不过关闭空间音频后播放总是正常的。
+
+``audiounit`` （ios独占）
+    使用 ``AudioUnits`` 和 AudioToolbox 的原生 iOS 音频输出驱动程序。
 
 ``openal``
     OpenAL音频输出驱动

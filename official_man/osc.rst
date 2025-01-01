@@ -26,23 +26,27 @@
 上一文件
     =============   ================================================
     左键单机        播放列表中的上一个文件
-    右键单机        显示播放列表
     shift左键单机   显示播放列表
+    中键单机        显示播放列表
+    右键单机        打开播放列表选择器
     =============   ================================================
 
 下一文件
     =============   ================================================
     左键单机        播放列表中的下一个文件
-    右键单机        显示播放列表
     shift左键单机   显示播放列表
+    中键单机        显示播放列表
+    右键单机        打开播放列表选择器
     =============   ================================================
 
 标题
-    | 悬停在进度条时，显示当前的媒体标题、文件名、自定义标题或目标章节名称
+    | 显示当前播放列表位置和媒体标题、文件名或自定义标题，或悬停在进度条上的目标章节名称。
 
     =============   ================================================
-    左键单机        显示播放列表中的位置、长度和完整标题
-    右键单机        显示文件名
+    左键单机        显示文件和轨道信息
+    shift左键单机   显示文件名
+    中键单机        显示文件名
+    右键单机        显示路径
     =============   ================================================
 
 缓存指示
@@ -51,20 +55,23 @@
 播放
     =============   ================================================
     左键单机        切换 播放/暂停
+    右键单机        切换 无限循环播放
     =============   ================================================
 
 上一章节
     =============   ================================================
     左键单机        跳转章节开头/上一章节
-    右键单机        显示章节列表
     shift左键单机   显示章节列表
+    中键单机        显示章节列表
+    右键单机        打开章节选择器
     =============   ================================================
 
 下一章节
     =============   ================================================
     左键单机        跳转下一章节
-    右键单机        显示章节列表
     shift左键单机   显示章节列表
+    中键单机        显示章节列表
+    右键单机        打开章节选择器
     =============   ================================================
 
 已过时间
@@ -78,7 +85,8 @@
     | 显示当前的播放位置和章节的位置
 
     =============   ================================================
-    左键单机        跳转位置
+    左键单机        跳转至位置
+    右键单机        跳转至最近章节
     鼠标滚轮        前进/后退
     =============   ================================================
 
@@ -94,21 +102,26 @@
 
     =============   ================================================
     左键单机        循环 音频/字幕轨 前进
-    右键单机        循环 音频/字幕轨 后退
-    shift左键单机   显示可用的音频/字幕轨列表
+    shift左键单机   循环 音频/字幕轨 后退
+    中键单机        循环 音频/字幕轨 后退
+    右键单机        打开音频/字幕轨选择器
     鼠标滚轮        循环 音频/字幕轨 前进/后退
     =============   ================================================
 
 音量
     =============   ================================================
     左键单机        切换 静音
+    右键单机        打开音频设备选择器
     滚轮滚动        音量增大/减小
     =============   ================================================
 
 全屏
     =============   ================================================
     左键单机        切换 全屏
+    右键单机        切换 窗口最大化
     =============   ================================================
+
+自 mpv 0.40.0 起，可以在某些界面元素上配置命令与鼠标指令同时运行，而且一些元素的默认行为也有所更改。如果你怀念某些旧行为，请查看 mpv git 仓库中的 ``etc/restore-osc-bindings.conf`` 。
 
 按键绑定
 ~~~~~~~~
@@ -213,19 +226,19 @@ del             循环 OSC可见性 始终隐藏/自动显示/始终显示
     全屏时OSC的比例系数
 
 ``vidscale``
-    默认： yes
+    默认： auto
 
-    随视频的比例缩放OSC。 ``no`` 试图在窗口大小允许的范围内保持OSC大小不变。
+    随视频的比例缩放OSC。 ``no`` 试图在窗口大小允许的范围内保持OSC大小不变。 ``auto`` 缩放OSC和OSD随窗口缩放或保持恒定大小，具体取决于 ``--osd-scale-by-window`` 选项。
 
 ``valign``
     默认： 0.8
 
-    垂直对齐，-1（顶部）到1（底部）
+    垂直对齐（仅box或slimbox布局有效），-1（顶部）到1（底部）
 
 ``halign``
     默认： 0.0
 
-    水平对齐，-1（左侧）到1（右侧）
+    水平对齐（仅box或slimbox布局有效），-1（左侧）到1（右侧）
 
 ``barmargin``
     默认： 0
@@ -245,10 +258,15 @@ del             循环 OSC可见性 始终隐藏/自动显示/始终显示
 ``fadeduration``
     默认： 200
 
-    淡出的持续时间，以ms为单位，0=不淡出
+    淡入淡出的持续时间，以ms为单位，0=不淡出
+
+``fadein``
+    默认： no
+
+    启用淡入效果。
 
 ``title``
-    默认： ${media-title}
+    默认： ${!playlist-count==1:[${playlist-pos-1}/${playlist-count}] }${media-title}
 
     支持属性扩展的字符串，将被显示为OSC标题。ASS标签被转义，换行被转换为空格。
 
@@ -329,16 +347,6 @@ del             循环 OSC可见性 始终隐藏/自动显示/始终显示
 
     在持续时间变化时更新章节标记的位置，例如，直播流。状态更新尚未优化 —— 考虑在非常低端的系统上禁用它。
 
-``chapters_osd`` , ``playlist_osd``
-    默认： yes
-
-    当左键单机OSC的下一个/上一个按钮时，是否分别在OSD上显示章节/播放列表。
-
-``playlist_media_title``
-    默认： yes
-
-    是否以媒体标题显示为播放列表的条目。如果设置为 ``no`` ，则使用文件名。请注意，文件的媒体标题只有在加载后才可用。
-
 ``chapter_fmt``
     默认： ``Chapter: %s``
 
@@ -399,17 +407,105 @@ del             循环 OSC可见性 始终隐藏/自动显示/始终显示
 
     Sets the colors of the elements that are being pressed or held down.
 
+``tick_delay``
+    默认： 1/60
+
+    设置以秒为单位的 OSC 重绘最小间隔时间。在运行速度较快的系统中，可以缩短这一间隔，使 OSC 渲染更流畅。
+
+    如果 ``tick_delay_follow_display_fps`` 设置为 yes ，且 VO 支持 ``display-fps`` 属性，则忽略该设置。
+
+``tick_delay_follow_display_fps``
+    默认： no
+
+    使用显示帧频计算 OSC 重绘的间隔时间。
+
+以下选项可配置点击按钮时运行的命令。 ``shift+mbtn_left`` 也会触发 ``mbtn_mid`` 的命令。
+
+``playlist_prev_mbtn_left_command=playlist-prev; show-text ${playlist} 3000``
+
+``playlist_prev_mbtn_mid_command=show-text ${playlist} 3000``
+
+``playlist_prev_mbtn_right_command=script-binding select/select-playlist; script-message-to osc osc-hide``
+
+``playlist_next_mbtn_left_command=playlist-next; show-text ${playlist} 3000``
+
+``playlist_next_mbtn_mid_command=show-text ${playlist} 3000``
+
+``playlist_next_mbtn_right_command=script-binding select/select-playlist; script-message-to osc osc-hide``
+
+``title_mbtn_left_command=script-binding stats/display-page-5``
+
+``title_mbtn_mid_command=show-text ${filename}``
+
+``title_mbtn_right_command=show-text ${path}``
+
+``play_pause_mbtn_left_command=cycle pause``
+
+``play_pause_mbtn_mid_command=``
+
+``play_pause_mbtn_right_command=cycle-values loop-file inf no``
+
+``chapter_prev_mbtn_left_command=osd-msg add chapter -1``
+
+``chapter_prev_mbtn_mid_command=show-text ${chapter-list} 3000``
+
+``chapter_prev_mbtn_right_command=script-binding select/select-chapter; script-message-to osc osc-hide``
+
+``chapter_next_mbtn_left_command=osd-msg add chapter 1``
+
+``chapter_next_mbtn_mid_command=show-text ${chapter-list} 3000``
+
+``chapter_next_mbtn_right_command=script-binding select/select-chapter; script-message-to osc osc-hide``
+
+``audio_track_mbtn_left_command=cycle audio``
+
+``audio_track_mbtn_mid_command=cycle audio down``
+
+``audio_track_mbtn_right_command=script-binding select/select-aid; script-message-to osc osc-hide``
+
+``audio_track_wheel_down_command=cycle audio``
+
+``audio_track_wheel_up_command=cycle audio down``
+
+``sub_track_mbtn_left_command=cycle sub``
+
+``sub_track_mbtn_mid_command=cycle sub down``
+
+``sub_track_mbtn_right_command=script-binding select/select-sid; script-message-to osc osc-hide``
+
+``sub_track_wheel_down_command=cycle sub``
+
+``sub_track_wheel_up_command=cycle sub down``
+
+``volume_mbtn_left_command=no-osd cycle mute``
+
+``volume_mbtn_mid_command=``
+
+``volume_mbtn_right_command=script-binding select/select-audio-device; script-message-to osc osc-hide``
+
+``volume_wheel_down_command=add volume -5``
+
+``volume_wheel_up_command=add volume 5``
+
+``fullscreen_mbtn_left_command="cycle fullscreen"``
+
+``fullscreen_mbtn_mid_command=``
+
+``fullscreen_mbtn_right_command="cycle window-maximized"``
 
 脚本命令
 ~~~~~~~~
 
 OSC脚本会监听某些脚本命令。这些命令可以绑定在 ``input.conf`` 中，或者由其他脚本发送。
 
-``osc-message``
-    使用OSC在屏幕上显示一条信息。第一个参数是信息，第二个参数是持续时间（秒）。
-
 ``osc-visibility``
     控制可见性模式 ``never`` / ``auto`` （在鼠标移动时）/ ``always`` 和 ``cycle`` 在各种模式之间循环。
+
+``osc-show``
+    触发 OSC 显示，就像用户移动鼠标一样。
+
+``osc-hide``
+    当 ``visibility`` 为 ``auto`` 时，隐藏 OSC。
 
 示例
 
@@ -420,7 +516,3 @@ OSC脚本会监听某些脚本命令。这些命令可以绑定在 ``input.conf`
 
 ``osc-idlescreen``
     控制空闲状态时mpv的logo可见性。有效的参数是 ``yes`` ``no`` ，也可用 ``cycle`` 来切换。
-
-``osc-playlist`` ``osc-chapterlist`` ``osc-tracklist``
-    使用OSC显示各自类型的列表的有限视图。第一个参数是持续时间，单位是秒。
-

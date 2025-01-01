@@ -145,6 +145,28 @@
 
     如果使用了 ``--audio-pitch-correction`` （默认： yes），以高于正常速度播放会自动插入 ``scaletempo2`` 音频滤镜。
 
+``--pitch=<0.01-100>``
+    按参数给定的系数提高或降低音频的音调。不会影响播放速度。以改变后的音调播放时，会自动插入 ``scaletempo2`` 音频滤镜。
+
+    由于音调变化是通过结合音调保留速度变化和重采样来实现的，因此音调变化的范围实际上受到了 ``scaletempo2`` 的 ``min-speed`` 和 ``max-speed`` 参数的限制：例如，0.25 的 ``min-speed`` 将最高音调系数限制为 4(1/0.25) 。
+
+    在标准的 12 音阶系统中，八度之间的分隔系数为 2，而半音的分隔系数为 2^(1/12) 。这意味着只需一个简单的乘法器，就能轻松实现音高的上移或下移。
+
+    .. admonition:: 示例
+
+        ``--pitch=2``
+            将音调调高一个八度。
+        ``--pitch=0.5``
+            将音调调低一个八度。
+        ``--pitch=1.498307`` (2^(7/12))
+            将音调调高一个全五度。
+        ``--pitch=0.667420`` (2^(-7/12))
+            将音调调低一个全五度。
+        ``--pitch=1.059463`` (2^(1/12))
+            将音调调高一个半音。
+        ``--pitch=0.943874`` (2^(-1/12))
+            将音调调低一个半音。
+
 ``--pause``
     以暂停状态启动播放器。
 
@@ -244,7 +266,7 @@
     循环点可以在运行时通过相应的属性来调整。另参见 ``ab-loop`` 命令。
 
 ``--ab-loop-count=<N|inf>``
-    只运行A-B循环N次，然后忽略A-B循环点（默认： inf）。每完成一次循环迭代，该选项将递减1（除非它被设置为 ``inf`` 或0）。 ``inf`` 表示循环会永远进行下去。如果这个选项被设置为0，A-B循环将被忽略，甚至 ``ab-loop`` 命令也不会再次启用循环（如果两个循环点都已被设置，但 ``ab-loop-count`` 为0，该命令将在OSD信息中显示 ``(disabled)`` ）。
+    只运行A-B循环N次，然后忽略A-B循环点（默认： inf）。 ``inf`` 表示循环将一直进行下去。如果将该选项设置为 0，A-B 循环将被忽略，即使使用 ``ab-loop`` 命令也不会再次启用循环（如果两个循环点都已设置，但 ``ab-loop-count`` 为 0，命令将在 OSD 信息上显示 ``(disabled)`` ）。
 
 ``--ordered-chapters=<yes|no>``
     默认： yes。禁用对Matroska有序章节的支持。mpv不会加载或搜索其它文件的视频片段，也会忽略为主文件指定的任何章节顺序。
@@ -439,10 +461,10 @@
 
     ``--scripts`` 是一个路径列表选项。详见 `列表选项`_
 
-``--script-opts=key1=value1,key2=value2,...``
+``--script-opt=<key=value>`` ``--script-opts=key1=value1,key2=value2,...``
     为脚本设置选项。脚本可以通过按键来查询一个选项。如果一个选项被使用，以及该选项值具有什么样的语义，完全取决于所加载的脚本。没有被任何脚本声明的值会被忽略。
 
-    这是一个按键/值列表选项。详见 `列表选项`_
+    每次使用 ``--script-opt`` 选项都会在内部列表中添加另一个选项，而 ``--script-opts`` 则一次性获取一个选项列表，并用它覆盖内部列表。后者是一个按键/值列表选项。详见 `列表选项`_
 
 ``--merge-files``
     假装所有传递给mpv的文件都被串联成一个单一的大文件。这使用内部的时间轴/EDL支持。
@@ -495,6 +517,8 @@
 
         ``^`` 匹配URL的开头， ``$`` 匹配其结尾，你应该在任何 ``^$()%|,.[]*+-?`` 字符之前使用 ``%`` 来匹配该字符。
 
+        URLs 在匹配前会被转换为小写。
+
         .. admonition:: 示例
 
             - ``--script-opts=ytdl_hook-exclude='^youtube%.com'``
@@ -503,6 +527,11 @@
               将排除任何以 ``.mkv`` 或 ``.mp4`` 结尾的URL。
 
         在这里可以看到更多的lua模式：https://www.lua.org/manual/5.1/manual.html#5.4.1
+
+    ``include=<URL1|URL2|...``
+        一个 ``|``` 分隔的 URL 模式列表，当 ``try_ytdl_first`` 为 ``no`` 时，mpv 应首先尝试使用 youtube-dl 进行解析。这些模式的匹配方式与 ``exclude`` 相同。
+
+        默认： ``^%w+%.youtube%.com/|^youtube%.com/|^youtu%.be/|^%w+%.twitch%.tv/|^twitch%.tv/``
 
     ``all_formats=<yes|no>``
         如果 "yes"，将尝试添加所有由youtube-dl报告的格式（默认： no）。每种格式都作为一个单独的轨道被添加。此外，它们被延迟加载，且实际上只有在选择轨道时才会打开（这应该能使加载时间和没有这个设置选项时一样短）。
@@ -572,7 +601,7 @@
 ``--load-stats-overlay=<yes|no>``
     启用内置脚本，在一个按键绑定上显示有用的播放信息（默认： yes）。默认情况下，使用 ``i`` 键（ ``I`` 键使覆盖层永久化）。
 
-``--load-osd-console=<yes|no>``
+``--load-console=<yes|no>``
     启用内置脚本，在一个按键绑定上显示控制台，可让你输入命令（默认： yes）。在默认情况下， ````` 键用于显示控制台， ``ESC`` 键用于再次隐藏它。
 
 ``--load-auto-profiles=<yes|no|auto>``
@@ -764,7 +793,7 @@
     :crystalhd:         将视频复制回到系统RAM（任何受硬件支持的平台）
     :rkmpp:             需要 ``--vo=gpu`` （部分RockChip设备独占）
 
-    ``auto`` 尝试使用第一个可用的方式来自动启用硬解码。这仍然取决于所使用的是什么视频输出驱动。例如，如果没有使用 ``--vo=gpu`` 或 ``--vo=vdpau`` ，vdpau解码将永不会被启用。还要注意的是，如果第一个找到的方式在实际情况中无法工作，它将总是回退到软解，而不是尝试下一个方式（在一些Linux系统上可能很重要）。
+    ``auto`` 尝试使用第一个可用的方式来自动启用硬解码。这仍然取决于所使用的是什么视频输出驱动。请参阅上面的列表，了解特定硬解码需要哪些 ``--vo`` 和 ``gpu-context`` 。它将沿着可用的 hwdec 列表查找，直到有一个 hwdec 被成功初始化。如果全部失败，它将退回到软件解码。
 
     ``auto-safe`` 与 ``auto`` 类似，但只允许白名单中的被认为是“安全”的方式。这应该是在设置文件中默认启用硬解的一种合理方式（尽管你不应该这样做；最好在运行时用 ``Ctrl+h`` 启用）。不像 ``auto`` ，它不会尝试启用未知或已知的损坏的方式。此外，在其它已知会导致问题的情况下，这可能会禁用硬解，但目前这个机制是相当原始的（作为一个仍然会引发问题的例子：Windows上HEVC和Intel芯片的某些组合往往会导致mpv崩溃，很可能是由于驱动的错误）。
 
@@ -908,11 +937,22 @@
     这个值与从 ``--video-zoom`` 得出的值和正常的视频宽高比相乘。如果使用 ``--keepaspect=no`` ，该选项将被禁用。
 
 ``--video-align-x=<-1-1>``, ``--video-align-y=<-1-1>``
-    在黑色边框内移动视频矩形，如果视频和屏幕的长宽比不同，通常会添加黑色边来填充视频到屏幕。 ``--video-align-y=-1`` 会将视频移到屏幕顶部（只在底部留有边框），数值为 ``0`` 会将其居中（默认），数值为 ``1`` 会将视频放在屏幕底部。
+    当视频大于窗口时，这些选项会移动显示的矩形，以显示视频的不同部分。 ``--video-align-y=-1`` 将显示视频的顶部， ``0`` 将显示中央（默认）， ``1`` 将显示底部。
+
+    当视频小于窗口且 ``--video-recenter`` 被禁用时，这些选项会将视频矩形移动到黑色边框内。 ``--video-align-y=-1`` 将把视频移到窗口顶部（只在底部留出边框）， ``0`` 将使视频居中， ``1`` 将使视频位于窗口底部。
 
     如果视频和屏幕的长宽比完全匹配，这些选项没有任何作用。
 
+    与 ``--video-pan-x`` 和 ``--video-pan-y`` 不同，它们不会超出视频或窗口的边界，也不会在缩放后使显示的矩形偏移。
+
     如果使用 ``--keepaspect=no`` ，该选项将被禁用。
+
+``--video-recenter=<yes|no>``
+    当视频在相应方向上小于窗口时，是否将 ``--video-align-x`` 和 ``--video-align-y`` 视为 0
+
+    在放大视频直到视频大于窗口、使用 ``--video-align-x`` 和/或 ``--video-align-y`` 进行平移、缩小视频直到视频小于窗口后，此功能有助于重新调整视频在窗口中的位置。
+
+    默认： no
 
 ``--video-margin-ratio-left=<val>``, ``--video-margin-ratio-right=<val>``, ``--video-margin-ratio-top=<val>``, ``--video-margin-ratio-bottom=<val>``
     在每条边上设置额外的视频边距（默认： 0）。每个值是窗口大小的比率，使用的范围是0.0-1.0。例如，在窗口大小为1000像素时，设置选项 ``--video-margin-ratio-right=0.2`` ，将在窗口的右边增加200像素的边框。
@@ -938,7 +978,7 @@
         只在 ``--correct-pts=no`` 模式下工作。
 
 ``--deinterlace=<yes|no|auto>``
-    启用或禁用隔行扫描（默认： no）。隔行扫描的视频会出现丑陋的梳状伪影，在快速移动时可见。启用这个功能通常会插入bwdif视频滤镜，以便对视频进行去隔行扫描，或者如果支持的话，让视频输出应用去隔行扫描。
+    启用或禁用去隔行扫描（默认： no）。隔行扫描的视频会出现丑陋的梳状伪影，在快速移动时可见。启用这个功能通常会插入bwdif视频滤镜，以便对视频进行去隔行扫描，或者如果支持的话，让视频输出应用去隔行扫描。
 
     使用 ``auto`` 时，如果 ffmpeg 检测到视频帧是隔行扫描的，mpv 将插入去隔行扫描滤镜。请注意，在某些情况下可能会出现误报，例如文件被编码为隔行扫描，但视频实际上并非如此。因此， ``auto`` 不是默认值。
 
@@ -1101,7 +1141,7 @@
 ``--audio-exclusive=<yes|no>``
     启用独占输出模式。在这种模式下，系统通常被锁定，只有mpv能够输出音频。
 
-    这只对某些音频输出有效，比如 ``wasapi`` ``coreaudio`` 和 ``pipewire`` 。其它音频输出会默默的忽略这个选项。它们要么没有独占模式的概念，要么就是缺少mpv方面的实现。
+    这只对某些音频输出有效，比如 ``wasapi`` ``coreaudio`` ``pipewire`` 和 ``audiounit`` 。其它音频输出会默默的忽略这个选项。它们要么没有独占模式的概念，要么就是缺少mpv方面的实现。
 
 ``--audio-fallback-to-null=<yes|no>``
     如果没有音频设备被打开，它的行为就像给出了 ``--ao=null`` 一样。这和 ``--audio-device`` 结合起来很有用：如果选择的设备不存在，client API用户（或Lua脚本）可以让播放正常进行，并检查 ``current-ao`` 和 ``audio-device-list`` 属性，来做出关于如何继续的高级决策。
@@ -1169,10 +1209,8 @@
 ``--audio-delay=<sec>``
     音频延迟，以秒为单位（正或负的浮点值）。正值是延迟音频，负值是延迟视频。
 
-``--mute=<yes|no|auto>``
+``--mute=<yes|no>``
     设置启动时的音频静音状态（默认： no）。
-
-    ``auto`` 是一个过时的可能值，相当于 ``no``
 
     另参见： ``--volume``
 
@@ -1277,8 +1315,8 @@
     :fuzzy: 加载所有包含媒体文件名的音频文件
     :all:   加载当前目录和 ``--audio-file-paths`` 目录中的所有音频文件
 
-``--audio-file-auto-exts=ext1,ext2,...``
-    在使用 ``audio-file-auto`` 时尝试匹配的音频文件扩展名。
+``--audio-exts=ext1,ext2,...``
+    在使用 ``audio-file-auto`` ``--autocreate-playlist`` 或 ``--directory-filter-types`` 时尝试匹配的音频文件扩展名。使用 ``--help=audio-exts`` 查看默认扩展名。
 
     这是一个字符串列表选项。详见 `列表选项`_
 
@@ -1362,18 +1400,18 @@
         这也影响ASS字幕，并可能导致不正确的字幕渲染。小心使用，或用 ``--sub-font-size`` 代替。
 
 ``--sub-scale-by-window=<yes|no>``
-    是否随窗口大小缩放字幕（默认： yes）。如果禁用这个功能，改变窗口尺寸不会更改字幕字体大小。
-
-    和 ``--sub-scale`` 一样，这可能会破坏ASS字幕。
-
-``--sub-scale-with-window=<yes|no>``
-    使字幕的字体大小与窗口关联，而不是与视频关联。如果你总是想要相同的字体大小，这很有用，即使视频没有完全覆盖窗口，例如，因为屏幕和窗口的长宽不匹配（而且播放器会添加黑条）。
-
-    默认： yes
-
-    这个选项被错误的命名。与听起来令人困惑的类似选项 ``--sub-scale-by-window`` 的区别是， ``--sub-scale-with-window`` 仍然是根据窗口的近似大小进行缩放，而另一个选项则是禁用这种缩放。
+    是否随窗口大小缩放字幕（默认： yes）。如果禁用此选项，即使将 ``--sub-scale-with-window`` 设为 yes，更改窗口大小也不会改变字幕字体大小。
 
     只影响纯文本字幕（或者ASS，前提是如果 ``--sub-ass-override`` 设置得足够高）。
+
+``--sub-scale-with-window=<yes|no>``
+    Make the subtitle font size relative to the window (default: yes). If this is disabled while ``--sub-scale-by-window`` is set to yes, the subtitle font size is scaled relative to the video size instead.
+
+    只影响纯文本字幕（或者ASS，前提是如果 ``--sub-ass-override`` 设置得足够高）。
+
+    .. note::
+
+        默认情况下，字幕字体大小随窗口大小缩放。要使字体大小保持不变，只需将 ``--sub-scale-by-window`` 设为 no 。要使字体大小随视频大小缩放，只需将 ``--sub-scale-with-window`` 设为 no 。将两个选项都设为 no 没有意义。
 
 ``--sub-ass-scale-with-window=<yes|no>``
     类似 ``--sub-scale-with-window`` ，但只影响ASS格式的字幕。和 ``--sub-scale`` 一样，这可能会破坏ASS字幕。
@@ -1418,7 +1456,7 @@
 
         使用这个选项可能会导致不正确的字幕渲染。
 
-``--sub-ass-hinting=<none|light|normal|native>``
+``--sub-hinting=<none|light|normal|native>``
     设置字体hinting类型。 <type> 可以是：
 
     :none:       无hinting（默认）
@@ -1430,16 +1468,26 @@
 
         启用hinting可能会导致错误位置的文本（在它应该与视频背景相匹配的情况下），或者降低一些不好的ASS脚本的动画的平滑度。不推荐使用这个选项，除非真的需要。
 
-``--sub-ass-line-spacing=<value>``
+``--sub-line-spacing=<value>``
     设置SSA/ASS渲染器的行距值。
 
-``--sub-ass-shaper=<simple|complex>``
+``--sub-shaper=<simple|complex>``
     设置libass使用的文本布局引擎。
 
     :simple:   只使用Fribidi，速度快，不能正确渲染某些语言
     :complex:  使用HarfBuzz，速度较慢，支持更多语言
 
     ``complex`` 是默认的。如果libass没有针对HarfBuzz进行编译，libass会默默地恢复到 ``simple``
+
+``--sub-ass-prune-delay=<-1|seconds>``
+    设置 libass 内存中事件自动pruning的延迟时间。启用后，一旦字幕事件的结束时间戳超过指定的延迟时间，就会从内存中删除。
+
+    :-1:        禁用自动pruning（默认）。
+    :seconds:   指定在event不再显示多少秒后进行pruning。 ``0`` 在event离开屏幕后立即pruning。
+
+    .. note::
+
+        对于已经“被看到”并需要再次渲染的event（如果这些event被pruning），在运行时将播放方向从前向后更改时，这会中断sub-seek和字幕渲染。
 
 ``--sub-ass-styles=<filename>``
     加载在指定文件中找到的所有SSA/ASS样式，并使用它们来渲染文本字幕。文件的语法与SSA/ASS的 ``[V4 Styles]`` / ``[V4+ Styles]`` 部分完全一样。
@@ -1448,18 +1496,18 @@
 
         使用这个选项可能导致不正确的字幕渲染。
 
-``--sub-ass-override=<yes|no|force|scale|strip>``
-    控制是否应该应用用户风格覆盖。请注意，所有这些覆盖都尝试在某种程度上智能的识别出一个字幕是否被认为是一个“符号”。
+``--sub-ass-override=<no|yes|scale|force|strip>``
+    控制是否应该应用用户风格覆盖。请注意，所有这些覆盖都尝试在某种程度上智能的识别出一个字幕是否被认为是一个“符号”并尽量避免破坏。
 
     :no:    按照字幕脚本的指定渲染字幕，没有覆盖
     :yes:   应用所有的 ``--sub-ass-*`` 样式覆盖选项。改变这些选项的默认值可能导致不正确的字幕渲染（默认）
-    :force: 类似 ``yes`` ，但也强制使用所有 ``--sub-*`` 选项。可以轻易破坏渲染
-    :scale: 类似 ``yes`` ，但也应用 ``--sub-scale``
+    :scale: 类似 ``yes`` ，但也应用 ``--sub-scale``（默认）
+    :force: 类似 ``yes`` ，但也强制使用所有 ``--sub-*`` 选项。可以轻易破坏渲染。如果某些选项可能破坏性太大，则不会被覆盖。
     :strip: 彻底剥离字幕的所有ASS标签和样式。这相当于以前的 ``--no-ass`` / ``--no-sub-ass`` 选项
 
     这也控制了一些位图字幕的覆盖，以及SRT等格式的HTML标签，尽管该选项的名称不同。
 
-``--secondary-sub-ass-override=<yes|no|force|scale|strip>``
+``--secondary-sub-ass-override=<no|yes|scale|force|strip>``
     控制是否应该应用用户风格覆盖次字幕。这与 ``--sub-ass-override`` 类似。
 
     默认： strip.
@@ -1474,17 +1522,23 @@
 
     默认： yes
 
-``--sub-ass-vsfilter-aspect-compat=<yes|no>``
-    在播放变形视频时拉伸SSA/ASS字幕，与传统VSFilter行为兼容。当视频以方形像素存储时，这个开关没有影响。
+``--sub-ass-use-video-data=<none|aspect-ratio|all>``
+    控制传递给 libass 的视频流信息。除 ``all`` 以外的任何选项都与 VSFilter 定义的标准 ASS 不兼容，大多数字幕脚本和渲染器（包括 libass）都以 VSFilter 的行为为目标。要准确模拟 VSFilter 的语义，就必须使用视频流属性，不使用这些属性可能会导致大多数文件的字幕渲染出现问题。因此建议只在每个文件需要时才有选择性地更改。
 
-    历史上最常用于SSA/ASS字幕格式的渲染器VSFilter具有可疑的行为，如果视频以变形格式存储，需要缩放显示时，会导致字幕也被拉伸。这种行为通常是不可取的，较新的VSFilter版本可能会有不同的行为。然而，许多现有的脚本通过在相反的方向上进行修改来补偿拉伸。因此，如果这类脚本被“正确”地显示出来，它们就不会如预期那样出现。这个开关启用模拟旧的VSFilter行为（不可取但许多现有的脚本都如此期望）。
+    :none:         不转发任何视频流信息。
+    :aspect-ratio: 只转发宽高比；其它属性使用回退。这将使不同视频分辨率下的行为保持一致。
+    :all:          转发所有可用信息，尤其包括存储分辨率。
 
-    默认情况下是启用的。
+    对于某些在未设置 ``LayoutRes`` headers 或调整受影响特效的情况下在多个视频分辨率下重复使用的 ASS 文件，可能需要从 libass 中保留存储分辨率信息，以确保在不同分辨率下呈现一致的效果。除其他外，这还会影响 3D 旋转和blur。遇到此类文件时，可尝试设置 ``aspect-ratio`` 。
 
-``--sub-ass-vsfilter-blur-compat=<yes|no>``
-    根据视频分辨率而不是脚本分辨率来缩放 ``\blur`` 标签的大小（默认启用）。这是VSFilter的错误，根据一些人的说法，为了兼容性的名义不再能被修复。
+    除非宽高比信息也是伪造的，否则变形视频上的更多破损文件也可能出现拉伸，在这种情况下，可以尝试使用 ``none`` 。这对非变形视频没有影响。
 
-    请注意，这是用实际的视频分辨率来计算偏移比例系数，而不是视频滤镜链或视频输出所使用的。
+    默认： ``all``
+
+``--sub-ass-video-aspect-override=<no|ratio>``
+    允许向 libass 传递任意宽高比，而不是视频的实际宽高比。零或负的纵横比与 ``no`` 相同。
+
+    如果 ``sub-ass-use-video-data`` 设置为 ``none``，则此选项无效。
 
 ``--sub-vsfilter-bidi-compat=<yes|no>``
     将隐式 bidi 检测设为 ``ltr`` 而非 ``auto`` 以匹配 ASS 的默认设置。这也会禁用 libass 的不兼容扩展。目前，这包括根据 Unicode 6.3 中引入的修订版 Unicode 双向算法进行的括号对匹配，还影响 BiDi 运行的分割和处理方式，以及 unicode 文本的软换行。
@@ -1663,10 +1717,7 @@
 ``--sub-font-size=<size>``
     指定字幕字体的大小。单位是窗口高度为720时按比例计算的像素大小。实际的像素大小随着窗口高度的变化而缩放：如果窗口高度大于或小于720，文字的实际大小也会随之增加或减少。
 
-    默认： 55
-
-``--sub-back-color=<color>``
-    参见 ``--sub-color`` 。用于字幕文本背景的颜色。你可以使用 ``--sub-shadow-offset`` 来改变它相对于文本的大小。
+    默认： 38
 
 ``--sub-blur=<0..20.0>``
     应用于字体边框的高斯模糊系数。0表示不应用模糊（默认）。
@@ -1677,13 +1728,39 @@
 ``--sub-italic=<yes|no>``
     格式化文本为斜体。
 
-``--sub-border-color=<color>``
-    参见 ``--sub-color`` 。用于字幕字体边框的颜色。
+``--sub-outline-color=<color>``
+    参见 ``--sub-color`` 。用于字幕轮廓的颜色。
 
-``--sub-border-size=<size>``
-    字幕字体边框的大小，以缩放的像素为单位（详见 ``--sub-font-size`` ）。值为0时禁用边框。
+    ``--sub-border-color`` 是 ``--sub-outline-color`` 的别名。
 
-    默认： 3
+``--sub-back-color=<color>``
+    参见 ``--sub-color`` 。用于字幕背景的颜色。
+
+    ``--sub-shadow-color`` 是 ``--sub-back-color`` 的别名。
+
+``--sub-outline-size=<size>``
+    字幕轮廓的大小，以缩放像素为单位（详见 ``--sub-font-size``）。值为 0 时将禁用轮廓。
+
+    ``--sub-border-size`` 是 ``--sub-outline-size`` 的别名。
+
+     默认： 1.65
+
+``--sub-border-style=<outline-and-shadow|opaque-box|background-box>``
+    字幕边框的样式。
+
+    - ``outline-and-shadow``: 绘制轮廓和阴影。轮廓的大小由 ``--sub-outline-size`` 决定，阴影的偏移量由 ``--sub-shadow-offset`` 决定。轮廓的颜色由 ``--sub-outline-color`` 决定，阴影的颜色由 ``--sub-back-color`` 决定。这与 ASS 规范中的 ``BorderStyle=1`` 相对应。
+    - ``opaque-box``: 将轮廓和阴影绘制成不透明的方框，紧紧包裹每行文字。轮廓不透明框的边距由 ``--sub-outline-size`` 决定，阴影不透明框的偏移量由 ``--sub-shadow-offset`` 决定。轮廓不透明框由 ``--sub-outline-color`` 着色，阴影不透明框由 ``--sub-back-color`` 着色。尽管名称如此，不透明框可以是半透明的。这与 ASS 规范中的 ``BorderStyle=3`` 相对应。
+    - ``background-box``: 绘制一个背景框，框住所有文本行。背景框由 ``--sub-back-color`` 着色，背景框的边距由 ``--sub-shadow-offset`` 决定。轮廓的表现与 ``outline-and-shadow`` 样式相同。这与 ``BorderStyle=4`` 相对应，后者是 libass 特有的扩展。
+
+    默认： ``outline-and-shadow``
+
+    可使用预定义的Profile，为 OSD 和字幕启用优化的 ``background-box`` 样式。
+
+    .. admonition:: Profiles
+
+        - ``--profile=sub-box`` 应用 ``background-box`` 样式到字幕
+        - ``--profile=osd-box`` 应用 ``background-box`` 样式到OSD，包括统计数据和控制台
+        - ``--profile=box`` 应用 ``background-box`` 样式到字幕和OSD
 
 ``--sub-color=<color>``
     指定无样式的文本字幕的颜色。
@@ -1698,7 +1775,7 @@
         - ``--sub-color=1.0/0.0/0.0/0.75`` 设置字幕为不透明的红色带75%透明
         - ``--sub-color=0.5/0.75`` 设置字幕为50%灰色带75%透明
 
-    另外，颜色可以被指定为RGB十六进制三元组，其形式为 ``#RRGGBB`` ，其中每个2位数组表示0（ ``00`` ）到255（ ``FF`` ）范围内的一个颜色值。例如， ``#FF0000`` 是红色。这与web颜色类似。Alpha是用 ``#AARRGGBB`` 来表示的。
+    另外，颜色可以被指定为RGB十六进制三元组，其形式为 ``#RRGGBB`` ，其中每个2位数组表示0（ ``00`` ）到255（ ``FF`` ）范围内的一个颜色值。例如， ``#FF0000`` 是红色。Alpha是用 ``#AARRGGBB`` 来表示的。
 
     .. admonition:: 示例
 
@@ -1710,14 +1787,14 @@
 
     这个选项指定了字幕到左边的距离，以及长字幕文本到右边界被打断的距离。
 
-    默认： 25
+    默认： 19
 
 ``--sub-margin-y=<size>``
     字幕的顶部和底部的屏幕边距，以缩放后的像素为单位（详见 ``--sub-font-size`` ）。
 
     这个选项指定了无样式的文本字幕的垂直边距。如果你只想提高垂直字幕的位置，使用 ``--sub-pos``
 
-    默认： 22
+    默认： 34
 
 ``--sub-align-x=<left|center|right>``
     控制文本字幕应该对齐屏幕的哪个角落（默认： ``center`` ）
@@ -1732,13 +1809,6 @@
 
 ``--sub-ass-justify=<yes|no>``
     如果 ``--sub-ass-override`` 没有设置为 ``no`` ，则在ASS字幕上应用 ``--sub-justify`` 所定义的对齐方式。默认： ``no``
-
-``--sub-shadow-color=<color>``
-    参见 ``--sub-color`` 。用于字幕文本阴影的颜色。
-
-    .. note::
-
-        当指定 ``--sub-back-color`` 时（或者更确切地说：当该选项没有被设置为完全透明时）被忽略。
 
 ``--sub-shadow-offset=<size>``
     字幕文本阴影的偏移，以缩放后的像素为单位（详见 ``--sub-font-size`` ）。值为0时禁用阴影。
@@ -1879,7 +1949,7 @@
     如果设置为 ``no`` ，当 ``--keep-open`` 激活时，不会暂停，而只是在文件结束时停止，当你向前跳转时继续向后播放，直到结束时再次停止。默认： ``yes``
 
 ``--image-display-duration=<seconds|inf>``
-    如果当前文件是图像，播放图像的时间为给定的秒数（默认： 1）。 ``inf`` 表示该文件永远保持打开（直到用户手动停止播放）。
+    如果当前文件是图像，播放图像的时间为给定的秒数（默认： 5）。 ``inf`` 表示该文件永远保持打开（直到用户手动停止播放）。
 
     与 ``--keep-open`` 不同，播放器不是暂停的，只是继续播放直到时间结束。（在“播放”期间，它不应该使用任何资源。）
 
@@ -2052,7 +2122,7 @@
     不论窗口的可见性，强制mpv始终渲染帧。目前只影响X11和Wayland视频输出驱动，因为只有它们具有这种优化（即其它的输出都是不考虑可见性进行渲染）。
 
 ``--force-window-position``
-    每当视频参数、视频流或文件有变化时，强制将mpv的视频输出窗口移到默认位置。这曾经是默认行为。目前只影响到X11和SDL视频输出驱动。
+    每当视频参数、视频流或文件有变化时，强制将mpv的视频输出窗口移到默认位置。这曾经是默认行为。目前只影响到 X11 macvk 和 SDL 视频输出驱动。
 
 ``--auto-window-resize=<yes|no>``
     默认情况下，如果视频的大小发生变化，mpv会自动调整自己的大小（例如，在播放列表中向前跳转）。把这个选项设置为 ``no`` 就可以阻止该行为，因此窗口的大小不会自动改变。这个选项对 ``--autofit`` 和 ``--geometry`` 选项没有任何影响。
@@ -2132,7 +2202,7 @@
 
     mpv向X11询问目前的事件，然后它可以使用这些事件进行更精确的帧呈现。这只有在使用 ``--video-sync=display-...`` 时才有效果。
 
-    ``auto`` 选项列举了自动检测的XRandr提供者。如果找到amd、radeon、intel或nouveau（标准的x86 Mesa驱动），并且没有找到nvidia，就会启用演示反馈。其它驱动不被认为可以工作，所以它们不会被自动启用。
+    ``auto`` 选项列举了自动检测的XRandr providers。如果找到 amd、radeon、intel 或 nouveau（标准 x86 Mesa 驱动程序），则会启用presentation feedback。其它驱动程序不能正常工作，因此不会自动启用。
 
     ``yes`` 或 ``no`` 仍然可以被传递，以启用/禁用这一机制，以防你的硬件/驱动程序/等等的组合出现好/坏的行为。
 
@@ -2425,6 +2495,18 @@
 ``--directory-mode=<auto|lazy|recursive|ignore>``
     在打开目录时，可以选择以延迟方式、递归方式或根本不打开子目录。默认为 ``auto`` ，如果使用 ``--shuffle`` ，则表现得像 ``recursive`` ，否则表现得像 ``lazy`` 。
 
+``--directory-filter-types=<video,audio,image,archive,playlist>``
+    打开目录时要过滤的媒体文件类型。如果列表为空，则所有文件都会添加到播放列表中。（默认： ``video,audio,image,archive,playlist`` ）
+
+    这是一个字符串列表选项。详见 `列表选项`_
+
+``--autocreate-playlist=<no|filter|same>``
+    打开本地文件时，就像打开父目录一样，自动创建播放列表。
+
+    :no:     加载单个文件（默认）。
+    :filter: 从父级目录中创建一个播放列表，其中的文件要匹配 ``--directory-filter-types`` 的条件。
+    :same:   从父级目录中创建一个播放列表，其中包含与当前加载文件匹配的相同类别的文件。根据输入文件选择其中一个 ``*-exts`` ，只有扩展名匹配的文件才会添加到播放列表中。如果输入文件本身与任何扩展名列表都不匹配，则不会自动生成播放列表。
+
 输入
 ----
 
@@ -2450,6 +2532,9 @@
 
 ``--input-builtin-bindings=<yes|no>``
     在启动时加载内置的按键绑定（默认： yes）。这个选项只在(lib)mpv初始化时应用，如果使用的话，以后就不可能再启用它们。可能对libmpv clients有用。
+
+``--input-builtin-dragging=<yes|no>``
+    启用内置的窗口拖动行为（默认： yes）。将其设置为  no 将禁用内置拖动行为。需要注意的是，与 ``window-dragging`` 选项不同，该选项只影响支持 ``begin-vo-dragging` 命令的 VO，而不会禁用使用该命令初始化的窗口拖动。
 
 ``--input-cmdlist``
     输出所有可以绑定到按键的命令。
@@ -2499,7 +2584,7 @@
 
     .. note::
 
-        在Windows上不适用，将来也不适用。
+        要在 Windows 上使用此选项，fd 必须指向一个已连接客户端的已包装（由 ``_open_osfhandle`` 创建）命名管道服务器句柄。命名管道必须通过重叠的 IO 和可继承句柄双向创建。程序通过客户端句柄与 mpv 通信。
 
     .. warning::
 
@@ -2509,7 +2594,7 @@
     启用/禁用SDL2游戏手柄支持。默认禁用。
 
 ``--input-cursor=<yes|no>``
-    允许mpv接收由视频输出驱动报告的指针events。必需要使用OSC，或在选中DVD菜单中的按钮。支持与否取决于使用的视频输出驱动。
+    允许mpv接收由视频输出驱动报告的指针events。对于使用OSC来说是必要的。支持与否取决于使用的视频输出驱动。
 
 ``--input-cursor-passthrough=<yes|no>``
     告诉后端窗口系统允许指针事件穿过mpv窗口。这使得mpv下面的窗口能够接收指针事件，就好像mpv窗口从未存在过一样。
@@ -2541,6 +2626,9 @@
 ``--input-touch-emulate-mouse=<yes|no>``
     当启用多点触控支持时（平台要求或 ``--native-touch`` 启用），会模拟触控事件中的鼠标移动和按键操作（默认： yes）。这对于读取不支持 ``--native-touch=no`` 的平台（如 Wayland）鼠标位置的鼠标键绑定和脚本的兼容性非常有用。
 
+``--input-dragging-deadzone=<N>``
+    在按住鼠标键的同时，当鼠标移出 ``N`` 像素的死区（默认： 3）时，开始内置窗口拖动。这只影响支持 ``begin-vo-dragging`` 命令的 VO。
+
 OSD
 ---
 
@@ -2571,7 +2659,7 @@ OSD
 ``--osd-font-size=<size>``
     指定OSD的字体大小。详见 ``--sub-font-size``
 
-    默认： 55
+    默认： 30
 
 ``--osd-msg1=<string>``
     在OSD等级1（默认可见）的OSD上显示这个字符串作为信息。该信息默认是可见的，只要没有其它信息挡住它，并且OSD等级无改变（参见 ``--osd-level`` ）。扩展属性；参见 `属性扩展`_
@@ -2599,6 +2687,11 @@ OSD
 ``--osd-playing-msg-duration=<time>``
     设置 ``osd-playing-msg`` 的持续时间，以毫秒为单位。如果不设置， ``osd-playing-msg`` 将在以 ``osd-duration`` 设置的时间内停留在屏幕上。
 
+``--osd-playlist-entry=<title|filename|both>``
+    是否显示媒体标题、文件名或两者。如果没有 ``media-title`` ，则只显示 ``filename`` 。
+
+    默认： ``title``
+
 ``--osd-bar-align-x=<-1-1>``
     OSD条的位置。-1是最左边，0是中间，1是最右边。允许使用小数值（如0.5）。
 
@@ -2611,16 +2704,32 @@ OSD
 ``--osd-bar-h=<0.1-50>``
     OSD条的高度，以屏幕高度的百分比为单位（默认： 3.125）。
 
-``--osd-bar-border-size=<size>``
-    OSD条边框的大小，按比例缩放像素 （详见 ``--sub-font-size`` ）
+``--osd-bar-outline-size=<size>``
+    OSD条的轮廓大小，以按比例缩放的像素为单位（详见 ``--sub-font-size`` ）
 
-    默认： 0.5
+    ``--osd-bar-border-size`` 是 ``--osd-bar-outline-size`` 的别名。
 
-`--osd-back-color=<color>```。
-    参见 ``--sub-color`` 。用于OSD文本背景的颜色。
+    默认： 0.5.
+
+``--osd-bar-marker-scale=<0-100>``
+    OSD条标记尺寸相对于OSD条轮廓尺寸的系数。
+
+    默认： 1.3.
+
+``--osd-bar-marker-min-size=<size>``
+    OSD条的最小标记尺寸。
+
+    默认： 1.6.
+
+``--osd-bar-marker-style=<none|triangle|line>``
+    设置OSD条的标记样式。
+
+    :none:     不绘制标记。
+    :triangle: 将标记绘制为三角形（默认）。
+    :line:     将标记绘制为线条
 
 ``--osd-blur=<0..20.0>``
-    应用于OSD条边框的高斯模糊系数。0表示不应用模糊（默认）。
+    应用于OSD字体边框的高斯模糊系数。0表示不应用模糊（默认）。
 
 ``--osd-bold=<yes|no>``
     格式化文本为粗体。
@@ -2628,16 +2737,34 @@ OSD
 ``--osd-italic=<yes|no>``
     格式化文本为斜体。
 
-``--osd-border-color=<color>``
-    参见 ``--sub-color`` 。用于OSD字体边框的颜色。
+``--osd-outline-color=<color>``
+    参见 ``--sub-color`` 。用于 OSD 字体轮廓的颜色。
 
-``--osd-border-size=<size>``
-    OSD字体边框的大小，以像素为单位（详见 ``--sub-font-size`` ）。值为0时禁用边框。
+    ``--osd-border-color`` 是 ``--osd-outline-color`` 的别名。
 
-    默认： 3
+``--osd-back-color=<color>``
+    参见 ``--sub-color`` 。用于 OSD 字体背景的颜色。
+
+    ``--osd-shadow-color`` 是 ``--osd-back-color`` 的别名。
+
+``--osd-outline-size=<size>``
+    OSD字体轮廓的尺寸，以缩放的像素为单位（详见 ``--sub-font-size``）。值为 0 禁用轮廓。
+
+    ``--osd-border-size`` 是 ``--osd-outline-size`` 的别名。
+
+    默认： 1.65
+
+``--osd-border-style=<outline-and-shadow|opaque-box|background-box>``
+    参见 ``--sub-border-style`` 。OSD文本边框的样式。
 
 ``--osd-color=<color>``
-    指定用于OSD的颜色。详见 ``--sub-color``
+    指定用于OSD的颜色。详见 ``--sub-color`` 。
+
+``--osd-selected-color=<color>``
+    列表中选中条目的颜色。详见 ``--sub-color`` 。
+
+``--osd-selected-outline-color=<color>``
+    列表中选中条目的轮廓颜色。详见 ``--sub-color`` 。
 
 ``--osd-fractions``
     显示带小数点的秒数的OSD时间（精度为毫秒）。有助于查看视频帧的精确时间戳。
@@ -2655,14 +2782,14 @@ OSD
 
     这个选项指定了OSD与左边的距离，以及从右边框到长OSD文本的断开距离。
 
-    默认： 25
+    默认： 16
 
 ``--osd-margin-y=<size>``
     OSD的顶部和底部屏幕边距，以缩放后的像素为单位（详见 ``--sub-font-size`` ）。
 
     这个选项指定了OSD的垂直边距。
 
-    默认： 22
+    默认： 16
 
 ``--osd-align-x=<left|center|right>``
     控制OSD应该对齐屏幕的哪个角（默认： ``left`` ）。
@@ -2676,12 +2803,9 @@ OSD
 ``--osd-scale-by-window=<yes|no>``
     是否随窗口尺寸缩放OSD（默认： yes）。如果这个选项被禁用， ``--osd-font-size`` 和其它使用缩放后像素的OSD选项总是以实际像素为准。其影响是，改变窗口尺寸不会改变OSD字体大小。
 
-``--osd-shadow-color=<color>``
-    参见 ``--sub-color`` 。用于OSD阴影的颜色。
-
     .. note::
 
-        当指定 ``--osd-back-color`` 时被忽略（或者更确切地说：当该选项没有设置为完全透明时）。
+        对于绘制用户界面元素类的脚本，建议在决定元素是否随窗口大小缩放时遵循该选项的值。
 
 ``--osd-shadow-offset=<size>``
     OSD阴影的位移，以缩放后的像素为单位（详见 ``--sub-font-size`` ）。值为0时禁用阴影。
@@ -3273,10 +3397,12 @@ GPU渲染选项
         （该filter是 ``jinc``-windowed ``jinc`` 的别名）
 
     ``ewa_lanczossharp``
-        ewa_lanczos的一个略锐利的版本，这是使用 ``high-quality`` 配置时的默认设置。
+        ewa_lanczos的一个略锐利的版本，这是使用 ``high-quality`` 配置时的默认设置。Blur值由Nicolas Robidoux为Image Magick最初开发的方法确定，参见： https://www.imagemagick.org/discourse-server/viewtopic.php?p=89068#p89068
 
     ``ewa_lanczos4sharpest``
         非常锐利的缩放器，但比 ``ewa_lanczossharp`` 稍慢。容易出现边缘振铃效应，因此建议将其与一个抗振铃着色器结合使用。在 ``--vo=gpu-next`` 中，设置此filter将启用内置的抗振铃，因此无需额外操作。
+
+        详见 https://www.imagemagick.org/discourse-server/viewtopic.php?p=128587#p128587
 
     ``mitchell``
         Mitchell-Netravali。 ``B`` 和 ``C`` 参数可以用 ``--scale-param1`` 和 ``--scale-param2`` 来设置。
@@ -3339,6 +3465,12 @@ GPU渲染选项
 
     注意，这不影响特殊的 ``bilinear`` 和 ``bicubic_fast`` filter，也不影响任何polar (EWA) 缩放器。
 
+    在 ``--vo=gpu-next`` 中，这也会影响polar (EWA) 缩放器。某些filter别名也会隐式的启用抗振铃，与此设置无关（参见 ``--scale`` ）。
+
+    .. note::
+
+        使用separable (orthogonal) filter缩放时，将 ``--dscale-antiring`` 设置为 0.0（默认值）以外的值会降低缩放质量并产生锯齿伪影。在 ``--vo=gpu-next`` 中， ``--dscale-antiring`` 对separable (orthogonal) filter是禁用的。
+
 ``--scale-window=<window>``, ``--cscale-window=<window>``, ``--dscale-window=<window>``, ``--tscale-window=<window>``
     （仅限高级用户）为kernel选择一个自定义的window函数。如果未设置则默认为filter的首选window。使用 ``--scale-window=help`` 来获得一个支持的window函数的列表。
 
@@ -3370,6 +3502,8 @@ GPU渲染选项
 
 ``--sigmoid-upscaling``
     当放大时，使用正弦波颜色变换以避免强调振铃伪影。默认启用。这与 ``--linear-upscaling`` 不兼容并取代了它（注意sigmoidization也需要线性化，所以在两种情况下 ``LINEAR`` 渲染步骤都会启动）。
+
+    关于sigmoidization的信息，详见： https://imagemagick.org/Usage/resize/#resize_sigmoidal
 
 ``--sigmoid-center``
     用于 ``--sigmoid-upscaling`` 的正弦曲线的中心，必须是0.0到1.0之间的浮点数。如果未指定则默认： 0.75
@@ -3451,6 +3585,22 @@ GPU渲染选项
     两次缓冲区互换之间的显示帧间隔。1相当于启用垂直同步，0相当于禁用垂直同步。如果没有指定则默认为1。
 
     注意，这取决于正确的OpenGL 垂直同步支持。在某些平台和驱动上，只有在全屏模式下才能可靠地工作。如果使用多个显示器，它可能还需要特定驱动程序的hack，以确保mpv同步到正确的显示器。合成窗口管理器也会导致不好的结果，比如显示FPS信息可能丢失或不正确（参见 ``--display-fps-override`` ）。
+
+``--egl-config-id=<ID>``
+    （EGL独占） 选择指定 EGL_CONFIG_ID 的 EGLConfig。渲染表面和上下文将使用此 EGLConfig 创建。你可以使用 ``--msg-level=vo=trace`` 获取可用配置的列表。
+
+``--egl-output-format=<auto|rgb8|rgba8|rgb10|rgb10_a2|rgb16|rgba16|rgb16f|rgba16f|rgb32f|rgba32f>``
+    （EGL独占） 为 OpenGL 渲染选择指定的 EGL 输出格式。此选项与 ``--egl-config-id`` 互斥。默认为 auto ，它将根据驱动程序给出的顺序选择第一个可用的配置。
+
+    并非所有格式都可用。如果选择了不可用的格式，将引起致命错误。
+
+    .. note::
+
+        目前还没有可靠的 API 来查询 EGL 中的桌面位深度。你可以根据显示器的位深度手动设置该选项。此选项还会影响 ``--dither-depth`` 的自动检测。
+
+    .. note::
+
+        与 ``--d3d11-output-format`` 不同，此选项也会在 ``--vo=gpu-next`` 下生效。
 
 ``--vulkan-device=<device name>``
     用于渲染和呈现的Vulkan设备的名称或UUID。使用 ``--vulkan-device=help`` 来查看可用设备的列表和它们的名称与UUID。如果未指定，将使用第一个枚举的硬件Vulkan设备。
@@ -3551,6 +3701,9 @@ GPU渲染选项
 
 ``--wayland-edge-pixels-touch=<value>``
     定义边缘边框的大小（默认： 32），以便使用鼠标在wayland上下文中启动client调整大小的events。
+
+``--wayland-present=<yes|no>``
+    如果合成器支持 wayland presentation time 协议，则启用该协议以获得更精确的帧呈现（默认： ``yes`` ）。只有在使用 ``--video-sync=display-...`` 时才会生效。
 
 ``--spirv-compiler=<compiler>``
     控制哪个编译器用于将GLSL翻译成SPIR-V。这（目前）只与 ``--gpu-api=vulkan`` 和 ``--gpu-api=d3d11`` 有关。目前可能的选择只有：
@@ -3720,6 +3873,47 @@ GPU渲染选项
 
 ``--glsl-shader-opts=param1=value1,param2=value2,...``
     指定用于可调节着色器参数的选项。你可以通过在着色器名称前加上 ``/`` ，例如 ``shader/param=value`` ，来针对特定命名的着色器。如果没有前缀，参数会影响所有着色器。着色器名称是着色器文件名的基础部分，不带扩展名（ ``--vo=gpu-next`` 独占）。
+
+    如果着色器需要，某些参数会自动填充。目前可用的参数如下：
+
+    ``PTS``
+        当前帧的显示时间戳，以秒为单位。
+
+    ``chroma_offset_x``
+        参考平面在 X 方向的色度偏移。
+
+    ``chroma_offset_y``
+        参考平面在 Y 方向的色度偏移。
+
+    ``min_luma``
+        最低亮度值（单位 cd/m²）
+
+    ``max_luma``
+        最高亮度值（单位 cd/m²）
+
+    ``max_cll``
+        最大内容亮度（单位 cd/m²）
+
+    ``max_fall``
+        最大帧平均亮度（单位 cd/m²）
+
+    ``scene_max_r``
+        红色通道的最大场景亮度（单位 cd/m²）
+
+    ``scene_max_g``
+        绿色通道的最大场景亮度（单位 cd/m²）
+
+    ``scene_max_b``
+        蓝色通道的最大场景亮度（单位 cd/m²）
+
+    ``scene_avg``
+        平均场景亮度（单位 cd/m²）
+
+    ``max_pq_y``
+        最大 PQ 亮度（单位 PQ， 0-1）
+
+    ``avg_pq_y``
+        平均 PQ 亮度（单位 PQ， 0-1）
 
 ``--deband``
     启用去色带算法。这大大减少了可见的色带、色块和其它量化伪影的数量，代价是使一些最细微的细节变得非常模糊。在实际中，它几乎总是一种改进 —— 禁用它的唯一原因是为了性能。
@@ -3892,16 +4086,33 @@ GPU渲染选项
     :system:   无手动同步，依赖于层机制和下一个可绘制的情况
     :feedback: 与precise相同，但使用presentation反馈核心机制
 
+``--macos-menu-shortcuts=<yes|no>``
+    启用默认菜单栏快捷方式（默认： yes）。菜单栏快捷方式始终优先于其他快捷方式，它们不会传播到 mpv 内核，也不能在设置文件（如 ``input.conf`` 或脚本绑定）中使用。
+
+``--macos-bundle-path=path1,path2,...``
+    应用程序Bundle在自己的 shell 环境中运行，与终端环境不同。所有Bundle的默认 PATH 变量都是 ``/usr/bin:/bin:/usr/sbin:/sbin`` 。因此，mpv 无法找到由软件包管理器安装的二进制文件，而这些文件可能会在脚本中被使用。该选项会将所有给定路径预置为默认的 Bundle PATH。
+
+    默认值按以下顺序排列：
+
+    :/usr/local/bin:     homebrew (Intel) 安装路径
+    :/usr/local/sbin:    homebrew (Intel) 安装路径
+    :/opt/local/bin:     MacPorts 安装路径
+    :/opt/local/sbin:    MacPorts 安装路径
+    :/opt/homebrew/bin:  homebrew (ARM) 安装路径
+    :/opt/homebrew/sbin: homebrew (ARM) 安装路径
+
 ``--android-surface-size=<WxH>``
     设置Android gpu上下文使用的渲染表面的尺寸。如果尺寸在运行期间发生变化（例如，如果设备被旋转），需要由嵌入的应用程序通过surfaceChanged回调进行设置。
 
     （Android 和 ``--gpu-context=android`` 独占）
 
 ``--gpu-sw``
-    即使检测到软件渲染器也继续。
+    即使检测到软件渲染器也继续。仅适用于 OpenGL/Vulkan 后端。对于 d3d11，参见 ``--d3d11-warp`` 。
 
 ``--gpu-context=<context1,context2,...[,]>``
     指定要使用的 GPU 上下文的优先级列表。值 ``auto`` （默认）选择默认自动探测顺序的GPU上下文。你也可以通过 ``help`` 来获得后端编译的完整列表（按自动探测顺序排序）。
+
+    请注意，默认 GPU 上下文可能会发生变化，因此不能依赖默认 GPU 上下文。如果需要使用某个 GPU 上下文，必须显式指定。
 
     auto
         自动选择（默认）
@@ -3934,11 +4145,11 @@ GPU渲染选项
     macvk
         macOS上使用一个转译层（实验性的），通过Metal surface支持的Vulkan
 
-``--gpu-api=<type>``
-    控制哪种类型的图形API将被接受：
+``--gpu-api=<type1,type2,...[,]>``
+    指定一个可接受的图形 API 的优先级列表。
 
     auto
-        使用任何可用的API（默认）
+        使用任何可用的API（默认）。注意该值使用的默认 GPU API 可能会更改，因此不可依赖。如果需要使用某个 GPU API，则必须显式指定。
     opengl
         只允许OpenGL（需要OpenGL 2.1+或GLES 2.0+）
     vulkan
@@ -3964,14 +4175,12 @@ GPU渲染选项
 ``--gamma-factor=<0.1..2.0>``
     设置一个额外的原始伽玛系数（默认：1.0）。如果用其他方式调整伽玛（比如用 ``--gamma`` 选项或按键绑定和 ``gamma`` 属性），该值将与其它伽玛值相乘。
 
-    此选项已过时，将来可能会被移除。
-
 ``--gamma-auto``
     根据环境照明条件自动修正伽马值（为明亮的房间添加一个伽马增强）。
 
     此选项已过时，将来可能会被移除。
 
-    注意：只在macOS上实现。
+    注意：只在macOS和 ``--vo=gpu`` 上实现。
 
 ``--image-lut=<file>``
     指定一个自定义的LUT文件（Adobe .cube格式），在图像解码过程中应用到颜色上。LUT的确切解释取决于 ``--image-lut-type`` 的值。（ ``--vo=gpu-next`` 独占）
@@ -3988,8 +4197,8 @@ GPU渲染选项
     conversion
         完全取代了颜色解码。这种类型的LUT应该摄入图像的原生色彩空间，并输出标准化的非线性RGB
 
-``--target-colorspace-hint``
-    如果可能的话，自动设置显示器的输出色彩空间，来传递流的输入值（例如，用于HDR直通）。需要一个支持的驱动程序和 ``--vo=gpu-next``
+``--target-colorspace-hint=<auto|yes|no>``
+    如果可能的话，自动设置显示器的输出色彩空间，来传递流的输入值（例如，用于HDR直通）。在 ``auto`` 模式（默认）下，只有当显示信号支持 HDR 色彩空间时，才会设置目标色彩空间。需要一个支持的驱动程序和 ``--vo=gpu-next`` （默认： ``auto`` ）
 
 ``--target-prim=<value>``
     指定显示器的色彩原色。当不使用ICC色彩管理时，视频色彩将被适应到这个色彩空间。有效值是：
@@ -4064,7 +4273,7 @@ GPU渲染选项
 ``--target-peak=<auto|nits>``
     指定输出显示器的测量峰值亮度，单位是cd/m^2（又名尼特）。这个亮度的解释取决于设置的 ``--target-trc`` 。在所有情况下，它对将被发送到显示器的信号值施加了一个限制。如果信号源超过了这个亮度水平，将插入一个色调映射滤镜。对于HLG来说，它还有一个额外的作用，就是对逆向OOTF进行参数化，以便获得与母版显示器一致的色度结果。对于SDR，或者当使用ICC profile（ ``--icc-profile`` ）时，将其设置为高于203的值，基本上会使显示器被视为变相的HDR显示器。（参见下方的注意）
 
-    在 ``auto`` 模式下（默认），所选择的峰值是基于使用中的TRC的一个适当的值。对于SDR曲线，它使用203。对于HDR曲线，它使用203 * 转换函数的额定峰值。
+    在 ``auto`` 模式下（默认），所选择的峰值是基于使用中的TRC的一个适当的值。对于SDR曲线，它使用203。对于HDR曲线，它使用203 * 转换函数的额定峰值。如果可用，它将使用目标显示屏报告的峰值亮度。
 
     .. note::
 
@@ -4073,7 +4282,7 @@ GPU渲染选项
         在这样的设置中，我们强烈推荐将 ``--tone-mapping`` 设置为 ``mobius`` 或甚至 ``clip``
 
 ``--target-contrast=<auto|10-1000000|inf>``
-    指定输出显示的测量对比度。``--target-contrast`` 与 ``--target-peak`` 值一起用于计算显示器的黑点。在HDR色调映射期间用于黑点补偿。默认值为 ``auto``，它假设典型的SDR显示器具有1000:1的对比度，或者在使用HDR ``--target-trc`` 时假定具有无限对比度。 ``inf`` 对比度指定具有完美黑色级别的显示器，实际上是OLED显示器。（ ``--vo=gpu-next`` 独占）
+    指定输出显示的测量对比度。``--target-contrast`` 与 ``--target-peak`` 值一起用于计算显示器的黑点。在HDR色调映射期间用于黑点补偿。默认值为 ``auto``，它假设典型的SDR显示器具有1000:1的对比度，或者在使用HDR ``--target-trc`` 时假定具有无限对比度。如果API支持，则显示对比度将使用报告的值。 ``inf`` 对比度指定具有完美黑色级别的显示器，实际上是OLED显示器。（ ``--vo=gpu-next`` 独占）
 
 ``--target-gamut=<value>``
     限制显示的色域。您可以使用此选项输出例如 DCIP3-in-BT.2020 等色彩。将 ``--target-prim`` 设为包含色彩空间的基色（数值将被编码到基色中），将 ``--target-gamut`` 设为要限制色彩的色域。取值与 ``--target-prim`` 相同。（ ``--vo=gpu-next`` 独占）
@@ -4303,15 +4512,8 @@ GPU渲染选项
 
     https://libplacebo.org/options/
 
-杂项
-----
-
-``--display-tags=tag1,tags2,...``
-    设置应在终端上显示的标签列表。列表中但播放文件中不存在的标签将不会显示。如果一个值以 ``*`` 结尾，所有的标签都按前缀匹配（尽管没有通用的globbing）。仅仅传递 ``*`` 本质上是过滤。
-
-    默认包括一个通用的标签列表，用 ``--list-options`` 调用mpv来查看它。
-
-    这是一个字符串列表选项。详见 `列表选项`_
+视频同步
+--------
 
 ``--mc=<seconds/frame>``
     每一帧的最大A-V同步修正（以秒为单位）
@@ -4372,6 +4574,16 @@ GPU渲染选项
 ``--video-sync-max-audio-change=<value>``
     在 ``--video-sync=display-...`` 的情况下，应用于音频的最大 *附加* 速度差，以百分比为单位（默认： 0.125）。通常情况下，播放器会以视频的速度播放音频。但如果音频和视频的位置差异太大，例如，由于漂移或其它计时错误，它将试图通过这个额外的系数来加快或减慢音频的速度。如果A/V不同步不能得到补偿，那么太低的值可能会导致视频丢帧或重复，太高的值可能会导致混乱的丢帧，原因是音频“过冲”和在同步逻辑能反应之前跳过多个视频帧。
 
+杂项
+----
+
+``--display-tags=tag1,tags2,...``
+    设置应在终端和数据统计上显示的标签列表。列表中但播放文件中不存在的标签将不会显示。如果一个值以 ``*`` 结尾，所有的标签都按前缀匹配（尽管没有通用的globbing）。仅仅传递 ``*`` 本质上是过滤。
+
+    默认包括一个通用的标签列表，用 ``--list-options`` 调用mpv来查看它。
+
+    这是一个字符串列表选项。详见 `列表选项`_
+
 ``--mf-fps=<value>``
     当用 ``mf://`` 从多个PNG或JPEG文件解码时使用的帧速率（默认： 1）。
 
@@ -4412,6 +4624,9 @@ GPU渲染选项
 
     .. warning:: 使用realtime优先级会导致系统锁死。
 
+``--media-controls=<yes|player|no>``
+    （Windows独占）启用媒体控制界面 SystemMediaTransportControls 的集成。如果设置为 ``player`` ，则只有播放器会使用这些控件。将其设置为 ``yes`` ，还将为 libmpv 集成的程序启用控件。（默认： ``player`` ）
+
 ``--force-media-title=<string>``
     强制将 ``media-title`` 属性的内容变成这个值。对于想要设置标题的脚本很有用，而不需要覆盖用户在 ``--title`` 中的设置。
 
@@ -4447,15 +4662,36 @@ GPU渲染选项
 
     参见 ``--audio-display`` 关于如何控制封面图的显示（这可用来禁用属于文件一部分的封面图）。
 
-``--cover-art-auto-exts=ext1,ext2,...``
-    在使用``cover-art-auto``时尝试匹配的封面艺术文件扩展名。
+``--image-exts=ext1,ext2,...``
+    在使用 ``--cover-art-auto`` ``--autocreate-playlist`` 或 ``--directory-filter-types`` 时尝试匹配的图片文件扩展名。
+
+    这是一个字符串列表选项。详见 `List Options`_
+    使用 ``--help=image-exts`` 查看默认的扩展名。
+
+``--cover-art-whitelist=filename1,filename2,...``
+    作为封面图片加载的文件名，按优先级降序排列。它们与 ``--image-exts`` 中的扩展名组合在一起。如果 ``cover-art-auto`` 为 ``no`` ，则该选项无效。
+
+    默认： ``AlbumArt,Album,cover,front,AlbumArtSmall,Folder,.folder,thumb``
 
     这是一个字符串列表选项。详见 `List Options`_
 
-``--cover-art-whitelist=<no|yes>``
-    是否将文件加载为封面艺术，文件名包括 "AlbumArt"、"Album"、"cover"、"front"、"AlbumArtSmall"、"Folder"、".folder"、"thumb" 和一个扩展名，扩展名在 ``--cover-art-auto-exts`` 中指定。如果 ``cover-art-auto`` 为 ``no`` ，则此选项无效。
+``--video-exts=ext1,ext2,...``
+    在使用 ``--autocreate-playlist`` 或 ``--directory-filter-types`` 时尝试匹配的视频文件扩展名。
 
-    默认： ``yes``
+    这是一个字符串列表选项。详见 `List Options`_
+    使用 ``--help=video-exts`` 查看默认的扩展名。
+
+``--archive-exts=ext1,ext2,...``
+    在使用 ``--autocreate-playlist`` 或 ``--directory-filter-types`` 时尝试匹配的归档文件扩展名。
+
+    这是一个字符串列表选项。详见 `List Options`_
+    使用 ``--help=archive-exts`` 查看默认的扩展名。
+
+``--playlist-exts=ext1,ext2,...``
+    在使用 ``--autocreate-playlist`` 或 ``--directory-filter-types`` 时尝试匹配的播放列表文件扩展名。
+
+    这是一个字符串列表选项。详见 `List Options`_
+    使用 ``--help=playlist-exts`` 查看默认的扩展名。
 
 ``--autoload-files=<yes|no>``
     自动加载/选择外部文件（默认： yes）。
@@ -4510,3 +4746,13 @@ GPU渲染选项
     参见 ``--sub-codepage`` 选项，关于如何指定代码页以及关于自动检测和代码页转换的进一步细节。（底层代码相同）
 
     转换不应用于在运行时更新的元数据。
+
+``--clipboard-enable=<yes|no>``
+    （Windows Wayland 和 macOS 独占）
+
+    启用原生剪贴板支持（默认： yes）。这允许读写 ``clipboard`` 属性，以获取和设置剪贴板内容。
+
+``--clipboard-monitor=<yes|no>``
+    （Windows macOS 独占）
+
+    启用剪贴板监视，以便观察 ``clipboard`` 属性的内容变化（默认： no）。这只会影响使用轮询监控剪贴板更新的剪贴板实现。其他平台目前会忽略此选项，并始终/从不通知变更。

@@ -23,22 +23,22 @@ https://github.com/mpv-player/mpv/wiki
 
 | 名称 | 简介 | 同步 |
 | :--- | :--- | :--- |
-| af         | 音频滤镜         | [`commit`](https://github.com/mpv-player/mpv/commit/61f72bd5123551d91e7470f879f359f6104ac6bd) |
-| ao         | 音频输出驱动     | [`commit`](https://github.com/mpv-player/mpv/commit/61f72bd5123551d91e7470f879f359f6104ac6bd) |
+| af         | 音频滤镜         | [`commit`](https://github.com/mpv-player/mpv/commit/50042f5ee094a36e38f9ea809408e0b5cbf3b874) |
+| ao         | 音频输出驱动     | [`commit`](https://github.com/mpv-player/mpv/commit/50042f5ee094a36e38f9ea809408e0b5cbf3b874) |
 | changes    |  |  |
-| console    | 控制台           | [`commit`](https://github.com/mpv-player/mpv/commit/61f72bd5123551d91e7470f879f359f6104ac6bd) |
-| encode     | 编码/压制        | [`commit`](https://github.com/mpv-player/mpv/commit/61f72bd5123551d91e7470f879f359f6104ac6bd) |
-| input      | 按键和命令与属性 | [`commit`](https://github.com/mpv-player/mpv/commit/61f72bd5123551d91e7470f879f359f6104ac6bd) |
+| console    | 控制台           | [`commit`](https://github.com/mpv-player/mpv/commit/50042f5ee094a36e38f9ea809408e0b5cbf3b874) |
+| encode     | 编码/压制        | [`commit`](https://github.com/mpv-player/mpv/commit/50042f5ee094a36e38f9ea809408e0b5cbf3b874) |
+| input      | 按键和命令与属性 | [`commit`](https://github.com/mpv-player/mpv/commit/50042f5ee094a36e38f9ea809408e0b5cbf3b874) |
 | ipc        |  |  |
 | javascript |  |  |
 | libmpv     |  |  |
 | lua        |  |  |
-| mpv        | 综合             | [`commit`](https://github.com/mpv-player/mpv/commit/61f72bd5123551d91e7470f879f359f6104ac6bd) |
-| options    | 选项             | [`commit`](https://github.com/mpv-player/mpv/commit/61f72bd5123551d91e7470f879f359f6104ac6bd) |
-| osc        | 屏显式控制器     | [`commit`](https://github.com/mpv-player/mpv/commit/61f72bd5123551d91e7470f879f359f6104ac6bd) |
-| stats      | 统计数据         | [`commit`](https://github.com/mpv-player/mpv/commit/61f72bd5123551d91e7470f879f359f6104ac6bd) |
-| vf         | 视频滤镜         | [`commit`](https://github.com/mpv-player/mpv/commit/61f72bd5123551d91e7470f879f359f6104ac6bd) |
-| vo         | 视频输出驱动     | [`commit`](https://github.com/mpv-player/mpv/commit/61f72bd5123551d91e7470f879f359f6104ac6bd) |
+| mpv        | 综合             | [`commit`](https://github.com/mpv-player/mpv/commit/50042f5ee094a36e38f9ea809408e0b5cbf3b874) |
+| options    | 选项             | [`commit`](https://github.com/mpv-player/mpv/commit/50042f5ee094a36e38f9ea809408e0b5cbf3b874) |
+| osc        | 屏显式控制器     | [`commit`](https://github.com/mpv-player/mpv/commit/50042f5ee094a36e38f9ea809408e0b5cbf3b874) |
+| stats      | 统计数据         | [`commit`](https://github.com/mpv-player/mpv/commit/50042f5ee094a36e38f9ea809408e0b5cbf3b874) |
+| vf         | 视频滤镜         | [`commit`](https://github.com/mpv-player/mpv/commit/50042f5ee094a36e38f9ea809408e0b5cbf3b874) |
+| vo         | 视频输出驱动     | [`commit`](https://github.com/mpv-player/mpv/commit/50042f5ee094a36e38f9ea809408e0b5cbf3b874) |
 |  |  |  |
 |  |  |  |
 | Interpolation    | 帧率刷新率匹配 | [`commit`](https://github.com/mpv-player/mpv/wiki/Interpolation/164905fad8f55fa9af052b0766495391992ebfc2) |
