@@ -1,10 +1,12 @@
 控制台
 ======
 
-控制台是mpv中可输入命令的交互式解释器。它显示在视频窗口上。它也显示日志信息。它可以通过 ``--load-console=no`` 选项完全禁用。
+该脚本可通过 ``mp.input`` API 处理用户对其它脚本的文本输入。它可以在视频窗口和终端上显示。它可以通过 ``--load-console=no`` 选项完全禁用。
 
-按键绑定
---------
+控制台既可以处理自由格式文本，也可以从预定义的项目列表中进行选择。
+
+自由文本模式的按键绑定
+----------------------
 
 \`
     显示控制台
@@ -13,7 +15,7 @@ ESC, Ctrl+[
     隐藏控制台
 
 ENTER, Ctrl+J, Ctrl+M
-    展开第一个补全建议（如果存在，如果没有选择），并运行输入的命令。
+    如果没有手动选择，则选择第一个补全项，然后运行输入的命令
 
 Shift+ENTER
     换行输入
@@ -70,7 +72,7 @@ PGDN
     停止浏览历史命令
 
 Ctrl+r
-    搜索命令的历史记录
+    搜索命令的历史记录，有关该模式下的按键绑定，参见 `选择器`_
 
 INSERT
     切换 插入/覆盖模式
@@ -82,7 +84,7 @@ Shift+INSERT
     粘贴文本（在X11和Wayland上使用primary selection）
 
 TAB, Ctrl+i
-    循环补全建议。
+    循环补全
 
 Shift+TAB
     向后循环浏览补全信息
@@ -90,31 +92,14 @@ Shift+TAB
 Ctrl+l
     清除控制台中的所有日志信息
 
-MBTN_RIGHT
-    隐藏控制台。
-
 MBTN_MID
-    粘贴文本（在 X11 和 Wayland 上使用主选区）。
+    粘贴文本（在 X11 和 Wayland 上使用主选区）
 
 WHEEL_UP
-    在命令历史中后退。
+    在命令历史中后退
 
 WHEEL_DOWN
-    在命令历史中前进。
-
-命令
-----
-
-``script-message-to console type <text> [<cursor_pos>]``
-    显示控制台并预填充所提供的文本，可选择指定初始光标位置为从1开始的正整数。
-
-    .. admonition::  input.conf示例
-
-        ``% script-message-to console type "seek  absolute-percent" 6``; keypress ESC" 6``
-            （打开控制台）输入一个百分比位置，跳转并关闭控制台。
-
-        ``Ctrl+o script-message-to console type "loadfile ''; keypress ESC" 11``
-            输入要播放的文件或 URL，并自动补全文件系统中的路径。
+    在命令历史中前进
 
 已知问题
 --------
@@ -127,25 +112,48 @@ WHEEL_DOWN
 
 这个脚本可以通过放置在mpv用户目录下的设置文件 ``script-opts/console.conf`` 和 ``--script-opts`` 命令行选项来定制。设置语法在 `mp.options functions`_ 中描述。
 
-按键的绑定可以用标准的方式来改变，例如参见 stats.lua 文档。
-
 设置选项
 ~~~~~~~~
 
 ``font``
-    默认： 一个取决于平台的等宽字体
+    使用的字体名。
 
-    设置用于控制台的字体。要在网格中正确对齐补全建议，必须使用等宽字体。如果控制台是通过调用 ``mp.input.select`` 打开的，且未设置字体时，则使用 ``--osd-font`` ，因为在这种情况下无需对齐。
+    如果需要在网格中对齐补全，则默认使用与平台有关的等宽字体。当没有补全时，则默认使用 ``--osd-font``
 
 ``font_size``
     默认： 24
 
-    设置用于交互式解释器和控制台的字体大小。当控制台不随窗口缩放时，该值将乘以 ``display-hidpi-scale`` 。
+    字体大小。当控制台不随窗口缩放时，该值将乘以 ``display-hidpi-scale`` 。
 
 ``border_size``
     默认： 1.65
 
-    设置用于交互式解释器和控制台的字体边框大小。
+    字体边框大小。
+
+``background_alpha``
+    默认： 80
+
+    菜单背景透明度。取值范围从 0 （不透明）到 255 （完全透明）。
+
+``padding``
+    默认： 10
+
+    菜单内边距。
+
+``menu_outline_size``
+    默认： 0
+
+    菜单边框大小。
+
+``menu_outline_color``
+    默认： #FFFFFF
+
+    菜单边框颜色。
+
+``corner_radius``
+    默认： 8
+
+    菜单边角弧半径。
 
 ``margin_x``
     默认： 与 ``--osd-margin-x`` 值相同
@@ -162,6 +170,21 @@ WHEEL_DOWN
 
     是否根据窗口高度缩放控制台。可以是 ``yes`` ``no`` 或 ``auto`` ，后者遵循 ``--osd-scale-by-window`` 的值。
 
+``selected_color``
+    默认： ``#222222``
+
+    选中项目的颜色。
+
+``selected_back_color``
+    默认： ``#FFFFFF``
+
+    选中项目的背景颜色。
+
+``match_color``
+    默认： ``#0088FF``
+
+    与搜索字符串匹配的字符的颜色。
+
 ``case_sensitive``
     默认： （windows为 yes ，其它平台为 no ）
 
@@ -175,4 +198,4 @@ WHEEL_DOWN
 ``font_hw_ratio``
     默认： auto
 
-    字体高度与字体宽度的比例。调节代码补全辅助的表格宽度。对于一般的等宽字体，1.8-2.5 范围内的值是合理的。
+    字体高度与字体宽度的比例。调节代码补全的网格宽度。对于一般的等宽字体，1.8-2.5 范围内的值是合理的。

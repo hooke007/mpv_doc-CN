@@ -163,12 +163,12 @@ DOWN   向下滚动一行
     文本边框的颜色
 
 ``shadow_x_offset``
-    默认： 0
+    默认： 与 ``--osd-shadow-offset`` 一致
 
     阴影与文字之间的水平距离。
 
 ``shadow_y_offset``
-    默认： 0
+    默认： 与 ``--osd-shadow-offset`` 一致
 
     阴影与文字之间的垂直距离。
 

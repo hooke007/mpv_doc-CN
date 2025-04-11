@@ -222,7 +222,7 @@ Flat命令语法
 
     在没有任何参数的情况下使用默认行为。
 
-``sub-seek <skip> <flags>``
+``sub-seek <skip> [<flags>]``
     跳转视频和音频位置，以便显示 ``<skip>`` 字幕事件之后的字幕事件。例如， ``sub-seek 1`` 跳到下一个字幕， ``sub-seek -1`` 跳到上一个字幕， ``sub-seek 0`` 则跳到当前字幕的开头。
 
     这类似于 ``sub-step`` ，只是它跳转视频和音频，而不是调整字幕延迟。
@@ -236,11 +236,26 @@ Flat命令语法
 
     对于嵌入式字幕（如Matroska），这只适用于已经显示过的字幕事件，或在一个短的预取范围内。有关如何控制可用预取范围的详细信息，详见 `缓存`_ 部分。
 
-``frame-step``
-    播放一帧，然后暂停。对纯音频播放无效。
+``frame-step [<frames>] [<flags>]``
+    按给定的帧数前进或后退。如果省略了 ``<frames>`` ，则假定该值为 ``1`` 。
+
+    第二个参数由控制frameskip模式的标志组成：
+
+    play （默认）
+        将视频播放到所需的帧数，然后暂停。这只适用于正值（即帧步进）。
+    seek
+        执行非常精确的跳转，尝试跳转所需的帧数。如果 ``<frames>`` 为 ``-1`` ，则会精确回到上一帧。
+    mute
+        与 ``play`` 相同，但会在帧步进期间静音音频流（如果存在）。
+
+    请注意，默认的frameskip模式 play 更为精确，但速度可能较慢，这取决于跳转的帧数（例如，向前跳转 100 帧将播放 100 帧视频后才停止）。该模式仅在帧步进时有效。帧步退总是执行跳转。
+
+    在使用 seek 模式时，它的运行速度仍然会很慢（它试图做到精确，而不是快速），有时还会出现与预期不符的情况。效果如何取决于精确跳转是否正确（例如，参见 ``--hr-seek-demuxer-offset`` 选项）。视频滤镜或其它修改帧timing的视频后处理（例如去隔行扫描）通常都能正常工作，但在某些情况下可能会使帧步进出现静默错误。使用 ``--hr-seek-framedrop=no`` 应该会有帮助，不过可能会降低精确跳转的速度。此外，如果视频是 VFR，帧步进使用seek可能无法正常工作，除非是在 ``-1`` 的情况下。
+
+    这对纯音频播放无效。
 
 ``frame-back-step``
-    后退一帧，然后暂停。注意，这可能非常慢（它尝试精确，而不是快速），有时不能达到预期效果。这样做的效果如何，取决于精确跳转是否正常工作（例如，参见 ``--hr-seek-demuxer-offset`` 选项）。视频滤镜或其它修改帧计时的视频后处理（例如去隔行扫描）通常应该有效，但在边缘情况下可能会使反向步进暗中发生错误。使用 ``--hr-seek-framedrop=no`` 应该会有帮助，尽管它可能会使精确跳转更慢。
+    Calls ``frame-step`` with a value of ``-1`` and the ``seek`` flag.
 
     这对纯音频播放无效。
 
@@ -263,6 +278,8 @@ Flat命令语法
 
 ``add <name> [<value>]``
     向属性或选项添加指定的值。在上溢或下溢时，将属性钳制为最大值。如果省略了 ``<value>`` ，则假定为 ``1`` 。
+
+    默认情况下是否启用key-repeat取决于属性。当前，具有连续值的属性默认为可重复（例如 ``volume`` ），具有离散值的属性默认为不可重复（例如 ``osd-level`` ）。
 
     这是一个可扩展命令。详见 `输入命令前缀`_ 中的 ``nonscalable`` 部分的文档。
 
@@ -297,7 +314,7 @@ Flat命令语法
 播放列表操作
 ~~~~~~~~~~~~
 
-``playlist-next <flags>``
+``playlist-next [<flags>]``
     转到播放列表的下一个条目。
 
     第一个参数：
@@ -307,7 +324,7 @@ Flat命令语法
     force
         如果播放列表没有更多的文件，就终止播放
 
-``playlist-prev <flags>``
+``playlist-prev [<flags>]``
     转到播放列表的上一个条目。
 
     第一个参数：
@@ -421,6 +438,24 @@ Flat命令语法
 
         选择字幕。如果已经添加了一个相同文件名的字幕，则选择该字幕，而不是加载一个重复的条目（在这种情况下，标题/语言被忽略，如果在加载后发生了变化，这些变化将不会被反映出来）
 
+    此外，还可以用 ``+`` 添加以下flag：
+
+    <hearing-impaired>
+
+        将轨道标记为适合听障人士使用。
+
+    <visual-impaired>
+
+        将轨道标记为适合视障人士使用。
+
+    <forced>
+
+        将轨道标记为强制轨道。
+
+    <attached-picture> （仅适用于 ``video-add`` ）
+
+        将轨道标记为附加图片，与 ``video-add`` 的 ``albumart`` 参数相同。
+
     ``title`` 参数设置UI中的曲轨道标题。
 
     ``lang`` 参数设置轨道语言，如果 ``flags`` 设置为 ``auto`` ，也会影响流的选择。
@@ -433,7 +468,7 @@ Flat命令语法
 
     这通过卸载和重新添加字幕轨道来工作。
 
-``sub-step <skip> <flags>``
+``sub-step <skip> [<flags>]``
     改变字幕时间，使下一个 ``<skip>`` 字幕事件之后的字幕事件被显示。 ``<skip>`` 可以是负数以便后退。
 
     第二个参数：
@@ -484,7 +519,7 @@ Flat命令语法
 ``expand-text <text>``
     对参数进行属性扩展，并返回扩展后的字符串。这只能通过client API或脚本中的 ``mp.command_native`` 来使用。（见 `属性扩展`_ ）
 
-``expand-path "<text>"``
+``expand-path <text>``
     将一个路径的double-tilde占位符扩展为一个特定平台的路径。与 ``expand-text`` 一样，这只能通过client API或脚本中的 ``mp.command_native`` 来使用。
 
     .. admonition:: 示例
@@ -519,7 +554,7 @@ Flat命令语法
 
     模式参数：
 
-    ``default``
+    ``apply``
         应用该配置文件。如果省略该参数，则为默认。
 
     ``restore``
@@ -875,7 +910,7 @@ OSD类命令
 截图类命令
 ~~~~~~~~~~
 
-``screenshot <flags>``
+``screenshot [<flags>]``
     拍摄屏幕截图。
 
     有多个标志可供选择（有些可与 ``+`` 组合）：
@@ -895,7 +930,7 @@ OSD类命令
 
     成功后，将返回一个带有 ``filename`` 字段，设为保存的屏幕截图位置的 ``mpv_node`` 。
 
-``screenshot-to-file <filename> <flags>``
+``screenshot-to-file <filename> [<flags>]``
     截图并保存到一个指定的文件。文件的格式将由扩展名来猜测（并且 ``--screenshot-format`` 被忽略 —— 当扩展名丢失或未知时，行为是随机的）。
 
     第二个参数和 ``screenshot`` 的第一个参数一样，支持 ``subtitles`` ``video`` ``window``
@@ -904,12 +939,25 @@ OSD类命令
 
     像所有的输入命令参数一样，文件名符合属性扩展，如 `属性扩展`_ 中所述。
 
-``screenshot-raw [<flags>]``
-    在内存中返回一个屏幕截图。这只能通过client API使用。这个命令返回的MPV_FORMAT_NODE_MAP的 ``w``, ``h``, ``stride`` 字段被设置为明显的内容。 ``format`` 字段默认设置为 ``bgr0`` 。这个格式被组织为 ``B8G8R8X8`` （其中 ``B`` 是LSB）。填充物 ``X`` 的内容是未定义的。 ``data`` 字段是MPV_FORMAT_BYTE_ARRAY类型，包含实际图像数据。当结果mpv_node被释放时，图像也被释放。像通常的client API语义一样，你不允许写入图像数据。
+``screenshot-raw [<flags> [<format>]]``
+    在内存中返回一个屏幕截图。这只能通过client API使用。这个命令返回的MPV_FORMAT_NODE_MAP的 ``w`` , ``h`` , ``stride`` 字段被设置为明显的内容。
 
-    ``stride`` 是指从 ``(x0, y0)`` 的像素到 ``(x0, y0 + 1)`` 的像素的字节数。如果图像被裁剪，或者有边距，这个数字可以大于 ``w * 4`` 。这个数字也可以是负数。你可以用 ``byte_index = y * stride + x * 4`` 访问一个像素（假设是 ``bgr0`` 格式）。
+    ``format`` 字段设置为截图图像数据格式。这可以由 ``format`` 参数控制。格式可以是以下之一：
 
-    ``flags`` 参数与 ``screenshot`` 的第一个参数一样，支持 ``subtitles``, ``video``, ``window``
+    bgr0 （默认）
+        该格式的组织形式为 ``B8G8R8X8`` （其中 ``B`` 为 LSB）。填充 ``X`` 的内容未定义。
+    bgra
+        该格式的组织形式为 ``B8G8R8A8`` （其中 ``B`` 为 LSB）。
+    rgba
+        该格式的组织形式为 ``R8G8B8A8`` （其中 ``R`` 为 LSB）。
+    rgba64
+        该格式的组织形式为 ``R16G16B16A16`` （其中 ``R`` 为 LSB）。每个分量占用每个像素 2 个字节。使用此格式时，图像数据将是高位深数据， ``--screenshot-high-bit-depth`` 将被忽略。
+
+    ``data`` 字段的类型为 MPV_FORMAT_BYTE_ARRAY ，包含实际图像数据。结果 mpv_node 释放后，图像也随之释放。与client API 语义一样，不允许写入图像数据。
+
+    ``stride`` 是从位于 ``(x0, y0)`` 的像素到位于 ``(x0, y0 + 1)`` 的像素的字节数。如果图像被裁剪或有填充，这个数字可能大于 ``w * bpp`` 。这个数字也可以是负数。可以使用 ``byte_index = y * stride + x * bpp`` 访问像素。这里， ``bpp`` 是每个像素的字节数， ``rgba64`` 格式为 8 ，其他格式为 4 。
+
+    ``flags`` 参数与 ``screenshot`` 的第一个参数一样，支持 ``subtitles`` , ``video`` , ``window``
 
 滤镜类命令
 ~~~~~~~~~~
@@ -1329,7 +1377,7 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     mpv的进程ID。
 
 ``path``
-    当前播放文件的完整路径。通常这和你在mpv命令行或 ``loadfile`` 命令中传递的字符串完全一样，即使它是一个相对路径。如果你期望一个绝对路径，你将不得不自行检测，例如通过使用 ``normalize-path`` 命令。
+    当前播放文件的完整绝对路径。
 
 ``stream-open-filename``
     当前播放的媒体的完整路径。这只在特殊情况下与 ``path`` 不同。特别是，如果使用了 ``--ytdl=yes`` ，并且URL是由 ``youtube-dl`` 检测的，那么脚本将把这个属性设置为实际的媒体URL。这个属性应该只在 ``on_load`` 或 ``on_load_fail`` hook期间设置，否则它将没有效果（或者可能在未来做一些实现定义的事情）。如果当前媒体播放结束，该属性将被重置。
@@ -1443,7 +1491,9 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     当前 A-B 循环即将进行的次数（如果有的话）。该值由 ``--ab-loop-count`` 的值初始化而来。这个值计算的是播放器跳转到 ``--ab-loop-a`` 的次数，因此在最后一次循环播放时它为 0。-1 对应无限。
 
 ``chapter`` (RW)
-    当前的章节编号。第一章的编号是0。
+    当前的章节编号。第一章的编号是0。值为 -1 表示当前播放位置在第一章开始之前。
+
+    设置该属性会导致absolute seek到该章的开始位置。但是，如果使用 ``add`` 或 ``cycle`` 命令更改该属性以导致值减小，则可能会跳转到当前章节的开头，而不是前一章的开头。详见 ``--chapter-seek-threshold``
 
 ``edition`` (RW)
     当前的edition编号。将此属性设置为一个不同的值将重新开始播放。第一个edition的号码是0。
@@ -1651,7 +1701,7 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     这个选项相对来说是无用的。在mpv0.18.1之前，它可以用来推断 ``volume`` 属性的行为。
 
 ``ao-volume`` (RW)
-    系统音量。这个属性只有在mpv音频输出当前处于激活状态时才可用，并且只有在底层实现支持音量控制时才可用。这个选项的作用取决于API。例如，在ALSA上，这通常会改变整个系统的音频，而在PulseAudio上，这控制每个应用的音量。
+    系统音量。这个属性只有在mpv音频输出当前处于激活状态时才可用，并且只有在底层实现支持音量控制时才可用。该选项的作用或如何解析该值取决于 API。例如，在 ALSA 上，它通常以线性曲线改变整个系统的音频音量，而在 PulseAudio 上，它则以立方曲线控制每个应用程序的音量。
 
 ``ao-mute`` (RW)
     与 ``ao-volume`` 相似，但控制静音状态。即使 ``ao-volume`` 起效，也可能未实现。
@@ -1742,7 +1792,7 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
         视频裁切后的尺寸
 
     ``video-params/aspect``
-        显示长宽比为浮点数
+        显示长宽比为双精度浮点数
 
     ``video-params/aspect-name``
         以字符串形式显示宽高比名称。该名称与特定宽高比的电影胶片格式名相对应。
@@ -2258,6 +2308,9 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     ``track-list/N/dolby-vision-profile``, ``track-list/N/dolby-vision-level``
         Dolby Vision 配置文件和级别。如果容器不提供此信息，则可能不可用。
 
+    ``track-list/N/metadata``
+        工作原理与 ``metadata`` 属性类似，但它访问的是按轨道/流设置的元数据，而不是整个文件的全局值。
+
     当用client API的 ``MPV_FORMAT_NODE`` 查询该属性时，或用Lua ``mp.get_property_native`` ，这将返回一个mpv_node，内容如下：
 
     ::
@@ -2309,6 +2362,8 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
                 "replaygain-album-gain" MPV_FORMAT_DOUBLE
                 "dolby-vision-profile"  MPV_FORMAT_INT64
                 "dolby-vision-level"    MPV_FORMAT_INT64
+                "metadata"              MPV_FORMAT_NODE_MAP
+                    (key and string value for each metadata entry)
 
 ``current-tracks/...``
     这可以访问当前选择的轨道。它重定向到 ``track-list`` 中的正确条目。
@@ -2496,6 +2551,12 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 ``user-data`` (RW)
     这是一个在客户端之间共享的任意节点的递归按键/值图表，以供一般使用（即脚本、IPC客户端、主机应用程序等）。播放器自身不使用其中的任何数据（尽管一些内置脚本可能使用）。该属性在播放器重新启动后不会被保留。
 
+    子路径可以被直接访问；例如， ``user-data/my-script/state/a`` 可被读取、写入或观测。
+
+    top-level 对象本身不能被直接写入；而应写入子路径。
+
+    将此属性或其子属性转换为字符串，这将得到一个JSON的呈现。如果转换一个 leaf-level 对象（即不是map或数组）并且不使用 raw mode，将给出底层内容（例如，字符串将被直接输出，而没有引号或JSON转义）。
+
     下列子路径保留给内部使用或具有特殊语义：
     ``user-data/osc``, ``user-data/mpv`` 除非另有说明，否则这些子路径下的任何属性的语义都可能随时发生变化，且不可依赖，写入这些属性可能会导致内置脚本无法正常工作。
 
@@ -2503,12 +2564,6 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
     ``user-data/osc/margins``
         该属性由 OSC 实现写入，用于指示其占用的页边距。其子属性 ``l``、``r``、``t`` 和 ``b` 都应分别设置为左、右、上和下边距。值介于 0.0 和 1.0 之间，以窗口宽度/高度为基准。
-
-    子路径可以被直接访问；例如， ``user-data/my-script/state/a`` 可被读取、写入或观测。
-
-    top-level 对象本身不能被直接写入；而是写入到子路径。
-
-    将此属性或其子属性转换为字符串，这将得到一个JSON的呈现。如果转换一个 leaf-level 对象（即不是图表或数组）并且不使用 raw 模式，将给出底层内容（例如，字符串将被直接输出，而没有引号或JSON转义）。
 
     ``user-data/mpv/ytdl``
         内置 ytdl hook脚本共享的数据。
@@ -2518,6 +2573,9 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
         ``user-data/mpv/ytdl/json-subprocess-result``
             执行 ytdl 以获取正在加载的 URL 的 JSON 数据的结果。格式与 ``subprocess`` 的结果相同，捕获 stdout 和 stderr。
+
+    ``user-data/mpv/console/open``
+        是否控制台已打开。
 
 ``menu-data`` (RW)
     此属性存储原始菜单定义。详情请参阅 `上下文菜单`_ 部分。
@@ -2558,6 +2616,9 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
 ``working-directory``
     mpv进程的工作目录。对JSON IPC用户可能有用，因为命令行播放器通常使用相对路径。
+
+``current-watch-later-dir``
+    存储 watch later 配置文件的目录。它返回 ``--watch-later-dir`` ，如果 ``--watch-later-dir`` 未被修改，则返回默认目录，并展开 tilde 占位符。
 
 ``protocol-list``
     可能被播放器识别的协议前缀列表。它们被返回，没有尾部的 ``://`` 后缀（但仍然总是需要）。在某些情况下，协议实际上是不被支持的（如果ffmpeg在编译时不支持TLS，可以考虑 ``https`` ）。
@@ -2621,7 +2682,7 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 ``option-info/<name>``
     每个选项的额外信息。
 
-    这有一系列子属性。用顶层选项的名称替换 ``<name>`` 。不保证这些子属性的稳定性 —— 它们可能在功能中发生根本性变化。
+    这有一系列子属性。用顶层选项的名称替换 ``<name>`` 。不保证这些子属性的稳定性 —— 它们可能在将来发生根本性变化。
 
     ``option-info/<name>/name``
         选项的名称
@@ -2692,9 +2753,18 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     ``clipboard/text`` (RW)
         剪贴板中的文本内容（Windows, Wayland 和 macOS 独占）。写入此属性可设置剪贴板中的文本内容（Windows 独占）
 
+    ``clipboard/text-primary``
+        primary selection 中的文本内容（Wayland 和 macOS 独占）。
+
     .. note::
 
-        在 Wayland 上，剪贴板内容只有在合成器发送选择的数据时才会更新（通常是在聚焦 VO 窗口时）。
+        在使用 ``vo`` 剪贴板后端的 Wayland 上，剪贴板内容只有在合成器发送selection数据请求时才会更新（通常是在 VO 窗口被聚焦时）。而 ``wayland`` 后端通常没有这种限制。详见属性 ``current-clipboard-backend``
+
+``current-clipboard-backend``
+    包含当前活动剪贴板后端的字符串。有关可用的后端列表，参见选项 ``--clipboard-backends``
+
+``clock``
+    当前的本地时间，格式为 hour:minutes
 
 选项和属性之间的不一致处
 ------------------------

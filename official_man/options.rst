@@ -35,7 +35,7 @@
 
     ``--audio`` 是 ``--aid`` 的别名。
 
-    ``--aid=no`` 或 ``--audio=no`` 禁用音频播放（后一种变体在client API中不起作用）。
+    ``--aid=no`` 或 ``--audio=no`` 禁用音频播放。
 
     .. note::
 
@@ -60,14 +60,14 @@
 
     ``--sub`` 是 ``--sid`` 的别名。
 
-    ``--sid=no`` 或 ``--sub=no`` 禁用字幕解码（后一种变体在client API中不起作用）。
+    ``--sid=no`` 或 ``--sub=no`` 禁用字幕解码。
 
 ``--vid=<ID|auto|no>``
     选择视频频道。 ``auto`` 选择默认的轨道， ``no`` 禁用视频。
 
     ``--video`` 是 ``--vid`` 的别名。
 
-    ``--vid=no`` 或 ``--video=no`` 禁用视频播放（后一种变体在client API中不起作用）。
+    ``--vid=no`` 或 ``--video=no`` 禁用视频播放。
 
     如果视频被禁用，mpv将尝试下载音频，只有当媒体是用youtube-dl串流时，因为这样可以节省带宽。这是通过在ytdl_hook.lua脚本中将ytdl_format设置为 "bestaudio/best" 来实现的。
 
@@ -322,7 +322,7 @@
 
     已知问题：
 
-    - 它很脆弱。如果有任何东西不工作，可能会出现随机的无用的行为。在简单的情况下，播放器将只是播放无意义的东西和伪影。在其它情况下，它可能会卡住或加热CPU（不过，内存使用量远远超过用户设置的限制将是一个错误）。
+    - 它很脆弱。如果有任何东西不工作，可能会出现随机的行为。在简单的情况下，播放器将只是播放无意义的东西和伪影。在其它情况下，它可能会卡住或加热CPU（不过，内存使用量远远超过用户设置的限制将是一个错误）。
 
     - 性能和资源的使用情况并不理想。这在一定程度上是普通媒体格式向前播放所固有的，这在一定程度上是由于实现的抉择和权衡。
 
@@ -602,13 +602,19 @@
     启用内置脚本，在一个按键绑定上显示有用的播放信息（默认： yes）。默认情况下，使用 ``i`` 键（ ``I`` 键使覆盖层永久化）。
 
 ``--load-console=<yes|no>``
-    启用内置脚本，在一个按键绑定上显示控制台，可让你输入命令（默认： yes）。在默认情况下， ````` 键用于显示控制台， ``ESC`` 键用于再次隐藏它。
+    启用内置脚本，来处理文本输入（默认： yes）。
+
+``--load-commands=<yes|no>``
+    启用内置脚本，来在控制台中输入命令（默认： yes）。默认情况下，使用 ````` 键激活该功能。
 
 ``--load-auto-profiles=<yes|no|auto>``
     启用内置脚本，进行自动配置预设（默认： ``auto`` ）。详见 `附带条件的自动配置预设`_ 。 ``auto`` 将加载脚本，但如果不存在附带条件的自动配置预设，则立即卸载它。
 
 ``--load-select=<yes|no>``
     启用内置脚本，让你从项目列表中进行选择（默认： yes）。默认情况下，它的按键绑定以 ``g`` 键开始。
+
+``--load-positioning=<yes|no>``
+    启用内置脚本，为平移视频和图像提供各种按键绑定（默认： yes）。
 
 ``--player-operation-mode=<cplayer|pseudo-gui>``
     用于启用“伪GUI模式”，这表示一些选项的默认值被改变。这个选项通常不应该直接使用，而应该由mpv内部使用，或者由mpv提供的脚本、设置文件或.desktop文件。详见 `伪GUI模式`_
@@ -617,7 +623,7 @@
 --------
 
 ``--save-position-on-quit``
-    在退出时总是保存当前的播放位置。当以后再次播放该文件时，播放器会在开始时跳转到之前的播放位置。如果以任何其他方式停止一个文件的播放而不是退出，这种情况不会发生。例如，前往播放列表中的下一个文件不会保存位置，而是在下次播放该文件时从头开始播放。
+    退出时和使用 ``loadfile`` 命令替换当前播放列表时，始终保存当前播放位置。当以后再次播放该文件时，播放器会在开始时跳转到之前的播放位置。如果以其它方式停止一个文件的播放，这种情况不会发生。例如，前往播放列表中的下一个文件不会保存位置，而是在下次播放该文件时从头开始播放。
 
     这种行为默认是禁用的，但当用Shift+Q退出播放器时，总是可用的。
 
@@ -662,6 +668,21 @@
 
 ``--ignore-path-in-watch-later-config``
     在使用稍后观看功能时忽略路径（即只使用文件名）。（默认： no）
+
+观看历史
+--------
+
+``--save-watch-history``
+    是否保存播放过的文件。之后，可以使用默认的 ``g-h`` 按键绑定来选择这些文件。
+
+    .. warning::
+
+        此选项可能会暴露隐私敏感信息，因此默认情况下已被禁用。
+
+``--watch-history-path=<path>``
+    观看历史记录的存储路径。默认： ``~~state/watch_history.jsonl`` （参见 `路径`_ ）
+
+    此文件每行包含一个JSON对象。其 ``time`` 字段表示文件打开时的UNIX时间戳， ``path`` 字段表示规范化路径， ``title`` 字段表示文件可用时的标题。
 
 视频
 ----
@@ -725,20 +746,22 @@
 
     只有在你有理由相信自动检测的数值是错误的情况下才设置这个选项。
 
-``--hwdec=<api1,api2,...|no|auto|auto-safe|auto-copy>``
+``--hwdec=<api1,api2,...|no|auto|auto-copy>``
     如果可能的话，指定应该使用的视频硬件解码API。硬解码是否实际完成取决于视频编码。如果硬件解码不可能，mpv将回退到软件解码。
 
     硬件解码在默认情况下是不启用的，目的是保持开箱即用的设置尽可能的可靠。然而，当使用现代硬件时，硬解码应该能正常工作，提供更低的CPU使用率，并可能减少功耗。在老旧系统上，由于CPU资源不足，可能有必要使用硬解码；即使在现代系统上，足够复杂的内容（例如4K60 AV1）也可能需要它。
 
+    这是一个字符串列表选项。详见 `列表选项`_
+
     .. note::
 
-        使用 ``Ctrl+h`` 快捷键来在运行时切换硬解码。它在 ``auto-safe`` 和 ``no`` 之间切换这个选项。
+        使用 ``Ctrl+h`` 快捷键来在运行时切换硬解码。它在 ``auto`` 和 ``no`` 之间切换这个选项。
 
         如果你决定默认使用硬件解码，一般的建议是用命令行选项尝试解码，并向自己证明它对你关注的内容有理想的效果。在此之后，你可以把它添加到你的设置文件中。
 
-        在测试时，你应该先使用 ``hwdec=auto-safe`` ，因为它将限制自己从开发团队积极支持的hwdec中选择。如果这并没有产生有效的硬解码，你可以尝试 ``hwdec=auto`` 让它尝试加载所有可能的hwdec，但是如果 ``auto-safe`` 无法工作，你可能需要知道哪种hwdec与你的硬件匹配，并阅读下方的条目。
+        在测试时，你应该先使用 ``hwdec=auto`` ，因为它将限制自己从开发团队积极支持的hwdec中选择。如果这并没有产生有效的硬解码，你可以尝试 ``hwdec=auto-unsafe`` 让它尝试加载所有可能的hwdec，但是如果 ``auto`` 无法工作，你可能需要知道哪种hwdec与你的硬件匹配，并阅读下方的条目。
 
-        如果 ``auto-safe`` 或 ``auto`` 产生了期待的结果，我们建议只需坚持使用它，如果确实有必要，只在你的设置文件中设定一个特定的hwdec。
+        如果 ``auto`` 产生了期待的结果，我们建议只需坚持使用它，如果确实有必要，就在你的设置文件中设定一个特定的hwdec。
 
         如果你使用Ubuntu软件包，请记住他们的 ``/etc/mpv/mpv.conf`` 包含 ``hwdec=vaapi`` ，这不是很理想，因为它对你的系统来说可能不是正确的选择，而且它可能最终使用一个低效的wrapper来掩饰。我们建议删除这一行或完全删除该文件。
 
@@ -749,17 +772,17 @@
     .. admonition:: 选择哪种方式？
 
         - 如果只想在运行时启用硬件解码，不要设置参数，或者在 ``mpv.conf`` 中加入 ``hwdec=no`` （与某些在默认情况下强制启用的发行版相关，比如Ubuntu）。使用默认绑定 ``Ctrl+h`` 在运行时启用它。
-        - 如果不确定，但希望硬件解码在默认情况下被启用，可以在 ``mpv.conf`` 中加入 ``hwdec=auto-safe`` ，并认识到可能会导致问题。
+        - 如果不确定，但希望硬件解码在默认情况下被启用，可以在 ``mpv.conf`` 中加入 ``hwdec=yes`` ，并认识到可能会导致问题。
         - 如果想测试可用的硬件解码方式，传递 ``--hwdec=auto --hwdec-codecs=all`` ，查看终端的输出。
         - 如果你是一个开发者，或者想进行详细的测试，可能需要其它任何可能的选项值。
 
     该选项接受一个以逗号分隔的 ``api`` 类型的列表，以及某些特殊值：
 
     :no:                始终使用软件解码（默认）
-    :auto-safe:         启用任何白名单中的hw解码器（见下文）
-    :auto:              强制启用任何已找到的hw解码器（见下文）
-    :yes:               与 ``auto-safe`` 完全相同
-    :auto-copy:         启用最佳的带copy-back的hw解码器（见下文）
+    :auto:              启用任何白名单中的hw解码器（见下文）
+    :auto-unsafe:       强制启用任何已找到的hw解码器（见下文）
+    :yes:               与 ``auto`` 完全相同
+    :auto-safe:         与 ``auto`` 完全相同
 
     .. note::
 
@@ -793,13 +816,15 @@
     :crystalhd:         将视频复制回到系统RAM（任何受硬件支持的平台）
     :rkmpp:             需要 ``--vo=gpu`` （部分RockChip设备独占）
 
-    ``auto`` 尝试使用第一个可用的方式来自动启用硬解码。这仍然取决于所使用的是什么视频输出驱动。请参阅上面的列表，了解特定硬解码需要哪些 ``--vo`` 和 ``gpu-context`` 。它将沿着可用的 hwdec 列表查找，直到有一个 hwdec 被成功初始化。如果全部失败，它将退回到软件解码。
+    ``auto`` 会尝试使用第一种可用方法自动启用硬件解码，但仅允许使用被视为“安全”的白名单方法。这被认为是在设置文件中默认启用硬件解码的合理方式（尽管无论如何都不应这样做；更推荐使用 ``Ctrl+h`` 在运行时启用）。与 ``auto-unsafe`` 不同，此模式不会尝试启用未知或已知有问题的解码方法。此外，在已知会导致问题的其它情况下，此模式可能会禁用硬件解码，但目前此机制还相当不完善。（例如，在Windows上，某些HEVC和Intel芯片的组合往往会导致mpv崩溃，这很可能是由于驱动程序错误造成的。）
 
-    ``auto-safe`` 与 ``auto`` 类似，但只允许白名单中的被认为是“安全”的方式。这应该是在设置文件中默认启用硬解的一种合理方式（尽管你不应该这样做；最好在运行时用 ``Ctrl+h`` 启用）。不像 ``auto`` ，它不会尝试启用未知或已知的损坏的方式。此外，在其它已知会导致问题的情况下，这可能会禁用硬解，但目前这个机制是相当原始的（作为一个仍然会引发问题的例子：Windows上HEVC和Intel芯片的某些组合往往会导致mpv崩溃，很可能是由于驱动的错误）。
+    ``auto-unsafe`` 与 ``auto`` 类似，但未使用白名单。通常，除了调试或开发用途外，您无需使用此选项。您想要测试的任何已知的不安全硬件解码器都可以简单地添加到列表选项中，例如 ``--hwdec=auto,unsafe-hwdec`` 。这仍然取决于您使用的VO。参阅上述列表，了解给定硬件解码器所需的 ``--vo`` 和 ``gpu-context`` 。它将从可用硬件解码器列表中向下搜索，直到成功初始化一个。如果所有尝试都失败，它将回退到软件解码。
 
-    ``auto-copy-safe`` 选择了联合 ``auto-safe`` 和 ``auto-copy`` 的方式。
+    ``auto-copy`` 仅选择在解码后将视频数据复制回系统内存的模式。这会选择如 ``vaapi-copy`` 等模式，但它只允许被视为“安全”的白名单方法。如果这些方法都不起作用，则禁用硬件解码。与软件解码相比，这种模式通常不会造成额外的质量损失（假设使用现代编解码器且视频流无错误），并且允许CPU处理视频滤镜。此模式适用于所有视频滤镜和VO。
 
-    ``auto-copy`` 只选择在解码后将视频数据复制回到系统内存的模式。这就选择了像  ``vaapi-copy`` （等等）这样的模式。如果这些都无效，硬解就会被禁用。这种模式通常保证，与软解相比不会产生额外的质量损失（假定视频流是现代的编码且无错误），并将允许由CPU处理的视频滤镜。这种模式适用于所有视频滤镜和视频输出驱动。
+    ``auto-copy-safe`` 是 ``auto-copy`` 的别名
+
+    ``auto-copy-unsafe`` 与 ``auto-copy`` 基本相同，但它会遍历所有方法，而不仅仅是那些被视为“安全”的白名单方法。
 
     因为这些模式把解码后的视频复制回到系统RAM，它们的效率往往不如直接模式，如果你的CPU资源不足，可能对软解没有太大帮助。
 
@@ -807,7 +832,7 @@
 
        大多数non-copy的方式只在OpenGL GPU后端工作。目前，只有 ``vaapi`` 、 ``nvdec`` 和 ``cuda`` 方式能在Vulkan上工作。
 
-    ``vaapi`` 模式，如果与 ``--vo=gpu`` 一起使用，需要Mesa 11，并且很可能只适用于Intel和AMD的GPU。它还需要opengl EGL后端。
+    ``vaapi`` 模式，如果与 ``--vo=gpu`` 或 ``--vo=gpu-next`` 一起使用，很可能只适用于Intel和AMD的GPU。它需要opengl EGL后端，如果GPU不支持drm modifiers的话。
 
     ``nvdec`` 和 ``nvdec-copy`` 是最新的方式，建议在Nvidia GPU上进行硬解。
 
@@ -877,14 +902,18 @@
 
     如果使用了选项 ``--video-unscaled`` ，这个选项就没有作用。
 
+    ``--panscan`` 和 ``--video-zoom`` 之间的区别在于， ``--panscan`` 只能放大，直到视频宽度或高度填满窗口，而 ``--video-zoom`` 可以任意放大或缩小，也适用于 ``--video-unscaled`` 。
+
 ``--video-aspect-override=<ratio|no>``
     覆盖视频长宽比，以防播放的文件中长宽比信息不正确或缺失。
 
     这些值有特殊含义：
 
-    :0:  禁用长宽比处理，假设视频是方形像素
-    :no: 与 ``0`` 相同
-    :-1: 使用视频流或容器的长宽（默认）
+    :no: 使用 ``--video-aspect-method`` 选项的方法。（默认）
+    :0:  禁用长宽比处理，假设视频是方形像素。
+        （已过时，请使用 ``--video-aspect-override=no --video-aspect-method=ignore`` 作为替代品）
+    :-1: 严格优先选择容器的宽高比。
+        （已过时，请使用 ``--video-aspect-override=no --video-aspect-method=container`` 作为替代品）
 
     但请注意，对这些特殊值的处理在未来可能会改变。
 
@@ -894,11 +923,12 @@
         - ``--video-aspect-override=16:9`` 或 ``--video-aspect-override=1.7777``
         - ``--no-video-aspect-override`` 或 ``--video-aspect-override=no``
 
-``--video-aspect-method=<bitstream|container>``
+``--video-aspect-method=<bitstream|container|ignore>``
     这设置了默认的视频长宽决定方法（如果长宽 _没有_ 被用户用 ``--video-aspect-override`` 或其它方式覆盖）。
 
     :container: 严格倾向于容器的长宽比。这显然是VLC的默认行为，至少在Matroska中是如此。请注意，如果容器没有设置长宽比，其行为与比特流相同
     :bitstream: 严格倾向于比特流长宽比，除非没有设置比特流长宽比。这显然是XBMC/kodi的默认行为，至少对Matroska是这样
+    :ignore:    禁用宽高比处理，假设视频有方形像素。
 
     目前mpv的默认值是 ``container``
 
@@ -1016,7 +1046,7 @@
 
     可以用 ``mpv --vd=help`` 获得允许的编码列表。移除前缀，例如，用 ``h264`` 代替 ``lavc:h264`` 
 
-    默认情况下，这被设置为 ``h264,vc1,hevc,vp8,vp9,av1,prores`` 。请注意，像 ``h264_vdpau`` 这样的硬件加速的特殊编码已经没有意义了，事实上已经从FFmpeg中移除了这种形式。
+    默认情况下，这被设置为 ``h264,vc1,hevc,vp8,vp9,av1,prores,ffv1`` 。请注意，像 ``h264_vdpau`` 这样的硬件加速的特殊编码已经没有意义了，事实上已经从FFmpeg中移除了这种形式。
 
     通常只有在损坏的GPU上才需要这样做，在这种情况下，一个编码被报告为支持，但解码导致的问题比它解决的问题更多。
 
@@ -1029,13 +1059,13 @@
         ``mpv --hwdec=vdpau --hwdec-codecs=h264,mpeg2video``
             只对h264和mpeg2启用vdpau解码。
 
-``--vd-lavc-check-hw-profile=<yes|no>``
-    检查硬件解码器的profile（默认： yes）。如果设置了 ``no`` ，就会无条件地选择硬件解码器的最高profile，即使视频的profile高于此，也会强制解码。其结果很可能是解码错误，但如果检测到的或报告的profile在某种程度上不正确，也可能有帮助。
-
-``--vd-lavc-software-fallback=<yes|no|N>``
+``--hwdec-software-fallback=<yes|no|N>``
     如果硬件加速解码器失败，退回到软件解码（默认：3）。如果这是一个数字，那么如果连续N个帧解码失败，就会触发回退。1相当于 ``yes``
 
     设置为更高的数字可能会破坏播放开始时的回退：如果回退发生，文件的部分内容将被跳过，这大约是无法解码的packets的数量。低于一个未指定计数的值不会有这个问题，因为mpv保留了这些packets。
+
+``--vd-lavc-check-hw-profile=<yes|no>``
+    检查硬件解码器的profile（默认： yes）。如果设置了 ``no`` ，就会无条件地选择硬件解码器的最高profile，即使视频的profile高于此，也会强制解码。其结果很可能是解码错误，但如果检测到的或报告的profile在某种程度上不正确，也可能有帮助。
 
 ``--vd-lavc-film-grain=<auto|cpu|gpu>``
     启用GPU上的胶片颗粒应用。如果视频解码是在CPU上完成的，在GPU上做胶片颗粒应用可以加速解码。该选项也有助于硬件解码，因为它可以减少帧拷贝的数量。
@@ -1166,7 +1196,7 @@
 ``--ad=<decoder1,decoder2,...[-]>``
     根据解码器的名称指定一个要使用的音频解码器的优先列表。当确定使用哪个解码器时，会选择首个与音频格式匹配的解码器。如果该解码器不可用，则使用下一个解码器。最后，它尝试所有其它没有被选项明确选择或拒绝的解码器。
 
-    列表末尾的 ``-`` 抑制了回退到不在 ``--ad`` 列表中的其它可用解码器。 ``+`` 在一个条目前面，强制使用解码器。这两种方法通常都不应该使用，因为它们破坏了正常的解码器自动选择。这两种方法都已被废弃。
+    列表末尾的 ``-`` 抑制了回退到不在 ``--ad`` 列表中的其它可用解码器。这通常不应该使用，因为它们会破坏正常的解码器自动选择！ ``-`` 模式已过时。
 
     .. admonition:: 示例
 
@@ -1399,13 +1429,16 @@
 
         这也影响ASS字幕，并可能导致不正确的字幕渲染。小心使用，或用 ``--sub-font-size`` 代替。
 
+``--sub-scale-signs=<yes|no>``
+    当设置为 yes 时，也对typesetting（或"signs"）应用 ``--sub-scale`` 。当设置为 no 时， ``--sub-scale`` 仅适用于dialogue。dialogue和typesetting之间的区别是尽最大努力完成的，并非绝对正确（默认： no）。
+
 ``--sub-scale-by-window=<yes|no>``
     是否随窗口大小缩放字幕（默认： yes）。如果禁用此选项，即使将 ``--sub-scale-with-window`` 设为 yes，更改窗口大小也不会改变字幕字体大小。
 
     只影响纯文本字幕（或者ASS，前提是如果 ``--sub-ass-override`` 设置得足够高）。
 
 ``--sub-scale-with-window=<yes|no>``
-    Make the subtitle font size relative to the window (default: yes). If this is disabled while ``--sub-scale-by-window`` is set to yes, the subtitle font size is scaled relative to the video size instead.
+    设置相对于窗口的字幕字体大小（默认： yes）。如果在 ``--sub-scale-by-window`` 设置为 yes 时禁用此功能，则字幕字体大小将相对于视频大小进行缩放。
 
     只影响纯文本字幕（或者ASS，前提是如果 ``--sub-ass-override`` 设置得足够高）。
 
@@ -1536,7 +1569,7 @@
     默认： ``all``
 
 ``--sub-ass-video-aspect-override=<no|ratio>``
-    允许向 libass 传递任意宽高比，而不是视频的实际宽高比。零或负的纵横比与 ``no`` 相同。
+    允许向 libass 传递任意宽高比，而不是视频的实际宽高比。值 0 的纵横比与 ``no`` 相同。
 
     如果 ``sub-ass-use-video-data`` 设置为 ``none``，则此选项无效。
 
@@ -2167,8 +2200,6 @@
 
     在win32上，ID被解释为 ``HWND`` 。将其作为值转换传递给 ``uint32_t`` （所有的Windows句柄都是32位的）。 mpv将创建自己的窗口，并将窗口设置为父窗口，就像X11一样。
 
-    在macOS/Cocoa上，ID被解释为 ``NSView*`` 。将其作为值转换传递给 ``intptr_t`` ，mpv将创建自己的子视图。因为macOS不支持外来进程的窗口内嵌，这只适用于libmpv，从命令行使用时会崩溃。
-
     在Android上，ID会被解释为 ``android.view.Surface`` 。将其作为值转换传递给 ``intptr_t`` 。与 ``--vo=mediacodec_embed`` 和 ``--hwdec=mediacodec`` 一起使用，以便使用MediaCodec直接渲染，或者与 ``--vo=gpu --gpu-context=android`` 一起使用（带或者不带 ``--hwdec=mediacodec`` ）。
 
 ``--window-dragging=<yes|no>``
@@ -2214,17 +2245,17 @@
 --------
 
 ``--cdda-device=<path>``
-    指定用于CDDA播放的CD设备（默认： ``/dev/cdrom`` ）。
+    指定用于CDDA播放的CD设备。默认设备路径取决于操作系统。参见 `光盘驱动器`_
 
 ``--dvd-device=<path>``
-    指定DVD设备或ISO文件名（默认： ``/dev/dvd`` ）。你也可以指定一个包含之前直接从DVD复制文件出来的目录（例如，使用 vobcopy ）。
+    指定DVD设备或ISO文件名。你也可以指定一个包含之前直接从DVD复制文件出来的目录（例如，使用 vobcopy ）。默认设备路径取决于操作系统。参见 `光盘驱动器`_
 
     .. admonition:: 示例
 
         ``mpv dvd:// --dvd-device=/path/to/dvd/``
 
 ``--bluray-device=<path>``
-    （Blu-ray独占）指定蓝光光盘的位置。必须是一个具有蓝光结构的目录。
+    指定蓝光光盘的位置。必须是一个具有蓝光结构的目录。参见 `光盘驱动器`_
 
     .. admonition:: 示例
 
@@ -2374,6 +2405,20 @@
 
     ``yes`` 模式只是使用索引，并从文件的末端读取少量的块。 ``full`` 模式实际上是遍历整个文件，即使没有索引也能做出可靠的估计（比如分部的文件）。
 
+``--demuxer-mkv-crop-compat=<yes|no>``
+    为不完全符合Matroska规范的文件启用兼容模式。（默认： yes）
+
+    大多数包含裁切元数据的文件都需要此模式才能正确显示。
+
+    如果启用此选项，则将在计算视频的宽高比之前应用裁剪元数据，以确保视频得到相应的裁剪。如果禁用此选项，则图像将首先被裁剪，然后被拉伸以匹配DisplayWidth和DisplayHeight。
+
+    根据Matroska规范，应在裁切后计算像素纵横比（PAR）。然而，大多数文件都不遵守这一规则，因为这会导致与不知道裁切的播放器不兼容。此外，在应用裁切元数据时，MKVToolNix不会自动调整DisplayWidth和DisplayHeight，导致使用它创建的大多数文件也不符合规范。
+
+    详见：
+    https://github.com/ietf-wg-cellar/matroska-specification/pull/947
+    https://gitlab.com/mbunkus/mkvtoolnix/-/issues/2389
+    https://github.com/mpv-player/mpv/pull/13446
+
 ``--demuxer-rawaudio-channels=<value>``
     如果使用 ``--demuxer=rawaudio`` ，声道的数量（或声道布局）（默认： stereo）。
 
@@ -2469,17 +2514,13 @@
     默认值是0秒，这将禁用缓存滞后。一个10秒的值可能对大多数情况都有效。
 
 ``--prefetch-playlist=<yes|no>``
-    在当前项目的播放结束时预取下一个播放列表项目（默认： no）。
+    在当前项目的播放结束时预取下一个播放列表项目（默认： yes）。
 
     这不会将下一个URL的视频数据预填充到缓存中。预取的视频数据只受当前的播放列表条目支持，并取决于解复用器缓存设置（默认启用）。这只用在当前的URL被完全读取后，打开下一个播放列表的URL。
 
     这对由 ``youtube-dl`` 封装器解析的URL **没** 效果，也不会起作用。
 
-    如果使用特定文件的选项，或者在预取开始和下一个文件播放之间的时间窗口内改变选项，这可能会产生微妙错误的结果。
-
     这可能偶尔会做出错误的预取判定。例如，它不能预测你是否在播放列表中回退，并假定你不会编辑播放列表。
-
-    它是高度实验性的。
 
 ``--force-seekable=<yes|no>``
     如果播放器认为媒体文件是不可跳转的（例如，从管道中播放，或者是http流的服务器不支持范围的请求），跳转将被禁用。这个选项可以强行启用它。对于缓存中的跳转，有很大的成功机会。
@@ -2628,6 +2669,17 @@
 
 ``--input-dragging-deadzone=<N>``
     在按住鼠标键的同时，当鼠标移出 ``N`` 像素的死区（默认： 3）时，开始内置窗口拖动。这只影响支持 ``begin-vo-dragging`` 命令的 VO。
+
+``--input-ime=<yes|no>``
+    通过连接到VO的活动输入法（IME）启用键盘输入。（默认： no）。输入弹出窗口（如果有的话）始终位于窗口的左上角。是否绘制预编辑文本取决于平台。如果您无法阅读mpv窗口中的预编辑文本，您可能需要配置IME以在输入弹出窗口中显示预编辑。
+
+    Wayland 和 Windows 独占。此选项不适用于终端输入。
+
+    .. note::
+
+        启用IME可能会导致按键绑定问题，因为mpv在进入IME预编辑区域时无法检测到任何按键。建议仅在需要输入文本的时间段内按需启用IME。
+
+        内置的控制台和输入选择器在接受文本输入期间启用IME。
 
 OSD
 ---
@@ -3361,7 +3413,7 @@ OSD
 ``--dvbin-file=<filename>``
     指示mpv从 ``<filename>`` 中读取频道列表。默认是在mpv设置目录下（通常是 ``~/.config/mpv`` ），文件名是 ``channels.conf.{sat,ter,cbl,atsc,isdbt}`` （根据你的卡类型）或 ``channels.conf`` 作为最后手段。请注意，推荐使用特定的文件名和卡类型，因为传统的频道格式没有完全标准化，因此否则可能无法自动检测传输系统。对于DVB-S/2卡，推荐使用VDR 1.7.x格式的频道表，因为它可以调节到DVB-S2频道，启用字幕并对PMT进行解码（这在很大程度上改善了解复用）。仍然支持经典的mplayer格式的频道表（没有这些改进），对于其它的卡类型，只实现了有限的VDR格式频道表支持（欢迎打补丁）。对于有动态PID切换的频道或不完整的 ``channels.conf`` ，推荐使用 ``-dvbin-full-transponder`` 或神奇的 ``8192`` PID。
 
-``--dvbin-timeout=<1-30>``
+``--dvbin-timeout=<seconds>``
     试图调节到一个频率时，在放弃前等待的最大秒数（默认： 30）。
 
 ``--dvbin-full-transponder=<yes|no>``
@@ -3649,6 +3701,8 @@ GPU渲染选项
 ``--d3d11-flip=<yes|no>``
     启用翻转模型呈现，通过与DWM共享表面来避免不必要地复制后缓存（默认： yes）。这可能会引起老旧驱动的性能问题。如果不支持翻转模型呈现（例如，在没有平台更新的Windows 7上），mpv将自动回退到旧的bitblt呈现模型。
 
+    翻转模型需要演示，需要禁用背景透明度才能工作。
+
 ``--d3d11-sync-interval=<0..4>``
     安排呈现每一帧的VBlank间隔数（默认：1）。设置为1将启用垂直同步，设置为0将禁用它。
 
@@ -3693,14 +3747,14 @@ GPU渲染选项
 ``--wayland-content-type=<auto|none|photo|video|game>``
     如果合成器支持，mpv将使用内容类型协议发送一个提示，告诉合成器正在显示什么类型的内容。 ``auto`` （默认）将自动切换，告诉合成器内容是照片、视频或可能不是，这取决于内部启发式的方法。
 
-``--wayland-disable-vsync=<yes|no>``
-    为基于Wayland的视频输出禁用mpv的内部垂直同步（默认： no）。当与 ``--video-sync=display-desync`` ``--audio=no`` 和 ``--untimed=yes`` 结合使用时，这对wayland视频输出的基准测试非常有用。
-
 ``--wayland-edge-pixels-pointer=<value>``
     定义边缘边框的大小（默认： 16），以便使用鼠标在wayland上下文中启动client调整大小的events。仅当合成器中没有服务器端装饰时，此选项才能激活。
 
 ``--wayland-edge-pixels-touch=<value>``
     定义边缘边框的大小（默认： 32），以便使用鼠标在wayland上下文中启动client调整大小的events。
+
+``--wayland-internal-vsync=<no|auto|yes>``
+    控制是否将mpv的内部vsync用于Wayland-base视频输出（默认： ``auto`` ）。当与 ``video-sync=display-desync`` ``--audio=no`` ``--untimed=yes`` 结合使用时，这主要用于对wayland VO进行基准测试。如果合成器在使用 ``--gpu-api=vulkan`` 时支持fifo协议和演示时协议的版本2，则特殊的 ``auto`` 值将禁用内部vsync。在任何其他情况下，这与 ``yes`` 完全相同。
 
 ``--wayland-present=<yes|no>``
     如果合成器支持 wayland presentation time 协议，则启用该协议以获得更精确的帧呈现（默认： ``yes`` ）。只有在使用 ``--video-sync=display-...`` 时才会生效。
@@ -4145,6 +4199,8 @@ GPU渲染选项
     macvk
         macOS上使用一个转译层（实验性的），通过Metal surface支持的Vulkan
 
+    这是一个对象设定列表选项。详见 `列表选项`_
+
 ``--gpu-api=<type1,type2,...[,]>``
     指定一个可接受的图形 API 的优先级列表。
 
@@ -4156,6 +4212,8 @@ GPU渲染选项
         只允许Vulkan（需要一个有效的/工作的 ``--spirv-compiler`` ）
     d3d11
         只允许 ``--gpu-context=d3d11``
+
+    这是一个对象设定列表选项。详见 `列表选项`_
 
 ``--opengl-es=<mode>``
     控制哪种类型的OpenGL上下文将被接受
@@ -4198,7 +4256,7 @@ GPU渲染选项
         完全取代了颜色解码。这种类型的LUT应该摄入图像的原生色彩空间，并输出标准化的非线性RGB
 
 ``--target-colorspace-hint=<auto|yes|no>``
-    如果可能的话，自动设置显示器的输出色彩空间，来传递流的输入值（例如，用于HDR直通）。在 ``auto`` 模式（默认）下，只有当显示信号支持 HDR 色彩空间时，才会设置目标色彩空间。需要一个支持的驱动程序和 ``--vo=gpu-next`` （默认： ``auto`` ）
+    如果可能的话，自动设置显示器的输出色彩空间，来传递流的输入值（例如，用于HDR直通）。在 ``auto`` 模式下，只有当显示信号支持 HDR 色彩空间时，才会设置目标色彩空间。需要一个支持的驱动程序和 ``--vo=gpu-next`` （默认： ``no`` ）
 
 ``--target-prim=<value>``
     指定显示器的色彩原色。当不使用ICC色彩管理时，视频色彩将被适应到这个色彩空间。有效值是：
@@ -4294,7 +4352,7 @@ GPU渲染选项
     指定用于将图像色调映射到目标显示上的算法。这与HDR->SDR转换和降低色域有关（例如，在标准色域显示器上播放BT.2020内容）。有效值是：
 
     auto
-        根据内部启发式方法选择最佳曲线（默认）
+        当使用 ``--vo=gpu`` 时，映射到 ``bt.2390`` ，当使用 ``--vo=gpu-next`` 时，映射到 ``spline`` 。再使用“--vo=gpu”。（默认）
     clip
         硬性裁切任何超出范围的数值。当你关心范围内值的完美色彩准确性时，使用这个方法，代价是完全扭曲范围外的值。一般不推荐使用
     mobius
@@ -4469,6 +4527,8 @@ GPU渲染选项
     none
         不混合帧，保持 Alpha 不变。
 
+    d3d11上的背景透明度要求 ``--d3d11-flip=no`` 。
+
     在 mpv 0.38.0 之前，该选项接受指定背景颜色的颜色值。现在由 ``--background-color`` 选项完成。请使用该选项。
 
 ``--background=<color>``
@@ -4624,8 +4684,9 @@ GPU渲染选项
 
     .. warning:: 使用realtime优先级会导致系统锁死。
 
-``--media-controls=<yes|player|no>``
-    （Windows独占）启用媒体控制界面 SystemMediaTransportControls 的集成。如果设置为 ``player`` ，则只有播放器会使用这些控件。将其设置为 ``yes`` ，还将为 libmpv 集成的程序启用控件。（默认： ``player`` ）
+``--media-controls=<yes|no>``
+    （Windows独占）启用媒体控制界面 SystemMediaTransportControls 的集成。
+    默认： ``yes`` （除了libmpv）
 
 ``--force-media-title=<string>``
     强制将 ``media-title`` 属性的内容变成这个值。对于想要设置标题的脚本很有用，而不需要覆盖用户在 ``--title`` 中的设置。
@@ -4747,12 +4808,34 @@ GPU渲染选项
 
     转换不应用于在运行时更新的元数据。
 
-``--clipboard-enable=<yes|no>``
-    （Windows Wayland 和 macOS 独占）
+``--clipboard-backends=<backend1,backend2,...[,]>``
+    指定要使用的剪贴板后端的优先级列表。还可以传递 ``help`` 以获取后端编译的完整列表。
 
-    启用原生剪贴板支持（默认： yes）。这允许读写 ``clipboard`` 属性，以获取和设置剪贴板内容。
+    如果列表不为空，它将为指定的后端启用原生剪贴板支持。这允许对 ``clipboard`` 属性进行读写操作，以获取和设置剪贴板内容。
+
+    默认情况下启用了原生剪贴板支持。要禁用此功能，使用 ``--clipboard-backends-clr`` 删除此列表中的所有后端。
+
+    请注意，默认剪贴板后端可能会发生变化，不应该依赖。
+
+    实现了以下剪贴板后端：
+
+    ``win32``
+        Windows 后端
+
+    ``mac``
+        macOS 后端
+
+    ``wayland``
+        Wayland 后端。此后端仅在合成器支持 ``ext-data-control-v1`` 协议时可用。
+
+    ``vo``
+        VO 后端。需要一个活动的VO窗口，并且支持因平台而异。当前，这被用作不支持 ``ext-data-control-v1`` 协议，或者如果 ``wayland`` 后端被禁用的Wayland合成器的后备方案。
+
+    这是一个对象设定列表选项。详见 `列表选项`_
 
 ``--clipboard-monitor=<yes|no>``
-    （Windows macOS 独占）
+    （Windows Wayland macOS 独占）
 
     启用剪贴板监视，以便观察 ``clipboard`` 属性的内容变化（默认： no）。这只会影响使用轮询监控剪贴板更新的剪贴板实现。其他平台目前会忽略此选项，并始终/从不通知变更。
+
+    在Wayland上，此选项仅对 ``wayland`` 后端有效，对 ``vo`` 后端无效。详见属性 ``current-clipboard-backend``
