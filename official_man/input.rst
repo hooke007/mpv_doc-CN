@@ -1,7 +1,7 @@
 命令接口
 ========
 
-mpv的核心可以用命令和属性来控制。许多与播放器交互的方式都使用它们：按键绑定（ ``input.conf`` ），OSD（用属性显示信息），JSON IPC，客户端API（ ``libmpv`` ），以及经典的slave mode 。
+mpv的核心可以用命令和属性来控制。许多与播放器交互的方式都使用它们：按键绑定（ ``input.conf`` ），OSD（用属性显示信息），JSON IPC和客户端API（ ``libmpv`` ）。
 
 input.conf
 ----------
@@ -2746,12 +2746,12 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     这个属性是只读的，不支持更改提醒。目前，除了脚本添加或删除自己的绑定外，没有任何机制可以在运行时改变按键绑定。
 
 ``clipboard``
-    剪贴板内容，只有在平台支持本地剪贴板（ ``--clipboard-enable`` ）时才有效。根据平台的不同，某些子属性、写入属性或更改通知目前无法使用。
+    剪贴板内容。只有在平台支持本地剪贴板时才有效。根据平台的不同，某些子属性、写入属性或更改通知目前无法使用。
 
     它有许多子属性：
 
     ``clipboard/text`` (RW)
-        剪贴板中的文本内容（Windows, Wayland 和 macOS 独占）。写入此属性可设置剪贴板中的文本内容（Windows 独占）
+        剪贴板中的文本内容（Windows, Wayland 和 macOS 独占）。写入此属性可设置剪贴板中的文本内容（Windows, Wayland 和 macOS 独占）
 
     ``clipboard/text-primary``
         primary selection 中的文本内容（Wayland 和 macOS 独占）。

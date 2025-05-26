@@ -115,10 +115,10 @@ WHEEL_DOWN
 设置选项
 ~~~~~~~~
 
-``font``
-    使用的字体名。
+``monospace_font``
+    默认： （视系统平台而定）
 
-    如果需要在网格中对齐补全，则默认使用与平台有关的等宽字体。当没有补全时，则默认使用 ``--osd-font``
+    当在网格中对齐补全时使用的等宽字体。当没有补全时，则使用 ``--osd-font``
 
 ``font_size``
     默认： 24
@@ -170,25 +170,30 @@ WHEEL_DOWN
 
     是否根据窗口高度缩放控制台。可以是 ``yes`` ``no`` 或 ``auto`` ，后者遵循 ``--osd-scale-by-window`` 的值。
 
-``selected_color``
+``focused_color``
     默认： ``#222222``
 
-    选中项目的颜色。
+    聚焦项目的颜色。
 
-``selected_back_color``
+``focused_back_color``
     默认： ``#FFFFFF``
 
-    选中项目的背景颜色。
+    聚焦项目的背景颜色。
 
 ``match_color``
     默认： ``#0088FF``
 
     与搜索字符串匹配的字符的颜色。
 
-``case_sensitive``
-    默认： （windows为 yes ，其它平台为 no ）
+``exact_match``
+    默认： ``no``
 
-    自动补全是否区分大小写，仅适用于 ASCII 字符。
+    是否精确匹配菜单搜索查询，而不是模糊匹配。如果不使用此选项，在查询前加上 ``'`` 可临时启用精确匹配。
+
+``case_sensitive``
+    默认： ``no``
+
+    精确搜索匹配是否区分大小写，仅适用于 ASCII 字符。
 
 ``history_dedup``
     默认： yes

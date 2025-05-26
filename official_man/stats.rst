@@ -111,16 +111,22 @@ DOWN   向下滚动一行
     是否按终端宽度截断行。
 
 ``plot_perfdata``
-    默认： yes
+    默认： no
 
     显示性能数据的图表（第2页）
 
 ``plot_vsync_ratio``
-    默认： yes
+    默认： no
+
 ``plot_vsync_jitter``
-    默认： yes
+    默认： no
 
     显示vsync和jitter值的图表（第1页）。只有在始终显示时才显示。
+
+``plot_cache``
+    默认： yes
+
+    显示缓存值的图表（第3页）。只有在始终显示时才显示。
 
 ``plot_tonemapping_lut``
     默认： no

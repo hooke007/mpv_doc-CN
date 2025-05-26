@@ -241,8 +241,8 @@
     ``<force-scaler=auto|zimg|sws>``
         如果适用的话，强制一个特定的缩放器后端。这是一个调试选项，随时可能消失。
 
-    ``<alpha=auto|straight|premul>``
-        设置视频使用的透明种类。如果图像格式没有透明通道，则未定义效果（可能被忽略或导致错误，取决于mpv内部如何发展）。设置这个可能会或不会导致下游的图像处理以不同的方式处理透明度，这取决于支持的情况。使用了 ``convert`` 或zimg，这将转换透明。libswscale和其他FFmpeg组件会完全忽略这一点。
+    ``<alpha=auto|straight|premul|none>``
+        设置视频使用的透明种类。如果图像格式没有透明通道，则未定义效果（可能被忽略或导致错误，取决于mpv内部如何发展）。设置这个可能会或不会导致下游的图像处理以不同的方式处理透明度，这取决于支持的情况。使用了 ``convert`` 或zimg，这将转换透明。libswscale和其他FFmpeg组件会完全忽略这一点。 ``none`` 仅在 libplacebo vN.344.0 开始可用。
 
 ``lavfi=graph[:sws-flags[:o=opts]]``
     使用FFmpeg的libavfilter过滤视频。

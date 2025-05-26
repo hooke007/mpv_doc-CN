@@ -595,6 +595,9 @@
         - ``--ytdl-raw-options=proxy=[http://127.0.0.1:3128]``
         - ``--ytdl-raw-options-append=proxy=http://127.0.0.1:3128``
 
+``--ytdl-extract-chapters=<yes|no>``
+    启用从youtube-dl视频描述中提取章节 （默认： yes ）
+
 ``--js-memory-report=<yes|no>``
     启用在数据统计叠加层中为JavaScript脚本报告内存使用情况。默认禁用，因为它会增加开销并增加内存使用量。此选项仅在启动mpv之前启用时才会生效。
 
@@ -1139,7 +1142,7 @@
 ----
 
 ``--audio-pitch-correction=<yes|no>``
-    如果启用这个功能（默认），以不同于正常的速度播放时会自动插入 ``scaletempo2`` 音频滤镜。您可以插入除了 ``scaletempo2`` 之外的滤镜，并使用 `附带条件的自动配置预设` 来修改它们的参数：
+    如果启用这个功能（默认），以不同于正常的速度播放时会自动插入 ``scaletempo2`` 音频滤镜。您可以插入除了 ``scaletempo2`` 之外的滤镜，并使用 `附带条件的自动配置预设`_ 来修改它们的参数：
 
     ::
 
@@ -1522,6 +1525,16 @@
 
         对于已经“被看到”并需要再次渲染的event（如果这些event被pruning），在运行时将播放方向从前向后更改时，这会中断sub-seek和字幕渲染。
 
+``--sub-glyph-limit=<value>``
+    设置 libass 缓存中字幕轨道的最大缓存glyphs数。0 表示 libass 使用默认值。
+
+    默认： ``0``
+
+``--sub-bitmap-max-size=<value>``
+    设置 libass 缓存中字幕轨道的最大bitmap缓存大小。0 表示 libass 使用默认值。该值的单位为 MB。
+
+    默认： ``0``
+
 ``--sub-ass-styles=<filename>``
     加载在指定文件中找到的所有SSA/ASS样式，并使用它们来渲染文本字幕。文件的语法与SSA/ASS的 ``[V4 Styles]`` / ``[V4+ Styles]`` 部分完全一样。
 
@@ -1543,17 +1556,17 @@
 ``--secondary-sub-ass-override=<no|yes|scale|force|strip>``
     控制是否应该应用用户风格覆盖次字幕。这与 ``--sub-ass-override`` 类似。
 
-    默认： strip.
+    默认： ``strip``
 
 ``--sub-ass-force-margins``
     如果字幕是ASS格式，在有黑边的情况下，启用将顶部字幕和字幕放进黑边。
 
-    默认： no
+    默认： ``no``
 
 ``--sub-use-margins``
     如果字幕是纯文本格式（或ASS格式，前提是如果 ``--sub-ass-override`` 设置得足够高），在有黑边的情况下，启用将顶部字幕和字幕放进黑边。
 
-    默认： yes
+    默认： ``yes``
 
 ``--sub-ass-use-video-data=<none|aspect-ratio|all>``
     控制传递给 libass 的视频流信息。除 ``all`` 以外的任何选项都与 VSFilter 定义的标准 ASS 不兼容，大多数字幕脚本和渲染器（包括 libass）都以 VSFilter 的行为为目标。要准确模拟 VSFilter 的语义，就必须使用视频流属性，不使用这些属性可能会导致大多数文件的字幕渲染出现问题。因此建议只在每个文件需要时才有选择性地更改。
@@ -2711,7 +2724,7 @@ OSD
 ``--osd-font-size=<size>``
     指定OSD的字体大小。详见 ``--sub-font-size``
 
-    默认： 30
+    默认： ``30``
 
 ``--osd-msg1=<string>``
     在OSD等级1（默认可见）的OSD上显示这个字符串作为信息。该信息默认是可见的，只要没有其它信息挡住它，并且OSD等级无改变（参见 ``--osd-level`` ）。扩展属性；参见 `属性扩展`_
@@ -2761,17 +2774,17 @@ OSD
 
     ``--osd-bar-border-size`` 是 ``--osd-bar-outline-size`` 的别名。
 
-    默认： 0.5.
+    默认： ``0.5``
 
 ``--osd-bar-marker-scale=<0-100>``
     OSD条标记尺寸相对于OSD条轮廓尺寸的系数。
 
-    默认： 1.3.
+    默认： ``1.3``
 
 ``--osd-bar-marker-min-size=<size>``
     OSD条的最小标记尺寸。
 
-    默认： 1.6.
+    默认： ``1.6``
 
 ``--osd-bar-marker-style=<none|triangle|line>``
     设置OSD条的标记样式。
@@ -2781,7 +2794,7 @@ OSD
     :line:     将标记绘制为线条
 
 ``--osd-blur=<0..20.0>``
-    应用于OSD字体边框的高斯模糊系数。0表示不应用模糊（默认）。
+    应用于OSD字体边框的高斯模糊系数。 ``0`` 表示不应用模糊（默认）。
 
 ``--osd-bold=<yes|no>``
     格式化文本为粗体。
@@ -2800,11 +2813,11 @@ OSD
     ``--osd-shadow-color`` 是 ``--osd-back-color`` 的别名。
 
 ``--osd-outline-size=<size>``
-    OSD字体轮廓的尺寸，以缩放的像素为单位（详见 ``--sub-font-size``）。值为 0 禁用轮廓。
+    OSD字体轮廓的尺寸，以缩放的像素为单位（详见 ``--sub-font-size``）。值为 ``0`` 禁用轮廓。
 
     ``--osd-border-size`` 是 ``--osd-outline-size`` 的别名。
 
-    默认： 1.65
+    默认： ``1.65``
 
 ``--osd-border-style=<outline-and-shadow|opaque-box|background-box>``
     参见 ``--sub-border-style`` 。OSD文本边框的样式。
@@ -2834,14 +2847,14 @@ OSD
 
     这个选项指定了OSD与左边的距离，以及从右边框到长OSD文本的断开距离。
 
-    默认： 16
+    默认： ``16``
 
 ``--osd-margin-y=<size>``
     OSD的顶部和底部屏幕边距，以缩放后的像素为单位（详见 ``--sub-font-size`` ）。
 
     这个选项指定了OSD的垂直边距。
 
-    默认： 16
+    默认： ``16``
 
 ``--osd-align-x=<left|center|right>``
     控制OSD应该对齐屏幕的哪个角（默认： ``left`` ）。
@@ -2860,17 +2873,17 @@ OSD
         对于绘制用户界面元素类的脚本，建议在决定元素是否随窗口大小缩放时遵循该选项的值。
 
 ``--osd-shadow-offset=<size>``
-    OSD阴影的位移，以缩放后的像素为单位（详见 ``--sub-font-size`` ）。值为0时禁用阴影。
+    OSD阴影的位移，以缩放后的像素为单位（详见 ``--sub-font-size`` ）。值为 ``0`` 时禁用阴影。
 
-    默认： 0
+    默认： ``0``
 
 ``--osd-spacing=<size>``
     水平OSD/字幕字体的间距，以缩放后的像素为单位（详见 ``--sub-font-size`` ）。这个值会加到正常的字母间距上。允许负值。
 
-    默认： 0
+    默认： ``0``
 
 ``--video-osd=<yes|no>``
-    在视频窗口上启用OSD渲染（默认： yes）。这可用于终端OSD是优先的情况。如果你只是想禁用所有的OSD渲染，使用 ``--osd-level=0``
+    在视频窗口上启用OSD渲染（默认： ``yes`` ）。这可用于终端OSD是优先的情况。如果你只是想禁用所有的OSD渲染，使用 ``--osd-level=0``
 
     它不影响字幕或由脚本创建的覆盖层（特别的是，OSC需要用 ``--osc=no`` 来禁用）。
 
@@ -2881,6 +2894,22 @@ OSD
 
 ``--osd-fonts-dir=<path>``
     参见 ``--sub-fonts-dir`` 了解详情。默认为 ``~~/fonts``
+
+``--osd-glyph-limit=<value>``
+    设置 libass 缓存中用于OSD的最大缓存glyphs数。0 表示 libass 使用默认值。
+
+    默认： ``0``
+
+``--osd-bitmap-max-size=<value>``
+    设置 libass 缓存中用于OSD的最大bitmap缓存大小。0 表示 libass 使用默认值。该值的单位为 MB。
+
+    默认： ``0``
+
+``--osd-prune-delay=<-1|seconds>``
+    设置 libass 内存中事件自动pruning的延迟时间。默认禁用。另见 ``--sub-ass-prune-delay``
+
+``--osd-shaper=<simple|complex>``
+    设置 libass 用于 OSD 的文本布局引擎。默认： ``complex`` 。另见 ``--sub-shaper``
 
 屏幕截图
 --------
