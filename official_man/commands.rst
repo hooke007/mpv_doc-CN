@@ -43,7 +43,7 @@ OSD命令行
 ``history_path``
     默认： ``~~state/command_history.txt``
 
-    ``persist_history`` 的文件路径（参见 `路径`_ ）
+    ``persist_history`` 的文件路径（参见 `文件`_ ）
 
 ``remember_input``
     默认： yes

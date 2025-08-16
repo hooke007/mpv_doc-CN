@@ -58,7 +58,14 @@ input.conf语法
 
 （这在一般的命令语法中没有展示）
 
-如果 ``a`` 或 ``a-b`` 或 ``b`` 已经被绑定，这将运行第一个匹配的命令，而多键命令将不会被调用。为了避免这个问题，可以将中间键重映射到 ``ignore`` 。多个键联合的最大数量（非修饰键）目前是4。
+按键匹配
+--------
+
+mpv 保留按键历史记录。如果当前按键触发了一个或多个已绑定的键序列（包括单键绑定），则 mpv 会选择其中最长的序列。如果该序列绑定到 ``ignore`` ，则继续跟踪历史记录，仿佛未匹配任何内容。否则，它将触发该序列绑定的命令并清除按键历史记录。
+
+需要注意的是，虽然单键绑定会覆盖内置绑定，但多键序列并非如此。例如，input.conf 中的 ``b-c`` 序列会被内置绑定 ``b`` 覆盖。在这种情况下，如果你不在意 ``b``，可以将其绑定到 ``ignore`` 。
+
+作为一个更复杂的示例，如果你想同时绑定 ``b`` 和 ``a-b-c`` ，那么这将无法工作，因为 ``b`` 会覆盖 ``a-b-c`` 。然而，将 ``a-b`` 绑定到 ``ignore`` 则可行，因为在 ``a-b`` 之后，最长的匹配序列 ``a-b`` 将被忽略，随后出现的 ``c`` 会触发序列 ``a-b-c``，而单独的 ``b`` 仍可正常工作。
 
 按键名称
 --------
@@ -451,6 +458,10 @@ Flat命令语法
     <forced>
 
         将轨道标记为强制轨道。
+
+    <default>
+
+        将轨道标记为默认轨道。
 
     <attached-picture> （仅适用于 ``video-add`` ）
 
@@ -1863,6 +1874,18 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     ``video-params/avg-pq-y``
         帧的平均 PQ 亮度，由峰值检测报告（单位 PQ，0-1）
 
+    ``video-params/prim-red-x``, ``video-params/prim-red-y``
+        红色主色度坐标，仅当与 ``video-params/primaries`` 不同时可用
+
+    ``video-params/prim-green-x``, ``video-params/prim-green-y``
+        绿色主色度坐标，仅当与 ``video-params/primaries`` 不同时可用
+
+    ``video-params/prim-blue-x``, ``video-params/prim-blue-y``
+        蓝色主色度坐标，仅当与 ``video-params/primaries`` 不同时可用
+
+    ``video-params/prim-white-x``, ``video-params/prim-white-y``
+        白点色度坐标，仅当与 ``video-params/primaries`` 不同时可用
+
     当使用client API的 ``MPV_FORMAT_NODE`` 查询该属性时，或者用Lua ``mp.get_property_native`` ，将返回一个mpv_node，内容如下：
 
     ::
@@ -1896,6 +1919,14 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
             "scene-max-b"       MPV_FORMAT_DOUBLE
             "max-pq-y"          MPV_FORMAT_DOUBLE
             "avg-pq-y"          MPV_FORMAT_DOUBLE
+            "prim-red-x"        MPV_FORMAT_DOUBLE
+            "prim-red-y"        MPV_FORMAT_DOUBLE
+            "prim-green-x"      MPV_FORMAT_DOUBLE
+            "prim-green-y"      MPV_FORMAT_DOUBLE
+            "prim-blue-x"       MPV_FORMAT_DOUBLE
+            "prim-blue-y"       MPV_FORMAT_DOUBLE
+            "prim-white-x"      MPV_FORMAT_DOUBLE
+            "prim-white-y"      MPV_FORMAT_DOUBLE
 
 ``dwidth``, ``dheight``
     视频显示尺寸。这是应用了滤镜和长宽比缩放之后的视频尺寸。实际的视频窗口大小仍可能与此不同，例如，如果用户手动调整视频窗口的大小。
@@ -2025,6 +2056,9 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 ``window-id``
     只读的 - mpv的窗口ID。可能并不总是可用的，例如，由于窗口尚未被打开或不被视频输出驱动支持。
 
+``display-swapchain``
+    只读 —— Direct3D 11 交换链地址。返回一个 int64 类型的值，表示 D3D11 交换链的内存地址。该地址可能并非总是可用，例如当 d3d11-output-mode 未设置为 ``composition`` 或 VO 不支持该功能时。
+
 ``mouse-pos``
     只读 —— 最近的已知的鼠标位置，根据OSD尺寸常规化。
 
@@ -2037,7 +2071,7 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
         布尔值 —— 鼠标指针是否悬停在视频窗口上。当此值为false时，坐标应被忽略，因为视频后端只有在指针悬停窗口时才会更新坐标
 
 ``touch-pos``
-    只读 - 最后已知的触摸点位置，按 OSD 尺寸标准化。
+    只读 —— 最后已知的触摸点位置，按 OSD 尺寸标准化。
 
     它有多个子属性。将 ``N`` 替换为基于 0 的触摸点索引。每当有新的手指触摸屏幕时，就会有一个新的触摸点被添加到触摸点列表中，其中可用的未使用的 ``N`` 最小。
 
@@ -2059,6 +2093,24 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
                 "x"        MPV_FORMAT_INT64
                 "y"        MPV_FORMAT_INT64
                 "id"       MPV_FORMAT_INT64
+
+``tablet-pos``
+    只读 —— 笔（平板工具）的最后已知位置（归一化为OSD尺寸）及工具状态。
+
+    有以下子属性：
+
+    ``tablet-pos/x``, ``tablet-pos/y``
+        平板工具的最后已知坐标。
+    ``tablet-pos/tool-in-proximity``
+        布尔值 - 表示平板工具是否当前位于平板表面附近或悬停于平板表面上方。
+    ``tablet-pos/tool-tip``,
+        平板工具提示的状态， ``up`` 或 ``down`` 。
+    ``tablet-pos/tool-stylus-btn1``, ``tablet-pos/tool-stylus-btn2``, ``tablet-pos/tool-stylus-btn3``
+        平板工具侧边按钮的状态， ``pressed`` 或 ``released`` 。
+    ``tablet-pos/pad-focus``
+        布尔值 - 当前是否聚焦于平板。
+    ``tablet-pos/pad-btns/N``
+        第N个平板垫按钮的状态， ``pressed`` 或 ``released`` 。
 
 ``sub-ass-extradata``
     当前 ASS 字幕轨道的额外数据。不进行格式化。额外数据将以字符串形式按原样返回。此属性不适用于非 ASS 类的字幕轨。

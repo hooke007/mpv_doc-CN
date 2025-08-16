@@ -574,10 +574,11 @@
 
         我不知道。
 
-``--ytdl-format=<ytdl|best|worst|mp4|webm|...>``
-    直接传递给youtube-dl的视频格式/质量。可能的值是针对网站和视频的，对于一个给定的URL，可用的格式可以通过命令 ``youtube-dl --list-formats URL`` 找到。关于可用的别名，参见youtube-dl的文档。（默认： ``bestvideo+bestaudio/best`` )
+``--ytdl-format=<|ytdl|best|worst|mp4|webm|...>``
+    直接传递给 youtube-dl 的格式选择字符串。可用的值因网站和视频而异，对于给定的 URL，可用的格式可以通过命令 ``youtube-dl -F URL`` 查找到。请参阅 youtube-dl 的文档以获取可用别名。
+    (默认： 空值)
 
-    ``ytdl`` 的值根本没有向youtube-dl传递 `--format`` 选项，因此没有覆盖其默认值。注意，有时youtube-dl返回的格式是mpv无法使用的，在这种情况下，mpv的默认值可能会更好工作。
+    空值或 ``ytdl`` 不会向 youtube-dl 传递 ``--format`` 选项，因此将使用其默认格式作为选择行为。
 
 ``--ytdl-raw-options=<key>=<value>[,<key>=<value>[,...]]``
     传递任意的选项给youtube-dl。参数应该以按键-值成对的形式传递。没有参数的选项必须包括 ``=`` 。
@@ -683,7 +684,7 @@
         此选项可能会暴露隐私敏感信息，因此默认情况下已被禁用。
 
 ``--watch-history-path=<path>``
-    观看历史记录的存储路径。默认： ``~~state/watch_history.jsonl`` （参见 `路径`_ ）
+    观看历史记录的存储路径。默认： ``~~state/watch_history.jsonl`` （参见 `文件`_ ）
 
     此文件每行包含一个JSON对象。其 ``time`` 字段表示文件打开时的UNIX时间戳， ``path`` 字段表示规范化路径， ``title`` 字段表示文件可用时的标题。
 
@@ -1061,6 +1062,11 @@
 
         ``mpv --hwdec=vdpau --hwdec-codecs=h264,mpeg2video``
             只对h264和mpeg2启用vdpau解码。
+
+``--hwdec-threads=<N>``
+    用于硬件解码的线程数（默认： 4）。与 vd-queue 不同，此选项可在libavcodec中启用帧和片段线程化。这有助于对解码过程进行管道化处理并提升性能。具体行为取决于所使用的硬件解码器API。
+
+    如果此值设置为0，线程数将根据可用CPU核心数自动确定。
 
 ``--hwdec-software-fallback=<yes|no|N>``
     如果硬件加速解码器失败，退回到软件解码（默认：3）。如果这是一个数字，那么如果连续N个帧解码失败，就会触发回退。1相当于 ``yes``
@@ -1618,6 +1624,18 @@
 ``--image-subs-video-resolution=<yes|no>``
     用视频分辨率覆盖图像字幕的分辨率（默认： no）。通常情况下，字幕画布是匹配视频画布的（例如信箱式）。设置这个选项可以使用视频尺寸作为字幕画布尺寸。可以用来测试损坏的字幕，这经常发生在视频被转码时，同时试图保留旧的字幕。
 
+``--image-subs-hdr-peak=<sdr|video|10-10000>``
+    控制HDR输出中图像字幕的漫反射白色亮度（单位：cd/m²，即尼特）。（默认： sdr）。 ``sdr`` 对应标准SDR白色的203 cd/m²，而 ``video`` 则使用视频元数据。
+    （ ``--vo=gpu-next`` 独占）
+
+    这也会影响使用 ``--blend-subtitles=<yes|video>`` 进行 HDR 色调映射时图像字幕的亮度。
+
+``--sub-hdr-peak=<sdr|10-10000>``
+    控制HDR输出中文本字幕和OSD的漫反射白色亮度（单位：cd/m²，即尼特）。（默认： sdr）。 ``sdr`` 对应标准SDR白色的亮度为203 cd/m²。
+    （ ``--vo=gpu-next`` 独占）
+
+    这也会影响使用 ``--blend-subtitles=<yes|video>`` 进行 HDR 色调映射时文本字幕的亮度。
+
 ``--sub-ass=<yes|no>``
     原生渲染ASS字幕（默认： yes）。
 
@@ -1879,9 +1897,9 @@
     默认： ``no``
 
 ``--sub-filter-sdh-enclosures=<string>``
-    指定一个字符串， ``--sub-filter-sdh`` 将使用该字符串删除可能的文本。由该字符串指定的字符括起来的文本将被删除。请注意，已知成对的括号字符（如 ``(`` 或 ``[`` ））将在内部映射到与其匹配的右侧字符，因此您只需指定左侧字符。
+    指定 ``--sub-filter-sdh`` 将用于潜在删除文本的字符对。这是一个字符串列表选项，详见 `列表选项`_ 。每个指定字符对之间的文本将被删除。请注意，括号对（标准和全角）被视为特殊情况，需要使用 ``--sub-fitler-sdh-harder`` 才能删除。
 
-    默认： ``([（``
+    默认： ``(),[],（）``
 
 ``--sub-filter-regex-...=...``
     设置一个正则表达式列表来匹配文本字幕，并移除任何匹配的行（默认：空）。这是一个字符串列表选项。详见 `列表选项`_ 。通常，你应该使用 ``--sub-filter-regex-append=<regex>`` ，每一个选项的使用都会附加一个新的正则表达式，而不需要对抗转义问题。
@@ -2206,8 +2224,10 @@
 
     在 mpv 0.33.0 之前，X11 后端在未暂停时以 10 秒间隔运行 ``xdg-screensaver reset`` 以支持某些环境中的屏保抑制。这一功能在 0.33.0 中被移除，但可以通过用户脚本调用 ``xdg-screensaver`` 命令行程序。
 
-``--wid=<ID>``
+``--wid=<ID|-1>``
     这告知mpv附加到一个现有的窗口。如果选择了支持该选项的视频输出驱动，它将使用该窗口进行视频输出。mpv将根据该窗口的大小缩放视频，如果视频的长宽比不同，将添加黑条来补偿。
+
+    值为 ``-1`` 的ID将被特殊处理，mpv将从当前关联的窗口中分离出来，并进入其自己的窗口。
 
     在X11上，该ID被解释为X11上的一个 ``Window`` 。与MPlayer/mplayer2不同，mpv始终创建自己的窗口，并将wid窗口设置为父窗口。该窗口将始终重新调整大小来完全覆盖父窗口。值 ``0`` 被特别解释，mpv将直接在根窗口上绘制。
 
@@ -2527,11 +2547,13 @@
     默认值是0秒，这将禁用缓存滞后。一个10秒的值可能对大多数情况都有效。
 
 ``--prefetch-playlist=<yes|no>``
-    在当前项目的播放结束时预取下一个播放列表项目（默认： yes）。
-
-    这不会将下一个URL的视频数据预填充到缓存中。预取的视频数据只受当前的播放列表条目支持，并取决于解复用器缓存设置（默认启用）。这只用在当前的URL被完全读取后，打开下一个播放列表的URL。
+    在当前项目的播放结束时预取下一个播放列表项目。
+    （默认： no）
+    这只是在当前 URL 完全读取后，立即打开下一个播放列表条目的 URL。
 
     这对由 ``youtube-dl`` 封装器解析的URL **没** 效果，也不会起作用。
+
+    这不会影响 HLS 流（ ``.m3u8`` URL）。此类流本身在内部是一个数据段播放列表，但 mpv 将其视为单个媒体项。HLS 预取功能取决于解复用器缓存设置，并且默认启用。
 
     这可能偶尔会做出错误的预取判定。例如，它不能预测你是否在播放列表中回退，并假定你不会编辑播放列表。
 
@@ -2679,6 +2701,11 @@
 
 ``--input-touch-emulate-mouse=<yes|no>``
     当启用多点触控支持时（平台要求或 ``--native-touch`` 启用），会模拟触控事件中的鼠标移动和按键操作（默认： yes）。这对于读取不支持 ``--native-touch=no`` 的平台（如 Wayland）鼠标位置的鼠标键绑定和脚本的兼容性非常有用。
+
+``--input-tablet-emulate-mouse=<yes|no>``
+    模拟鼠标移动和按钮点击以触发平板电脑事件。 (默认： yes)
+
+    （Wayland独占）
 
 ``--input-dragging-deadzone=<N>``
     在按住鼠标键的同时，当鼠标移出 ``N`` 像素的死区（默认： 3）时，开始内置窗口拖动。这只影响支持 ``begin-vo-dragging`` 命令的 VO。
@@ -3440,7 +3467,11 @@ OSD
     指定使用卡号 0-15（默认： 0）。
 
 ``--dvbin-file=<filename>``
-    指示mpv从 ``<filename>`` 中读取频道列表。默认是在mpv设置目录下（通常是 ``~/.config/mpv`` ），文件名是 ``channels.conf.{sat,ter,cbl,atsc,isdbt}`` （根据你的卡类型）或 ``channels.conf`` 作为最后手段。请注意，推荐使用特定的文件名和卡类型，因为传统的频道格式没有完全标准化，因此否则可能无法自动检测传输系统。对于DVB-S/2卡，推荐使用VDR 1.7.x格式的频道表，因为它可以调节到DVB-S2频道，启用字幕并对PMT进行解码（这在很大程度上改善了解复用）。仍然支持经典的mplayer格式的频道表（没有这些改进），对于其它的卡类型，只实现了有限的VDR格式频道表支持（欢迎打补丁）。对于有动态PID切换的频道或不完整的 ``channels.conf`` ，推荐使用 ``-dvbin-full-transponder`` 或神奇的 ``8192`` PID。
+    指示mpv从 ``<filename>`` 中读取频道列表。默认是在mpv设置目录下（通常是 ``~/.config/mpv`` ），文件名是 ``channels.conf.{sat,sat1,ter,ter1,cbl,atsc,isdbt}`` （根据你的卡类型）或 ``channels.conf`` 作为最后手段。
+    对于支持同一类型多种传输系统的卡片，即DVB-T/T2或DVB-S/S2，默认使用T2/S2，除非文件扩展名为 ``ter1`` 或 ``sat1`` 。
+    请注意，推荐使用特定的文件名和卡类型，因为传统的频道格式没有完全标准化，因此否则可能无法自动检测传输系统。对于DVB-S/2卡，推荐使用VDR 1.7.x格式的频道表，因为它可以调节到DVB-S2频道，启用字幕并对PMT进行解码（这在很大程度上改善了解复用）。
+    仍然支持经典的mplayer格式的频道表（没有这些改进），对于其它的卡类型，只实现了有限的VDR格式频道表支持（欢迎打补丁）。
+    对于有动态PID切换的频道或不完整的 ``channels.conf`` ，推荐使用 ``-dvbin-full-transponder`` 或神奇的 ``8192`` PID。
 
 ``--dvbin-timeout=<seconds>``
     试图调节到一个频率时，在放弃前等待的最大秒数（默认： 30）。
@@ -3724,6 +3755,9 @@ GPU渲染选项
 ``--d3d11-warp=<yes|no|auto>``
     使用WARP（Windows高级光栅化平台）与D3D11 GPU后端（默认： auto）。这是一个高性能的软件渲染器。默认情况下，只有当系统没有支持D3D11的硬件适配器时才会使用它。即使扩展的GPU功能将与WARP一起工作，但它们可能非常慢。
 
+``--d3d11-output-mode=<auto|window|composition>``
+    使用特定的输出模式来创建 D3D11 交换链。 ``composition`` 不会创建窗口。如果你想在 WinUI 应用程序中使用 D3D11 GPU 后端，需要将此选项设置为 ``composition`` 。 ``window`` 将会创建一个窗口并使用 DWM 来呈现视频。 ``auto`` 与 ``window`` 效果相同。创建交换链后，您可以通过获取 ``display-swapchain`` 属性来获取交换链地址（int64类型值）。
+
 ``--d3d11-feature-level=<12_1|12_0|11_1|11_0|10_1|10_0|9_3|9_2|9_1>``
     在使用D3D11 GPU后端时，选择一个特定的功能等级。默认情况下，会使用最高的可用功能等级。这个选项可以用来选择一个较低的功能等级，这主要是对调试有用。大多数扩展的GPU特性在9_x功能等级下将无法工作。
 
@@ -3928,6 +3962,9 @@ GPU渲染选项
     MAINPRESUB (resizable)
         转换为RGB后的图像，但在应用 ``--blend-subtitles=video`` 之前。
 
+        .. note::
+            使用 ``--vo=gpu`` 时， ``MAIN`` 和 ``MAINPRESUB`` 是独立的着色器阶段，这允许将叠加层直接渲染到预缩放的视频阶段。 ``--vo=gpu-next`` 不支持此功能，因此 ``MAINPRESUB`` 着色器阶段不存在。在着色器中引用此名称仍然有效，但其处理方式与 ``MAIN`` 完全相同。
+
     MAIN (resizable)
         主图像，在转换为RGB后，但在放大前。
 
@@ -3955,7 +3992,8 @@ GPU渲染选项
     CLI/设置文件只是 ``--glsl-shaders-append`` 的别名。
 
 ``--glsl-shader-opts=param1=value1,param2=value2,...``
-    指定用于可调节着色器参数的选项。你可以通过在着色器名称前加上 ``/`` ，例如 ``shader/param=value`` ，来针对特定命名的着色器。如果没有前缀，参数会影响所有着色器。着色器名称是着色器文件名的基础部分，不带扩展名（ ``--vo=gpu-next`` 独占）。
+    指定用于可调节着色器参数的选项。你可以通过在着色器名称前加上 ``/`` ，例如 ``shader/param=value`` ，来针对特定命名的着色器。如果没有前缀，参数会影响所有着色器。着色器名称是着色器文件名的基础部分，不带扩展名。
+    （ ``--vo=gpu-next`` 独占）
 
     如果着色器需要，某些参数会自动填充。目前可用的参数如下：
 
@@ -4270,7 +4308,8 @@ GPU渲染选项
     注意：只在macOS和 ``--vo=gpu`` 上实现。
 
 ``--image-lut=<file>``
-    指定一个自定义的LUT文件（Adobe .cube格式），在图像解码过程中应用到颜色上。LUT的确切解释取决于 ``--image-lut-type`` 的值。（ ``--vo=gpu-next`` 独占）
+    指定一个自定义的LUT文件（Adobe .cube格式），在图像解码过程中应用到颜色上。LUT的确切解释取决于 ``--image-lut-type`` 的值。
+    （ ``--vo=gpu-next`` 独占）
 
 ``--image-lut-type=<value>``
     控制送入和送出指定为 ``--image-lut`` 的LUT的颜色值的解释。有效值是：
@@ -4285,7 +4324,79 @@ GPU渲染选项
         完全取代了颜色解码。这种类型的LUT应该摄入图像的原生色彩空间，并输出标准化的非线性RGB
 
 ``--target-colorspace-hint=<auto|yes|no>``
-    如果可能的话，自动设置显示器的输出色彩空间，来传递流的输入值（例如，用于HDR直通）。在 ``auto`` 模式下，只有当显示信号支持 HDR 色彩空间时，才会设置目标色彩空间。需要一个支持的驱动程序和 ``--vo=gpu-next`` （默认： ``no`` ）
+    When enabled, output colorspace metadata will be set on the swapchain
+    depending on the GPU context and platform this may affect compositor/display.
+    This can be used for "HDR passthrough" and to set the output colorspace
+    for SDR content. In ``auto`` mode, the target colorspace is only set if the
+    current display parameters are known. Currently, this is supported on
+    Wayland, D3D11 and winvk contexts. The ``yes`` option will always try to set
+    the colorspace, you may need to adjust the ``--target-*`` options to match
+    your display capabilities.
+    Requires a supporting driver and ``--vo=gpu-next``. (Default: ``auto``)
+
+    .. note::
+        Auto detected target colorspace metadata is not guaranteed to be always
+        best choice. It depends on your compositor, driver, and display
+        capabilities. However in most cases ``auto`` mode should work fine.
+
+``--target-colorspace-hint-mode=<target|source|source-dynamic>``
+    Select which metadata to use for the ``--target-colorspace-hint``.
+    (Only for ``--vo=gpu-next``)
+
+    target
+        Uses metadata based on the target display's actual capabilities. This
+        mode adapts the source content to the target display before output.
+        Note: HDR primaries are not overridden by the ``--target-prim`` option
+        this only affects the enclosing container for the colorspace.
+
+    source
+        Uses the source content's metadata. This is the traditional
+        "HDR passthrough" mode (SDR too), where it is assumed that the compositor
+        and display will handle the colorspace directly and perform any necessary
+        mappings.
+
+    source-dynamic
+        The same as ``source``, but uses dynamic per-scene metadata instead of
+        static HDR10. This is experimental and depends on the display's ability
+        to react to metadata changes. Note that this does not send full HDR10+
+        or Dolby Vision metadata, but uses that information to produce HDR10
+        with per-scene luminance values.
+
+    Default is ``target``. If target display parameters are not available, this
+    will fall back to ``source``. Note that this is done on individual properties
+    basis, i.e. it will merge source params into target for unknown properties,
+    though not the other way around.
+
+    ``--target-*`` options override the metadata in both modes.
+
+    .. note::
+        The ICC profile always takes precedence over any metadata.
+
+    .. note::
+        强烈建议使用 ``--target-colorspace-hint=<auto|yes>`` 以确保输出颜色空间设置正确。这对所有非sRGB内容（包括SDR）至关重要，可确保合成器、驱动程序和显示设备正确解析信号。
+
+        遗憾的是，实际操作并不像听起来那么简单。尽管 mpv 能够进行高质量的颜色处理，但我们无法保证信号离开 mpv 后会发生什么。因此，您可能需要调整其它设置以确保正确输出。一个通用的默认设置并不可行。
+
+        现在既然背景情况已经说明清楚：
+
+        对于HDR输出，默认的 ``target`` 选项应该可以正常工作，它会自动推断出最佳的HDR目标参数和表面格式。为了兼容性，假设显示器处于HDR模式，除非有其它报告。 （你可以使用 ``--target-trc`` 来覆盖此设置）。这样HDR元数据就会被设置，希望合成器能处理剩下的部分。如果输入为 SDR，它将被转换为 PQ，且主色值设置为源值。
+
+        对于 SDR 输出，对于 mpv 无法确定目标是 HDR 还是 SDR 的情况，您可以使用 ``source`` 模式。元数据设置将与输入颜色空间匹配。对于 HDR 输入，它将原样通过。或者，您可以使用 ``target`` 模式并将 ``--target-trc`` 设置为 SDR 传输函数。这样任何输入都将转换为 SDR。
+
+        可使用统计显示来验证输入和输出颜色空间设置。
+
+        TL;DR:
+        使用 ``--target-colorspace-hint=auto`` 并调整 ``--target-*`` 参数以匹配目标显示器的能力，直到效果最佳。使用 `附带条件的自动配置预设`_ 进行特定调整。除非是sRGB内容，否则避免使用 ``--target-colorspace-hint=no`` ，但即使是sRGB内容，也建议设置颜色空间元数据。
+
+    .. note::
+        关于“HDR直通”模式的更多讨论：
+        有一种观点认为，该模式应将源HDR信号原封不动地传输至显示设备，而显示设备会自动处理，无论何种情况。但这种说法并不总是成立。在某些情况下，将HDR信号根据目标显示设备的性能进行色调映射后再传输会更优，而实现这一操作的最佳方式是在mpv内部完成。
+
+        这通常由合成器或GPU驱动程序处理。你可以在系统中某个地方找到HDR“校准”选项。
+
+        您可以选择要发送给显示器的元数据，并使用 ``--target-*`` 选项手动调整。如果您希望让一切看起来更像HDR，还可以尝试使用 ``--inverse-tone-mapping`` 选项。
+
+        效果因人而异，这高度取决于目标显示器，没有唯一的答案，但不妨尝试实验，您可能会感到惊喜。
 
 ``--target-prim=<value>``
     指定显示器的色彩原色。当不使用ICC色彩管理时，视频色彩将被适应到这个色彩空间。有效值是：
@@ -4312,6 +4423,8 @@ GPU渲染选项
         CIE 1931 RGB (不要与CIE XYZ混淆)
     dci-p3
         DCI-P3 (Digital Cinema Colorspace), SMPTE RP431-2
+    display-p3
+        DCI-P3 D65 white point
     v-gamut
         松下 V-Gamut (VARICAM) primaries
     s-gamut
@@ -4369,13 +4482,16 @@ GPU渲染选项
         在这样的设置中，我们强烈推荐将 ``--tone-mapping`` 设置为 ``mobius`` 或甚至 ``clip``
 
 ``--target-contrast=<auto|10-1000000|inf>``
-    指定输出显示的测量对比度。``--target-contrast`` 与 ``--target-peak`` 值一起用于计算显示器的黑点。在HDR色调映射期间用于黑点补偿。默认值为 ``auto``，它假设典型的SDR显示器具有1000:1的对比度，或者在使用HDR ``--target-trc`` 时假定具有无限对比度。如果API支持，则显示对比度将使用报告的值。 ``inf`` 对比度指定具有完美黑色级别的显示器，实际上是OLED显示器。（ ``--vo=gpu-next`` 独占）
+    指定输出显示的测量对比度。``--target-contrast`` 与 ``--target-peak`` 值一起用于计算显示器的黑点。在HDR色调映射期间用于黑点补偿。默认值为 ``auto``，它假设典型的SDR显示器具有1000:1的对比度，或者在使用HDR ``--target-trc`` 时假定具有无限对比度。如果API支持，则显示对比度将使用报告的值。 ``inf`` 对比度指定具有完美黑色级别的显示器，实际上是OLED显示器。
+    （ ``--vo=gpu-next`` 独占）
 
 ``--target-gamut=<value>``
-    限制显示的色域。您可以使用此选项输出例如 DCIP3-in-BT.2020 等色彩。将 ``--target-prim`` 设为包含色彩空间的基色（数值将被编码到基色中），将 ``--target-gamut`` 设为要限制色彩的色域。取值与 ``--target-prim`` 相同。（ ``--vo=gpu-next`` 独占）
+    限制显示的色域。您可以使用此选项输出例如 DCIP3-in-BT.2020 等色彩。将 ``--target-prim`` 设为包含色彩空间的基色（数值将被编码到基色中），将 ``--target-gamut`` 设为要限制色彩的色域。取值与 ``--target-prim`` 相同。
+    （ ``--vo=gpu-next`` 独占）
 
 ``--target-lut=<file>``
-    指定一个自定义的LUT文件（Adobe .cube格式），在屏幕上显示之前应用于颜色。这个LUT是在编码到目标色彩空间后，以标准化的RGB值输入的，所以在应用 ``---target-trc`` 之后。（ ``--vo=gpu-next`` 独占）
+    指定一个自定义的LUT文件（Adobe .cube格式），在屏幕上显示之前应用于颜色。这个LUT是在编码到目标色彩空间后，以标准化的RGB值输入的，所以在应用 ``---target-trc`` 之后。
+    （ ``--vo=gpu-next`` 独占）
 
 ``--tone-mapping=<value>``
     指定用于将图像色调映射到目标显示上的算法。这与HDR->SDR转换和降低色域有关（例如，在标准色域显示器上播放BT.2020内容）。有效值是：
@@ -4397,13 +4513,17 @@ GPU渲染选项
     linear
         将整个参考色域线性地拉伸（线性倍数）到显示
     spline
-        感知线性单轴多项式（ ``--vo=gpu-next`` 独占）
+        感知线性单轴多项式
+        （ ``--vo=gpu-next`` 独占）
     bt.2446a
-        在ITU-R报告BT.2446中指定的HDR<->SDR映射，方法A。这推荐用于精心制作的内容（ ``--vo=gpu-next`` 独占）
+        在ITU-R报告BT.2446中指定的HDR<->SDR映射，方法A。这推荐用于精心制作的内容
+        （ ``--vo=gpu-next`` 独占）
     st2094-40
-        SMPTE ST2094-40 附件B中规定的动态HDR10+色调映射方法。在没有元数据的情况下，回退到与输入/输出平均亮度特性相匹配的固定spline（ ``--vo=gpu-next`` 独占）
+        SMPTE ST2094-40 附件B中规定的动态HDR10+色调映射方法。在没有元数据的情况下，回退到与输入/输出平均亮度特性相匹配的固定spline
+        （ ``--vo=gpu-next`` 独占）
     st2094-10
-        SMPTE ST2094-10 附件B.2中规定的动态色调映射方法。在概念上比ST2094-40简单，但通常产生的结果更差（ ``--vo=gpu-next`` 独占）
+        SMPTE ST2094-10 附件B.2中规定的动态色调映射方法。在概念上比ST2094-40简单，但通常产生的结果更差
+        （ ``--vo=gpu-next`` 独占）
 
 ``--tone-mapping-param=<value>``
     设置色调映射参数。默认情况下，它被设置为特殊的字符串 ``default`` ，它映射到一个特定算法的默认值。如果色调映射算法不可调则忽略。这影响到下列色调映射算法：
@@ -4415,7 +4535,8 @@ GPU渲染选项
     reinhard
         指定显示峰值处的局部对比度系数。默认： 0.5，这表示in-gamut值的亮度将是裁切时的一半左右
     bt.2390
-        指定knee点的偏移量。默认： 1.0，高于原始ITU-R规范的值0.5（ ``--vo=gpu-next`` 独占）
+        指定knee点的偏移量。默认： 1.0，高于原始ITU-R规范的值0.5
+        （ ``--vo=gpu-next`` 独占）
     gamma
         指定函数的指数。默认： 1.8
     linear
@@ -4426,13 +4547,15 @@ GPU渲染选项
         指定knee点的对比度（斜率）。默认： 1.0
 
 ``--inverse-tone-mapping``
-    如果设置，允许反转色调映射（将SDR扩展到HDR）。不是所有的色调映射曲线都支持。请谨慎使用。（ ``--vo=gpu-next`` 独占）
+    如果启用，允许进行反向色调映射（扩展动态范围）。可用于将SDR内容升级为HDR，或使HDR内容更明亮。并非所有色调映射曲线都支持此功能。请谨慎使用。
+    （ ``--vo=gpu-next`` 独占）
 
 ``--tone-mapping-max-boost=<1.0..10.0>``
     允许色调映射算法通过过曝提高图像平均亮度的上限。默认： 1.0，不允许额外提高亮度。2.0的值允许过曝2倍，以此类推。提高这个设置可以帮助揭示黑暗场景中隐藏的细节，但提高得太高会使黑暗场景显得不自然地明亮。（ ``--vo=gpu`` 独占）
 
 ``--tone-mapping-visualize``
-    显示色调映射LUT（PQ-PQ）的活动图。仅用于调试目的。X轴显示PQ输入值，Y轴显示PQ输出值。色调映射曲线显示为绿色/黄色。黄色意味着亮度从源头上被提高了，深蓝色区域显示亮度被降低的地方。额外的彩色区域和线条表示各种显示器限制，以及参考对角线（中性色调映射）和源场景平均亮度信息（如果有的话）。（ ``--vo=gpu-next`` 独占）
+    显示色调映射LUT（PQ-PQ）的活动图。仅用于调试目的。X轴显示PQ输入值，Y轴显示PQ输出值。色调映射曲线显示为绿色/黄色。黄色意味着亮度从源头上被提高了，深蓝色区域显示亮度被降低的地方。额外的彩色区域和线条表示各种显示器限制，以及参考对角线（中性色调映射）和源场景平均亮度信息（如果有的话）。
+    （ ``--vo=gpu-next`` 独占）
 
 ``--gamut-mapping-mode``
     在完成任何色调映射后，指定用于降低目标显示的图像色域的算法。
@@ -4442,30 +4565,38 @@ GPU渲染选项
     clip
         硬性裁切到色域（每个通道）。非常低质量，但极低性能损耗
     perceptual
-        使用软拐点函数来进行平衡感知的色域映射，以消除裁切区域，并使用色调变换函数来保持饱和度（ ``--vo=gpu-next`` 独占）
+        使用软拐点函数来进行平衡感知的色域映射，以消除裁切区域，并使用色调变换函数来保持饱和度
+        （ ``--vo=gpu-next`` 独占）
     relative
-        执行相对比色法，同时保持亮度和色度之间的指数关系（ ``--vo=gpu-next`` 独占）
+        执行相对比色法，同时保持亮度和色度之间的指数关系
+        （ ``--vo=gpu-next`` 独占）
     saturation
-        执行简单的RGB->RGB饱和度映射。输入的R/G/B通道被直接映射到输出的R/G/B通道。不会出现裁切，但会扭曲所有的色调且/或导致褪色的观感（ ``--vo=gpu-next`` 独占）
+        执行简单的RGB->RGB饱和度映射。输入的R/G/B通道被直接映射到输出的R/G/B通道。不会出现裁切，但会扭曲所有的色调且/或导致褪色的观感
+        （ ``--vo=gpu-next`` 独占）
     absolute
-        执行绝对色度剪裁。与 ``relative`` 类似，但不适应白点（ ``--vo=gpu-next`` 独占）
+        执行绝对色度剪裁。与 ``relative`` 类似，但不适应白点
+        （ ``--vo=gpu-next`` 独占）
     desaturate
         执行恒定亮度比色法，使颜色向白色褪色，直到它们在色域范围内
     darken
-        均匀地使输入略微变暗，以防止高光部分被削掉，然后将色度钳制在输入色域边界，略微偏向于保留色度而不是亮度（ ``--vo=gpu-next`` 独占）
+        均匀地使输入略微变暗，以防止高光部分被削掉，然后将色度钳制在输入色域边界，略微偏向于保留色度而不是亮度
+        （ ``--vo=gpu-next`` 独占）
     warn
         不进行色域映射，而只是高亮色域外的像素
     linear
-        线性/均匀地使图像去饱和，以使整个图像进入目标色域（ ``--vo=gpu-next`` 独占）
+        线性/均匀地使图像去饱和，以使整个图像进入目标色域
+        （ ``--vo=gpu-next`` 独占）
 
 ``--hdr-compute-peak=<auto|yes|no>``
     计算每一帧HDR峰值和帧平均亮度，而不是依赖标记的元数据。这些值是局部区域以及几帧的平均值，以防止数值抖动太大。这个选项基本上为你提供了动态的、每个场景的色调映射。需要计算着色器，这是一个相当新的OpenGL特性，而且在某些驱动上可能会表现得很糟糕，所以启用时要自己承担风险。如果支持计算着色器和SSBO，特殊值 ``auto`` （默认）将自动启用HDR峰值计算。
 
 ``--allow-delayed-peak-detect``
-    当使用 ``--hdr-compute-peak`` 时，如果对性能有利，允许将检测到的峰值延迟一帧。特别是，当不需要高级渲染时，需要这样做以避免不必要的FBO介入。如果已经有一个indirect传递，例如启用高级缩放时，则没有影响。默认为no。（ ``--vo=gpu-next`` 独占，注意 ``--vo=gpu`` 始终延迟峰值。）
+    当使用 ``--hdr-compute-peak`` 时，如果对性能有利，允许将检测到的峰值延迟一帧。特别是，当不需要高级渲染时，需要这样做以避免不必要的FBO介入。如果已经有一个indirect传递，例如启用高级缩放时，则没有影响。默认为no。
+    （ ``--vo=gpu-next`` 独占，注意 ``--vo=gpu`` 始终延迟峰值。）
 
 ``--hdr-peak-percentile=<0.0..100.0>``
-    考虑输入图像亮度直方图的百分位数作为场景的真实峰值。如果将其设置为100（默认值），则测量最亮的像素。否则，频率分布的顶部逐渐被删减。将其设置得太低将导致非常亮的细节被裁剪，但可以改善具有非常亮的孤立高光的场景的动态亮度范围。除100以外的值会带来轻微的性能损耗。（ ``--vo=gpu-next`` 独占）
+    考虑输入图像亮度直方图的百分位数作为场景的真实峰值。如果将其设置为100（默认值），则测量最亮的像素。否则，频率分布的顶部逐渐被删减。将其设置得太低将导致非常亮的细节被裁剪，但可以改善具有非常亮的孤立高光的场景的动态亮度范围。除100以外的值会带来轻微的性能损耗。
+    （ ``--vo=gpu-next`` 独占）
 
 ``--hdr-peak-decay-rate=<1.0..1000.0>``
     用于HDR峰值检测算法的衰减率（默认： 20.0）。这只与 ``--hdr-compute-peak`` 启用时有关。更高的值使峰值衰减得更慢，导致更稳定的数值，但代价是更多类似"eye adaptation"的效果（尽管这在一定程度上被 ``--hdr-scene-threshold`` 缓解）。0.0的值（可能的最低值）可以禁止所有的平均化，这意味着每一帧的值都直接作为测量值使用，但是对于"noisy"源不推荐这样做，因为它可能导致过度的闪烁。（在信号理论方面，这控制了IIR低通滤波器的时间常数"tau"。）
@@ -4474,7 +4605,8 @@ GPU渲染选项
     亮度差异被认为是场景变化的最低和最高阈值（单位：dB）（默认：1.0低，3.0高）。这只有在启用 ``--hdr-compute-peak`` 时才相关。通常情况下，画面亮度的小波动会被峰值平均机制补偿，但对于亮度的大跳动，会导致画面过亮或过暗长达几秒钟，这取决于 ``--hdr-peak-decay-rate`` 的值。为了解决这个问题，当运行中的平均值和当前帧之间的亮度超过低阈值时，mpv将使averaging filter更加积极，直到高阈值的极限（此时filter会变得即时）。
 
 ``--hdr-contrast-recovery=<0.0..2.0>``, ``--hdr-contrast-smoothness=<1.0..100.0>``
-    启用HDR对比度恢复算法，旨在在色调映射后增强HDR视频的对比度。强度（默认值：0.0）表示对比度恢复的程度，0.0表示完全禁用，1.0表示100%强度。允许大于1.0的值，但可能会导致过多的锐化效果。平滑度（默认值：3.5）表示用于获取对比度信息的HDR源的低通滤波程度 - 2.0的值相当于2倍降采样。低DPI显示器的用户（<= 100）可能希望降低这个值，而高DPI显示器（“retina”）的用户可能希望增加它。（ ``--vo=gpu-next`` 独占）
+    启用HDR对比度恢复算法，旨在在色调映射后增强HDR视频的对比度。强度（默认值：0.0）表示对比度恢复的程度，0.0表示完全禁用，1.0表示100%强度。允许大于1.0的值，但可能会导致过多的锐化效果。平滑度（默认值：3.5）表示用于获取对比度信息的HDR源的低通滤波程度 - 2.0的值相当于2倍降采样。低DPI显示器的用户（<= 100）可能希望降低这个值，而高DPI显示器（“retina”）的用户可能希望增加它。
+    （ ``--vo=gpu-next`` 独占）
 
 ``--use-embedded-icc-profile``
     加载媒体文件（如PNG图像）中的内嵌ICC profile（默认： yes）。请注意，这个选项只有在同时使用显示ICC profile（ ``--icc-profile`` 或 ``--icc-profile-auto`` ）时才有效，而且还需要LittleCMS 2支持。
@@ -4520,10 +4652,12 @@ GPU渲染选项
     用一个特定的值覆盖目标设备的检测对比度。如果可能的话，这是从profile中自动检测出来的，但对于某些profile来说，它可能会丢失，导致对比度被认为是无限的。因此，视频可能看起来比预期的更暗。如果是这种情况，设置这个选项可能有帮助。这只影响BT.1886内容。默认的 ``no`` 表示使用profile的值。特殊值 ``inf`` 会使BT.1886曲线被当作纯功率的伽玛2.4函数处理。
 
 ``--icc-use-luma``
-    使用ICC配置文件内的亮度值。（ ``--vo=gpu-next`` 独占）
+    使用ICC配置文件内的亮度值。
+    （ ``--vo=gpu-next`` 独占）
 
 ``--lut=<file>``
-    指定一个自定义的LUT（Adobe .cube格式），作为颜色转换的一部分应用到颜色上。具体解释取决于 ``--lut-type`` 的值。（ ``--vo=gpu-next`` 独占）
+    指定一个自定义的LUT（Adobe .cube格式），作为颜色转换的一部分应用到颜色上。具体解释取决于 ``--lut-type`` 的值。
+    （ ``--vo=gpu-next`` 独占）
 
 ``--lut-type=<value>``
     控制送入和送出指定为 ``--lut`` 的LUT的颜色值的解释。有效值是：
@@ -4544,6 +4678,10 @@ GPU渲染选项
 
     如果选择 ``video`` ，行为类似于 ``yes`` ，但字幕是以视频的原始分辨率绘制的，并随着视频的缩放而缩放。
 
+    .. note:: ``--vo=gpu-next`` 配合 ``--blend-subtitles=video`` 时，若视频以 90 度为单位旋转，将正确跟随 ``--video-rotate`` 选项。
+
+    .. warning:: 使用 ``--vo=gpu-next`` 时， ``--blend-subtitles=video`` 模式会在缩放视频后混合字幕，类似于 ``--blend-subtitles=yes`` 。区别在于字幕以视频的原生分辨率渲染，然后单独缩放以与视频混合。这在性能方面很有用，因为它允许字幕以较低分辨率渲染，但它并不像硬编码字幕那样，需要在缩放前进行混合。这在未来可能会改变。
+
     .. warning:: 这改变了处理字幕颜色的方式。通常情况下，字幕的颜色被假定为sRGB，并按此进行色彩管理。启用这个选项后，它们将被视为在视频的色彩空间中。如果你想让softsubbed ASS signs与视频颜色相匹配，这样做很好，但可能会导致SRT字幕或类似的东西看起来有点不对劲。
 
 ``--background=<none|color|tiles>``
@@ -4552,7 +4690,8 @@ GPU渲染选项
     color
         将边框与背景颜色（ ``--background-color`` ，通常为黑色）混合。
     tiles
-        将边框与 16x16 灰/白色方格背景混合（默认）。
+        将帧与棋盘格图案融合，使用 ``--background-tile-color-0`` 和 ``--background-tile-color-1`` 选项指定的颜色，以及使用 ``--background-tile-size`` 选项指定的瓷砖大小。
+        （默认）
     none
         不混合帧，保持 Alpha 不变。
 
@@ -4560,11 +4699,18 @@ GPU渲染选项
 
     在 mpv 0.38.0 之前，该选项接受指定背景颜色的颜色值。现在由 ``--background-color`` 选项完成。请使用该选项。
 
-``--background=<color>``
-    用来绘制mpv窗口中没有被视频覆盖的部分的颜色。参见 ``--sub-color`` 选项关于如何定义颜色。
+``--background-color=<color>``
+    用于在 ``--background=color`` 模式下绘制 mpv 窗口中未被视频覆盖部分的颜色。有关颜色定义的信息，详见 ``--sub-color`` 选项。
+
+``--background-tile-color-0=<color>`` , ``--background-tile-color-1=<color>``
+    用于在 ``--background=tiles`` 模式下绘制 mpv 窗口中未被视频覆盖部分的颜色。有关颜色定义的信息，详见 ``--sub-color`` 选项。
+
+``--background-tile-size=<1-4096>``
+    用于在``--background=tiles``模式下绘制mpv窗口中未被视频覆盖部分的瓷贴大小。（默认： 16）
 
 ``--border-background=<none|color|tiles>``
-    类似 ``--background`` 但只应用于窗口的黑边/边框区域。 ``vo=gpu-next`` 独占。默认： ``color``
+    类似 ``--background`` 但只应用于窗口的黑边/边框区域。
+    ``vo=gpu-next`` 独占。默认： ``color``
 
 ``--opengl-rectangle-textures``
     强制使用矩形纹理（默认： no）。通常情况下，这不应该比普通纹理有任何优势。请注意，硬件解码会覆盖这个标志。可能在任何时候被移除。

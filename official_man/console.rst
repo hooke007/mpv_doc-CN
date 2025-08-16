@@ -83,6 +83,9 @@ Ctrl+v
 Shift+INSERT
     粘贴文本（在X11和Wayland上使用primary selection）
 
+Ctrl+y
+    复制当前行至剪贴板
+
 TAB, Ctrl+i
     循环补全
 
