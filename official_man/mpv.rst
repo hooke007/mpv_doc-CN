@@ -451,7 +451,7 @@ Shell实际上可能从传递到命令行的字符串中剥离一些引号，所
 ``~~home/``      mpv的设置目录（例如 ``~/.config/mpv/`` ）
 ``~~global/``    全局的设置路径（例如 ``/etc/mpv`` ），如果存在（win32不可用）
 ``~~osxbundle/`` macOS bundle的资源路径（macOS独占）
-``~~desktop/``   桌面的路径（win32 macOS）
+``~~desktop/``   桌面的路径
 ``~~exe_dir/``   win32独占：包含mpv.exe的目录路径（用于设置文件； ``$MPV_HOME`` 会覆盖它）
 ``~~cache/``     应用程序的缓存路径 ( ``~/.cache/mpv/`` )。在某些平台，这将和 ``~~home/`` 一致
 ``~~state/``     应用程序状态数据的路径 ( ``~/.local/state/mpv/`` ) 。在某些平台，这将和 ``~~home/`` 一致

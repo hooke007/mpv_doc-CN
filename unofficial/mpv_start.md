@@ -17,7 +17,7 @@ mpv是极简设计的高画质的开源播放器。
 推荐使用的高级文本编辑器，完全可替代系统自带的记事本 [Notepad3](https://www.rizonesoft.com/downloads/notepad3/)
 
 
-> 该系列文档已经停止更新，详见： https://github.com/hooke007/mpv_PlayKit/issues/573
+> **该系列文档已经停止更新** 详见： [中止维护非官方系列文档](https://github.com/hooke007/mpv_PlayKit/issues/573)
 
 
 ## mpv 播放器的使用【入门】

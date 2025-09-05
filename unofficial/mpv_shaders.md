@@ -3,7 +3,7 @@
 
 _ver.20231101_
 
-> 该系列文档已经停止更新，详见： https://github.com/hooke007/mpv_PlayKit/issues/573
+> **该系列文档已经停止更新** 详见： [中止维护非官方系列文档](https://github.com/hooke007/mpv_PlayKit/issues/573)
 
 ## 起
 

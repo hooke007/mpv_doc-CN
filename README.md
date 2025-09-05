@@ -29,13 +29,13 @@ https://github.com/mpv-player/mpv/wiki
 | commands    | 控制台2          |  |
 | console     | 控制台1          | [`commit`](https://github.com/mpv-player/mpv/commit/dbda70a11c213e7eb07c8fc8a491f5b01d20914b) |
 | encode      | 编码/压制        | [`commit`](https://github.com/mpv-player/mpv/commit/f0c3d466f9769e5eaed672a97c2a2a23d9697f09) |
-| input       | 按键和命令与属性 | [`commit`](https://github.com/mpv-player/mpv/commit/dbda70a11c213e7eb07c8fc8a491f5b01d20914b) |
+| input       | 按键和命令与属性 | [`commit`](https://github.com/mpv-player/mpv/commit/521e162420dfb7d489e6b7478fcc1476926226c9) |
 | ipc         |  |  |
 | javascript  |  |  |
 | libmpv      |  |  |
 | lua         |  |  |
-| mpv         | 综合             | [`commit`](https://github.com/mpv-player/mpv/commit/1d1535ff9124fdeb3c81a2f089551e2cc8404613) |
-| options     | 选项             | [`commit`](https://github.com/mpv-player/mpv/commit/dbda70a11c213e7eb07c8fc8a491f5b01d20914b) |
+| mpv         | 综合             | [`commit`](https://github.com/mpv-player/mpv/commit/ce7ea3d8ea69e4fc2e98473035b5542ffce86073) |
+| options     | 选项             | [`commit`](https://github.com/mpv-player/mpv/commit/78458a55ef435fe707107942bd02dccc18241e47) |
 | osc         | 屏显式控制器     | [`commit`](https://github.com/mpv-player/mpv/commit/f0c3d466f9769e5eaed672a97c2a2a23d9697f09) |
 | positioning | 位移器           | [`commit`](https://github.com/mpv-player/mpv/commit/f0c3d466f9769e5eaed672a97c2a2a23d9697f09) |
 | select      | 控制台3          |  |
