@@ -17,6 +17,8 @@ mpv是极简设计的高画质的开源播放器。
 推荐使用的高级文本编辑器，完全可替代系统自带的记事本 [Notepad3](https://www.rizonesoft.com/downloads/notepad3/)
 
 
+> 该系列文档已经停止更新，详见： https://github.com/hooke007/mpv_PlayKit/issues/573
+
 
 ## mpv 播放器的使用【入门】
 
@@ -125,7 +127,7 @@ O
 ### 1.主设置文件细化
 
 最可靠的途径是直接看官方的最新手册： [manual](https://mpv.io/manual/master/)  
-为了降低难度和节省时间，我挑选了其中的一些参数并添加了 [中文注释](https://github.com/hooke007/MPV_lazy/blob/main/portable_config/mpv.conf)  
+为了降低难度和节省时间，我挑选了其中的一些参数并添加了 [中文注释](https://github.com/hooke007/mpv_PlayKit/blob/main/portable_config/mpv.conf)  
 由于涉及的文本量巨大，此处不赘述重复的内容。从自身偏好出发，个性化平衡适配你的需求和硬件。
 
 
@@ -134,7 +136,7 @@ O
 使用 <font color=blue>**input.conf**</font> 文件创建属于你自己的快捷键方案，该文件应和**主设置文件** <font color=blue>**mpv.conf**</font> 位于同一级目录
 
 查看 [官方的内建方案](https://github.com/mpv-player/mpv/blob/master/etc/input.conf) 获得全部快捷键对应的功能；  
-同样我的 [懒人包版的中文注释](https://github.com/hooke007/MPV_lazy/blob/main/portable_config/input.conf) 也能降低上手难度。
+同样我的 [懒人包版的中文注释](https://github.com/hooke007/mpv_PlayKit/blob/main/portable_config/input.conf) 也能降低上手难度。
 
 即使你的 <font color=blue>**input.conf**</font> 文件不存在设置目录里（或为空文本），mpv依旧会使用内建的方案。
 
@@ -182,7 +184,7 @@ mpv中的很多功能都是依赖LUA脚本的，比如 i 键显示的统计信�
 内置脚本由于已集成，直接创建/编辑对应的设置文件即可，你可以在 [此处](https://github.com/mpv-player/mpv/tree/master/player/lua) 查看内置脚本的更新历史。
 
 以我的推荐用法为例，在 <font color=green>**X:/xxxxx/你的MPV文件夹/portable_config/script-opts/**</font> 里放置 `xxxx.conf` 的脚本设置文件  
-你依然可以在 [我的仓库](https://github.com/hooke007/MPV_lazy/tree/main/portable_config/script-opts) 里参考：  
+你依然可以在 [我的仓库](https://github.com/hooke007/mpv_PlayKit/tree/main/portable_config/script-opts) 里参考：  
 其中 `console.conf` `osc.conf` `stats.conf` `ytdl_hook.conf` 都是内置脚本的设置文件
 
 🔺 此后为了避免识别问题，严格文本规范：  
@@ -229,7 +231,7 @@ mpv集成的 **ytdl_hook.lua** 脚本加强了网络串流的播放能力。
 该脚本兼容ytdl的热门分支yt-dlp  
 需要 **mpv.exe** 所在目录存在 **yt-dlp.exe** [官方发布地址](https://github.com/yt-dlp/yt-dlp/releases)
 
-如何指定使用的程序可参考 [此处](https://github.com/hooke007/MPV_lazy/blob/main/portable_config/script-opts/ytdl_hook.conf)
+如何指定使用的程序可参考 [此处](https://github.com/hooke007/mpv_PlayKit/blob/main/portable_config/script-opts/ytdl_hook.conf)
 
 🔺 注意： mpv0.34.0及之后的版本默认优先使用yt-dlp，且youtube-dl项目已转入维护阶段，非特殊情况应始终使用yt-dlp
 
@@ -405,7 +407,7 @@ VS滤镜参与mpv的播放流程至少需要三个部分： ***dll库 + 对应�
 获取对应的vpy脚本，无所谓扩展名是 `.py` 或者 `.vpy` ，脚本也无命名要求规范
 
 [这里](https://gist.github.com/KCCat/1b3a7b7f085a066af3719859f88ded02) 是KCCat大佬的版本  
-或者选择我在懒人包 [使用的旧版本](https://github.com/hooke007/MPV_lazy/blob/a8c9413fb3c352851ebf87d34a97d428c0d63100/portable_config/vs/mvtools_2x.vpy) （懒人包的新版本使用了k7sfunc包装器，属于进阶用法，因此不作为示例推荐给用户）
+或者选择我在懒人包 [使用的旧版本](https://github.com/hooke007/mpv_PlayKit/blob/a8c9413fb3c352851ebf87d34a97d428c0d63100/portable_config/vs/mvtools_2x.vpy) （懒人包的新版本使用了k7sfunc包装器，属于进阶用法，因此不作为示例推荐给用户）
 
 放置位置也随意，按照前文的推荐放在 <font color=green>**X:/xxxxx/你的MPV文件夹/portable_config/**</font> 内便于调用
 
@@ -432,7 +434,7 @@ VS工作状态的检验可多方结合，例如在统计信息中的滤镜列表
 
 > 此节为 mpv-VapourSynth 滤镜进阶
 
-k7sfunc 是为简化mpv中vs工具链部署而产生的方案，提供模块化的接近开箱即用的多个滤镜组，更多详细说明参见 [它的维基](https://github.com/hooke007/MPV_lazy/wiki/3_K7sfunc) 。
+k7sfunc 是为简化mpv中vs工具链部署而产生的方案，提供模块化的接近开箱即用的多个滤镜组，更多详细说明参见 [它的维基](https://github.com/hooke007/mpv_PlayKit/wiki/3_K7sfunc) 。
 
 
 O  
@@ -459,11 +461,11 @@ O
 
 - **太长不想看怎么办？**
 
-有懒人包 [mpv-lazy](https://github.com/hooke007/MPV_lazy) ，虽然我极力想精简它的整合功能的说明，但随着折腾的深入我发现这就是根本不可能的事情，所以你可能到最后还是要看文档。。。
+有懒人包 [mpv-lazy](https://github.com/hooke007/mpv_PlayKit) ，虽然我极力想精简它的整合功能的说明，但随着折腾的深入我发现这就是根本不可能的事情，所以你可能到最后还是要看文档。。。
 
 - **mpv-lazy的发布帖收集了萌新常见问题的解决方案？**
 
-大部分都可以无障碍参考 [维基FAQ](https://github.com/hooke007/MPV_lazy/wiki/0_FAQ)
+大部分都可以无障碍参考 [维基FAQ](https://github.com/hooke007/mpv_PlayKit/wiki/0_FAQ)
 
 - **mpv的命令行操作的介绍呢？**
 

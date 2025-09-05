@@ -2,6 +2,8 @@
 
 _ver.20231101_
 
+> 该系列文档已经停止更新，详见： https://github.com/hooke007/mpv_PlayKit/issues/573
+
 ## 序
 
 阅读本文前默认已基本熟悉 mpv.conf 内各参数的用途及含义。
@@ -55,7 +57,7 @@ hdr-contrast-recovery = 0.30
 deband=yes
 ```
 
-P.S. mpv还有其它内建profile，详见 [《profiles_补充内容》](https://github.com/hooke007/MPV_lazy/discussions/42)
+P.S. mpv还有其它内建profile，详见 [《profiles_补充内容》](https://github.com/hooke007/mpv_PlayKit/discussions/42)
 
 因此，上方示例实际被解析为如下常驻参数列表 ——
 ```ini
@@ -117,7 +119,7 @@ border=no                         # 此行往后填写要你要应用的参数�
 - 若需某个属性的等于某个具体值时触发，对应条件就这样写： `p["xxxx"]=="value"`
 - 若需某个属性值（数字）大于等于某数值时触发（以音量为例），对应条件就这样写： `p["volume"]>=50`
 
-P.S. 更多示例参见 [主仓库_profiles](https://github.com/hooke007/MPV_lazy/blob/main/portable_config/profiles.conf)
+P.S. 更多示例参见 [主仓库_profiles](https://github.com/hooke007/mpv_PlayKit/blob/main/portable_config/profiles.conf)
 
 P.S. 常见的引用属性的方式是直接写属性名和 `p.xxxx` 的形式（参见前文的示范），这种方式适合名字简单无符号的属性，不用担心语法上的暗病。
 
@@ -143,7 +145,7 @@ profile-desc=mp4扩展名文件的处理   # [非必要参数] profile的描述�
 hwdec=auto                         # 此行往后填写要你要应用的参数，自定义
 ```
 
-它的功能有限，通常没有使用的必要而且可以转换为当前的 条件profile ，这在之前的 [《profiles_补充内容》](https://github.com/hooke007/MPV_lazy/discussions/42) 有记录。
+它的功能有限，通常没有使用的必要而且可以转换为当前的 条件profile ，这在之前的 [《profiles_补充内容》](https://github.com/hooke007/mpv_PlayKit/discussions/42) 有记录。
 
 ### 3.2.profile嵌套
 
@@ -173,7 +175,7 @@ profile=deband_plus
 这也是我当前在 mpv-lazy 中的处理方式，避免开头提到的 常驻参数 误入profile的问题。  
 实现方式是通过在mpv.conf中使用参数 `--include=xxxx.conf` 这样mpv就会在主设置文件读取完毕后，再读取该文件作为 mpv.conf 的补充内容，而我只在该文件内写profile，常驻参数只写在 mpv.conf 中。
 
-P.S. 我以同样的方式隔离了脚本选项，参见 [《集中化管理mpv的脚本选项》](https://github.com/hooke007/MPV_lazy/discussions/126)
+P.S. 我以同样的方式隔离了脚本选项，参见 [《集中化管理mpv的脚本选项》](https://github.com/hooke007/mpv_PlayKit/discussions/126)
 
 ### 3.4.穿插常驻参数
 

@@ -2,6 +2,8 @@
 
 _ver.20231101_
 
+> 该系列文档已经停止更新，详见： https://github.com/hooke007/mpv_PlayKit/issues/573
+
 ## 序
 
 本文是 [mpv进阶的小节4](https://hooke007.github.io/unofficial/mpv_start.html#id15) & [《快捷键自定义与控制台》](https://hooke007.github.io/unofficial/mpv_input.html) 的拓展内容。
@@ -14,7 +16,7 @@ _滤镜 也常被翻译作 过滤器_
 默认快捷键 (<kbd>Shift</kbd> + ) <kbd>i</kbd> 的第一页下方显示已挂载的用户滤镜列表 `Filters:` 。无挂载则不显示该条目  
 🔺 尽量使用软解或带复制的硬解（即 `--hwdec=no` 或 `--hwdec=auto-copy` ），大多数滤镜无法在原生硬解（即 `--hwdec=yes` ）下工作
 
-本文偏重写法而不是实际用途，推荐熟悉语法后再查看 [《实用向的滤镜》](https://github.com/hooke007/MPV_lazy/discussions/120) 中的诸多案例。
+本文偏重写法而不是实际用途，推荐熟悉语法后再查看 [《实用向的滤镜》](https://github.com/hooke007/mpv_PlayKit/discussions/120) 中的诸多案例。
 
 ## 1.语法简述
 

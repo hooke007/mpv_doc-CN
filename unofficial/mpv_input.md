@@ -2,6 +2,8 @@
 
 _ver.20230212_
 
+> 该系列文档已经停止更新，详见： https://github.com/hooke007/mpv_PlayKit/issues/573
+
 ## 序
 
 阅读本文前默认已基本熟悉 mpv.conf 内各参数的用途及含义。  
@@ -17,7 +19,7 @@ _ver.20230212_
 
 - 在 **input.conf** 中使用参数 `input-builtin-bindings=no` 或 `input-default-bindings=no` 可屏蔽全部内建的原始快捷键预设（后者能进一步屏蔽外置脚本内的静态若绑定预设）。
 
-- mpv-lazy版中可供参考的大量[示例](https://github.com/hooke007/MPV_lazy/blob/main/portable_config/input.conf)
+- mpv-lazy版中可供参考的大量[示例](https://github.com/hooke007/mpv_PlayKit/blob/main/portable_config/input.conf)
 
 ## 1.语法简述
 
@@ -180,7 +182,7 @@ RIGHT   seek 5 ; show-text "向前 5 秒"   # 前进 5 秒并显示OSD文本消�
 - 终端运行 `./mpv --input-keylist` 将列出所有可用的键值名
 
 - 终端运行 `./mpv --input-test --force-window --idle` 将打开一个空mpv窗口便于测试实际键位对应的值  
-（mpv-lazy提供了 [输入模式](https://github.com/hooke007/MPV_lazy/blob/main/installer/mpv-输入模式.bat) 便于更快启动）
+（mpv-lazy提供了 [输入模式](https://github.com/hooke007/mpv_PlayKit/blob/main/installer/mpv-输入模式.bat) 便于更快启动）
 
 ## 3.控制台
 
