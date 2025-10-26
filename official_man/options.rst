@@ -617,6 +617,9 @@
 ``--load-select=<yes|no>``
     启用内置脚本，让你从项目列表中进行选择（默认： yes）。默认情况下，它的按键绑定以 ``g`` 键开始。
 
+``--load-context-menu=<yes|no>``
+    启用实现上下文菜单的内置脚本。在未实现与原生上下文菜单集成的平台上默认为 ``yes`` ，而在已实现集成的平台上默认为 ``no``
+
 ``--load-positioning=<yes|no>``
     启用内置脚本，为平移视频和图像提供各种按键绑定（默认： yes）。
 
@@ -1142,7 +1145,7 @@
     某些视频编解码器支持裁切，意味着只有解码帧的子矩形用于显示。此选项控制libavcodec如何处理裁剪。在解码过程中进行裁切对齐和硬件解码方面存在一些限制。如果启用了此选项，解码器将应用裁切，否则由VO处理。默认启用。
 
 ``--swapchain-depth=<N>``
-    允许最多N个in-flight的帧。这实质上控制了帧的延迟。增加交换链深度可以改善管线并防止错过垂直同步，但会增加可见的延迟。这个选项只规定了一个上限，该实现可以使用比内部请求更低的延迟。设置为1表示视频输出驱动将等待每一帧变为可见，再开始渲染下一帧。（默认： 3）
+    允许最多N个in-flight的帧。这实质上控制了帧的延迟。增加交换链深度可以改善管线并防止错过垂直同步，但会增加可见的延迟。这个选项只规定了一个上限，该实现可以使用比内部请求更低的延迟。设置为1表示视频输出驱动将等待每一帧变为可见，再开始渲染下一帧。（默认： 2）
 
 音频
 ----
@@ -1695,7 +1698,15 @@
         这仅应用于文本字幕。
 
 ``--sub-fix-timing=<yes|no>``
-    调整字幕计时是为了移除字幕之间的微小间隔或重叠（如果差距小于210毫秒，间隔或重叠会被移除）。
+    调整字幕时间点，用于消除字幕间的小间隙或重叠。
+
+    另见 ``--sub-fix-timing-threshold`` 和 ``--sub-fix-timing-keep``
+
+``--sub-fix-timing-threshold=<amount>``
+    设置字幕时间校正的阈值，以毫秒为单位（默认： 210）。若两个字幕事件间隔小于该值，则消除间隙。
+
+``--sub-fix-timing-keep=<amount>``
+    设置字幕事件被纳入时间校正的最小持续时间，以毫秒为单位（默认： 400）。若字幕事件持续时间小于该值，其时间点将保持不变。
 
 ``--sub-forced-events-only=<yes|no>``
     启用此选项将仅显示字幕流中的强制事件。只有一些位图字幕格式（如DVD或PGS）能够在流中包含强制和非强制事件的混合。在文本字幕上启用此选项将导致不显示任何字幕（默认： ``no`` ）。
@@ -2231,9 +2242,15 @@
 
     在X11上，该ID被解释为X11上的一个 ``Window`` 。与MPlayer/mplayer2不同，mpv始终创建自己的窗口，并将wid窗口设置为父窗口。该窗口将始终重新调整大小来完全覆盖父窗口。值 ``0`` 被特别解释，mpv将直接在根窗口上绘制。
 
-    在win32上，ID被解释为 ``HWND`` 。将其作为值转换传递给 ``uint32_t`` （所有的Windows句柄都是32位的）。 mpv将创建自己的窗口，并将窗口设置为父窗口，就像X11一样。
+    在win32上，ID被解释为 ``HWND`` 。将其作为值转换传递给 ``uint32_t`` （所有的Windows句柄都是32位的）。 mpv将创建自己的窗口，并将窗口设置为父窗口，就像X11一样。值 ``0`` 具有特殊含义，mpv将显示在桌面壁纸之上、桌面图标之下。
 
     在Android上，ID会被解释为 ``android.view.Surface`` 。将其作为值转换传递给 ``intptr_t`` 。与 ``--vo=mediacodec_embed`` 和 ``--hwdec=mediacodec`` 一起使用，以便使用MediaCodec直接渲染，或者与 ``--vo=gpu --gpu-context=android`` 一起使用（带或者不带 ``--hwdec=mediacodec`` ）。
+
+    .. note::
+
+        在 Win32 系统上，若启用桌面壁纸过渡效果（例如在 Windows 设置中配置多图桌面幻灯片），且使用 ID 值 ``0`` 时，Windows 有时会销毁 mpv 关联的窗口。此时 mpv 将直接将此操作视为退出信号。
+
+        为避免此情况，请设置静态桌面壁纸，例如单张图片或纯色背景。
 
 ``--window-dragging=<yes|no>``
     当鼠标点击在窗口上并移动指针时，移动窗口。（默认： yes）
@@ -2330,7 +2347,10 @@
         你需要有对DVD设备的写入权限才能变更速度。
 
 ``--dvd-angle=<ID>``
-    一些DVD包含可以从多个角度观看的场景。该选项告知mpv要使用哪个角度（默认： 1）。
+    一些DVD包含可以从多个角度观看的场景。此选项告知mpv要使用哪个角度（默认： 1）。
+
+``--bluray-angle=<ID>``
+    一些蓝光碟包含可从多个角度观看的场景。此选项告知mpv应使用哪个角度（默认： 1）。
 
 
 
@@ -4227,6 +4247,11 @@ GPU渲染选项
 
     （Android 和 ``--gpu-context=android`` 独占）
 
+``--d3d11-composition-size=<WxH>``
+    设置D3D11合成模式的输出尺寸。使用合成模式时，系统不会显示窗口，必须由嵌入应用程序设置输出尺寸。
+
+    仅适用于同时启用 ``--gpu-context=d3d11`` 和 ``--d3d11-output-mode=composition`` 参数的窗口。
+
 ``--gpu-sw``
     即使检测到软件渲染器也继续。仅适用于 OpenGL/Vulkan 后端。对于 d3d11，参见 ``--d3d11-warp`` 。
 
@@ -4324,53 +4349,29 @@ GPU渲染选项
         完全取代了颜色解码。这种类型的LUT应该摄入图像的原生色彩空间，并输出标准化的非线性RGB
 
 ``--target-colorspace-hint=<auto|yes|no>``
-    When enabled, output colorspace metadata will be set on the swapchain
-    depending on the GPU context and platform this may affect compositor/display.
-    This can be used for "HDR passthrough" and to set the output colorspace
-    for SDR content. In ``auto`` mode, the target colorspace is only set if the
-    current display parameters are known. Currently, this is supported on
-    Wayland, D3D11 and winvk contexts. The ``yes`` option will always try to set
-    the colorspace, you may need to adjust the ``--target-*`` options to match
-    your display capabilities.
-    Requires a supporting driver and ``--vo=gpu-next``. (Default: ``auto``)
+    启用后，输出色彩空间元数据将根据GPU上下文和平台设置在交换链上，这可能影响合成器/显示器。此功能可用于“HDR直通”以及为SDR内容设置输出色彩空间。在 ``auto`` 模式下，仅当当前显示参数已知时才会设置目标色彩空间。目前支持Wayland、D3D11和winvk上下文。选择 ``yes`` 将始终尝试设置色彩空间，你可能需要调整 ``--target-*`` 选项以匹配显示器能力。需配备支持驱动程序并启用 ``--vo=gpu-next`` 。（默认： ``auto`` ）
 
     .. note::
-        Auto detected target colorspace metadata is not guaranteed to be always
-        best choice. It depends on your compositor, driver, and display
-        capabilities. However in most cases ``auto`` mode should work fine.
+        自动检测的目标色彩空间元数据未必总是最佳选择。这取决于你的合成器、驱动程序和显示器性能。但在大多数情况下， ``auto`` 模式应能正常工作。
 
 ``--target-colorspace-hint-mode=<target|source|source-dynamic>``
-    Select which metadata to use for the ``--target-colorspace-hint``.
-    (Only for ``--vo=gpu-next``)
+    选择用于 ``--target-colorspace-hint`` 的元数据。（ ``--vo=gpu-next`` 独占）
 
     target
-        Uses metadata based on the target display's actual capabilities. This
-        mode adapts the source content to the target display before output.
-        Note: HDR primaries are not overridden by the ``--target-prim`` option
-        this only affects the enclosing container for the colorspace.
+        基于目标显示器的实际能力使用元数据。此模式会在输出前将源内容适配至目标显示器。注意：HDR原色不会被 ``--target-prim`` 选项覆盖，该选项仅影响颜色空间的外部容器。如需限制输出色域，可使用 ``--target-gamut`` 选项。
 
     source
-        Uses the source content's metadata. This is the traditional
-        "HDR passthrough" mode (SDR too), where it is assumed that the compositor
-        and display will handle the colorspace directly and perform any necessary
-        mappings.
+        使用源内容的元数据。这是传统的“HDR直通”模式（SDR同样适用），该模式假定合成器和显示器将直接处理色彩空间并执行必要的映射操作。
 
     source-dynamic
-        The same as ``source``, but uses dynamic per-scene metadata instead of
-        static HDR10. This is experimental and depends on the display's ability
-        to react to metadata changes. Note that this does not send full HDR10+
-        or Dolby Vision metadata, but uses that information to produce HDR10
-        with per-scene luminance values.
+        与 ``source`` 相同，但使用动态的每场景元数据替代静态的HDR10。此功能尚在试验阶段，依赖显示设备对元数据变更的响应能力。请注意，此模式不会发送完整的HDR10+或杜比视界元数据，而是利用这些信息生成包含每场景亮度值的HDR10信号。
 
-    Default is ``target``. If target display parameters are not available, this
-    will fall back to ``source``. Note that this is done on individual properties
-    basis, i.e. it will merge source params into target for unknown properties,
-    though not the other way around.
+    默认值为 ``target` `。若目标显示参数不可用，则回退至 ``source`` 。请注意此操作基于单个属性进行，即对于未知属性，系统会将source参数合并到target中，但反向操作不可行。
 
-    ``--target-*`` options override the metadata in both modes.
+    ``--target-*`` 选项在两种模式下均会覆盖元数据。
 
     .. note::
-        The ICC profile always takes precedence over any metadata.
+        ICC配置文件始终优先于任何元数据。
 
     .. note::
         强烈建议使用 ``--target-colorspace-hint=<auto|yes>`` 以确保输出颜色空间设置正确。这对所有非sRGB内容（包括SDR）至关重要，可确保合成器、驱动程序和显示设备正确解析信号。
@@ -4397,6 +4398,9 @@ GPU渲染选项
         您可以选择要发送给显示器的元数据，并使用 ``--target-*`` 选项手动调整。如果您希望让一切看起来更像HDR，还可以尝试使用 ``--inverse-tone-mapping`` 选项。
 
         效果因人而异，这高度取决于目标显示器，没有唯一的答案，但不妨尝试实验，您可能会感到惊喜。
+
+``--target-colorspace-hint-strict``
+    启用时（默认），将遵循配置的交换链颜色空间（含hint）。在此模式下， ``--target-*`` 选项仅作为提示，渲染输出将采用协商后的交换链格式。这确保了正确结果，因为下游处理依赖于信号传递的颜色空间。禁用时，交换链颜色空间将被覆盖以匹配 ``--target-*`` 选项。（ ``--vo=gpu-next`` 独占）
 
 ``--target-prim=<value>``
     指定显示器的色彩原色。当不使用ICC色彩管理时，视频色彩将被适应到这个色彩空间。有效值是：
@@ -4489,9 +4493,21 @@ GPU渲染选项
     限制显示的色域。您可以使用此选项输出例如 DCIP3-in-BT.2020 等色彩。将 ``--target-prim`` 设为包含色彩空间的基色（数值将被编码到基色中），将 ``--target-gamut`` 设为要限制色彩的色域。取值与 ``--target-prim`` 相同。
     （ ``--vo=gpu-next`` 独占）
 
+    .. note::
+
+        若所选色域更宽，则将受限于 ``--target-prim`` 。此外，若指定了 ``--target-colorspace-hint`` ，则信号色域将受限于交换链支持的色域范围。该范围可能与请求的 ``--target-prim`` 存在差异。
+
 ``--target-lut=<file>``
     指定一个自定义的LUT文件（Adobe .cube格式），在屏幕上显示之前应用于颜色。这个LUT是在编码到目标色彩空间后，以标准化的RGB值输入的，所以在应用 ``---target-trc`` 之后。
     （ ``--vo=gpu-next`` 独占）
+
+``--hdr-reference-white=<auto|10-1000000>``
+    指定SDR内容母版显示器的假定峰值亮度，单位为cd/m²（尼特）。该值将作为SDR内容的HDR漫反射白电平使用。本质上，这是HDR容器中的SDR亮度值。默认值为 203
+    （ ``--vo=gpu-next`` 独占）
+
+    .. note::
+
+        This option overrides the ``--target-peak`` if is set and the target transfer function is SDR. This way you can control SDR output separately from HDR output.
 
 ``--tone-mapping=<value>``
     指定用于将图像色调映射到目标显示上的算法。这与HDR->SDR转换和降低色域有关（例如，在标准色域显示器上播放BT.2020内容）。有效值是：
@@ -4708,9 +4724,12 @@ GPU渲染选项
 ``--background-tile-size=<1-4096>``
     用于在``--background=tiles``模式下绘制mpv窗口中未被视频覆盖部分的瓷贴大小。（默认： 16）
 
-``--border-background=<none|color|tiles>``
+``--border-background=<none|color|tiles|blur>``
     类似 ``--background`` 但只应用于窗口的黑边/边框区域。
     ``vo=gpu-next`` 独占。默认： ``color``
+
+``--background-blur-radius=<radius>``
+    用于 ``--border-background=blur`` 的模糊半径（以像素为单位）
 
 ``--opengl-rectangle-textures``
     强制使用矩形纹理（默认： no）。通常情况下，这不应该比普通纹理有任何优势。请注意，硬件解码会覆盖这个标志。可能在任何时候被移除。
@@ -4861,7 +4880,10 @@ GPU渲染选项
 
 ``--media-controls=<yes|no>``
     （Windows独占）启用媒体控制界面 SystemMediaTransportControls 的集成。
-    默认： ``yes`` （除了libmpv）
+
+    Windows 系统可能显示“未知应用程序”或在媒体控制面板中缺少 mpv 图标。为实现完整支持，你需要使用 ``--register`` 命令注册mpv。
+
+    默认： ``yes`` （libmpv除外）
 
 ``--force-media-title=<string>``
     强制将 ``media-title`` 属性的内容变成这个值。对于想要设置标题的脚本很有用，而不需要覆盖用户在 ``--title`` 中的设置。
@@ -5014,3 +5036,44 @@ GPU渲染选项
     启用剪贴板监视，以便观察 ``clipboard`` 属性的内容变化（默认： no）。这只会影响使用轮询监控剪贴板更新的剪贴板实现。其他平台目前会忽略此选项，并始终/从不通知变更。
 
     在Wayland上，此选项仅对 ``wayland`` 后端有效，对 ``vo`` 后端无效。详见属性 ``current-clipboard-backend``
+
+``--register``
+    （Windows独占）（也可作为 mpv-register 辅助工具使用）
+
+    在 Windows 上将 mpv 注册为媒体播放器。这包括添加注册表项以将 mpv 与媒体文件和协议关联，并启用蓝光、DVD 和 CD-Audio 的自动播放处理程序。
+
+    请注意注册操作是在原位置完成的，因此将使用当前的 mpv.exe 路径。若注册后移动了mpv，可重新运行此命令更新注册表项。您也可随时使用支持此命令的任意mpv二进制文件执行 ``--unregister`` 操作，无需使用原始注册时使用的版本。
+
+    使用此选项时，mpv将在完成操作后退出。若需查看详细操作列表，请使用 ``-v`` 选项运行mpv。
+
+    可通过以下选项控制注册的文件扩展名列表：``--video-exts`` ``--audio-exts`` ``--image-exts`` ``--playlist-exts`` 和 ``--archive-exts``
+
+    默认情况下，mpv将注册为当前用户专属。若需全局注册，请以管理员身份运行mpv并添加此选项。但不建议采用此方式，因按用户注册通常更优。
+
+    您可通过Windows设置或运行mpv时添加``--unregister``选项来解除注册。
+
+``--register-rpath=<string>``
+    （Windows独占）
+
+    使用 ``--register`` 注册时，此选项允许您指定要添加在前的路径，以便mpv能找到必要的DLL文件。每次执行mpv时，指定的字符串都会被添加到运行时PATH的前面。
+
+    这有助于为mpv所需的外部库设置路径，而无需将其添加到全局PATH环境变量中。
+
+    字符串格式遵循PATH环境变量的结构，即用分号分隔的路径列表。
+
+    .. note::
+
+        此设置将在Windows注册表中为mpv配置 ``应用程序路径`` ，Windows Shell会通过该路径定位可执行文件及其依赖项。因此mpv在大多数情况下可无缝启动，但并非适用于所有场景。需特别注意：命令行运行mpv时，底层并非调用 `ShellExecute` ，而是使用 `CreateProcess` ，后者无法处理注册表中的 ``应用程序路径`` 键值。
+
+        为解决此问题，可创建一个简易PowerShell封装脚本，通过执行 ``Start-Process <mpv路径>`` 即可实现预期效果。
+
+``--unregister``
+    （Windows独占）（也可作为 mpv-unregister 辅助工具使用）
+
+    在 Windows 上取消注册 mpv 作为媒体播放器，撤销所有由 ``--register`` 选项所做的更改。此操作不会删除 mpv 二进制文件本身。
+
+    您可以使用任何支持此命令的 mpv 二进制文件进行取消注册，不必是最初用于注册的特定版本。
+
+    Windows设置应用程序条目与mpv.exe路径绑定。若删除二进制文件，该功能将失效。但您仍可通过此命令取消注册，在新的位置重新注册，或将mpv恢复至原始位置。
+
+    若mpv此前已为所有用户注册，请以管理员身份运行此命令以取消所有用户的注册。

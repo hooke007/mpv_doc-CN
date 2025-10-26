@@ -339,10 +339,6 @@ Ctrl+滚轮向上/下
 上下文菜单
 ----------
 
-.. warning::
-
-    此功能是实验性的。它可能无法适用于所有VO。将来可能会实现基于 libass 的回退版。
-
 上下文菜单是用户交互时（鼠标右键等）在视频窗口上弹出的菜单。
 
 要使用这一功能，需要在 ``menu-data`` 属性中填充菜单定义的数据，并添加键绑定以执行 ``context-menu`` 命令，这可以通过用户脚本完成。
@@ -1103,6 +1099,8 @@ mpv没有官方的GUI，除了OSC（ `屏显式控制器`_ ），它不是一个
 .. include:: commands.rst
 
 .. include:: select.rst
+
+.. include:: context_menu.rst
 
 .. include:: positioning.rst
 

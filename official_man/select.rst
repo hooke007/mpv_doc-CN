@@ -106,6 +106,15 @@ WHEEL_DOWN
 ``show-properties``
     列出所有属性的名称和值。你还可以选择一个属性，在 OSD 上输出其值，这对被裁切的长值非常有用。
 
+``edit-config-file``
+    使用系统文本编辑器打开 ``mpv.conf`` 文件，若不存在则创建。
+
+``edit-input-conf``
+    使用系统文本编辑器打开 ``input.conf`` 文件，若不存在则创建。
+
+``open-docs``
+    在浏览器中打开mpv的在线文档。
+
 ``menu``
     显示一个杂项条目的菜单。
 

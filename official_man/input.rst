@@ -926,14 +926,20 @@ OSD类命令
 
     有多个标志可供选择（有些可与 ``+`` 组合）：
 
-    <subtitles> （默认）
-        以原始分辨率保存视频图像，带有字幕。在某些情况下，一些视频输出可能仍然包括OSD。
     <video>
-        类似 ``subtitles`` ，但通常没有OSD或字幕。具体行为取决于所选的视频输出。
+        以原始分辨率保存视频图像，不包含OSD或字幕。当未指定任何标志时，此为默认设置，与其他标志组合使用时无需显式添加。
+    <scaled>
+        以当前的播放分辨率保存视频图像。
+    <subtitles> （默认）
+        保存视频图像，带有字幕。在某些情况下，一些VO可能仍然包括OSD。
+    <osd>
+        保存视频图像和OSD。
     <window>
-        保存mpv窗口的内容。通常视频是缩放过的，有OSD和字幕。具体行为取决于所选的视频输出。
+        保存mpv窗口的内容。带有OSD和字幕。这是 ``scaled+subtitles+osd`` 的别名。
     <each-frame>
         每一帧截一次屏。再次发出这个命令可以停止截图。注意，使用这种模式时，你应该禁用frame-dropping功能 —— 否则在丢帧的情况下，你可能会收到重复的图像。这个标志可以和其他标志结合使用，例如 ``video+each-frame``
+
+    除 ``each-frame`` 之外的所有标志的实际行为取决于所选的视频输出。
 
     旧版本mpv需要把 ``single`` 和 ``each-frame`` 作为第二个参数传递（且无标志）。这种语法仍然可以被解析，但已经过时，将来可能会被移除。
 
@@ -951,7 +957,7 @@ OSD类命令
     像所有的输入命令参数一样，文件名符合属性扩展，如 `属性扩展`_ 中所述。
 
 ``screenshot-raw [<flags> [<format>]]``
-    在内存中返回一个屏幕截图。这只能通过client API使用。这个命令返回的MPV_FORMAT_NODE_MAP的 ``w`` , ``h`` , ``stride`` 字段被设置为明显的内容。
+    返回屏幕截图到内存中。此功能仅可通过客户端API或使用 ``mp.command_native`` 的脚本调用。本命令返回的 MPV_FORMAT_NODE_MAP 对象中， ``w`` ``h`` ``stride`` 字段已设置为明显内容。
 
     ``format`` 字段设置为截图图像数据格式。这可以由 ``format`` 参数控制。格式可以是以下之一：
 
@@ -1989,7 +1995,7 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     窗口是否处于焦点。可能并非所有视频输出驱动都支持。
 
 ``ambient-light``
-    环境照明条件，以lux为单位。（macOS 独占）
+    环境照明条件，以lux为单位。仅在 macOS 上可被观察（macOS 和 Linux 独占）
 
 ``display-names``
     mpv窗口所包含的显示器的名称。在X11上，这些是xrandr名称（LVDS1, HDMI1, DP1, VGA1, 等等）。在Windows上，这些是GDI名称（\\.\DISPLAY1，\\.\DISPLAY2，等等），列表中的第一个显示器将是Windows认为与该窗口相关的（由MonitorFromWindow API决定）。在 macOS 上，这些名称是系统信息中使用的显示产品名称，括号内为序列号，由于一个窗口只能在一个屏幕上显示，因此只返回一个显示名称。在 Wayland 上，如果使用的协议版本 >= 4（LVDS-1、HDMI-A-1、X11-1 等），这些是 wl_output 名称；如果使用的协议版本 <4，这些是 geometry 事件报告的 wl_output 模型。
@@ -2769,7 +2775,39 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     如果 ``profile restore`` 字段包含默认值（可能是因为它没有设置，或者显式设置为 ``default`` ），则当前缺少该字段，但将来可能会包含值 ``default`` 。
 
 ``command-list``
-    输入命令的列表。这将返回一个数组表，其中每个表节点代表一个命令。这个表目前只有一个条目。 ``name`` 代表命令的名称（这个属性应该是对 ``--input-cmdlist`` 的替代。该选项转储了一些更多的信息，但如果需要的话，扩展这个属性是一个有效的功能请求）。
+    输入命令列表。该列表返回一个映射数组，其中每个映射节点代表一条命令。该映射包含以下条目：
+
+    ``name``
+        命令名称。
+
+    ``vararg``
+        该命令是否接受可变数量的参数。
+
+    ``args``
+        一个映射数组，其中每个映射节点代表一个参数，包含以下条目：
+
+        ``name``
+            参数名称。
+
+        ``type``
+            参数类型名称，如 ``String`` 或 ``Integer`` 。
+
+        ``optional``
+            参数是否为可选参数。
+
+    当使用客户端API通过 ``MPV_FORMAT_NODE`` 查询属性，或通过Lua的 ``mp.get_property_native`` 查询时，将返回一个包含以下内容的 mpv_node 对象：
+
+    ::
+
+        MPV_FORMAT_NODE_ARRAY
+            MPV_FORMAT_NODE_MAP (for each command entry)
+                "name"    MPV_FORMAT_STRING
+                "vararg"  MPV_FORMAT_FLAG
+                "args"    MPV_FORMAT_NODE_ARRAY
+                    MPV_FORMAT_NODE_MAP
+                        "name"     MPV_FORMAT_STRING
+                        "type"     MPV_FORMAT_STRING
+                        "optional" MPV_FORMAT_FLAG
 
 ``input-bindings``
     当前输入按键键绑定的列表。这将返回一个数组，其中每个表节点代表一个单一的按键键/命令的绑定。这个表有以下条目：
