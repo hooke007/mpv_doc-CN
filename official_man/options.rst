@@ -1053,7 +1053,7 @@
 
     可以用 ``mpv --vd=help`` 获得允许的编码列表。移除前缀，例如，用 ``h264`` 代替 ``lavc:h264`` 
 
-    默认情况下，这被设置为 ``h264,vc1,hevc,vp8,vp9,av1,prores,ffv1`` 。请注意，像 ``h264_vdpau`` 这样的硬件加速的特殊编码已经没有意义了，事实上已经从FFmpeg中移除了这种形式。
+    默认情况下，这被设置为 ``h264,vc1,hevc,vp8,vp9,av1,prores,prores_raw,ffv1,dpx`` 。请注意，像 ``h264_vdpau`` 这样的硬件加速的特殊编码已经没有意义了，事实上已经从FFmpeg中移除了这种形式。
 
     通常只有在损坏的GPU上才需要这样做，在这种情况下，一个编码被报告为支持，但解码导致的问题比它解决的问题更多。
 
@@ -4509,6 +4509,26 @@ GPU渲染选项
 
         This option overrides the ``--target-peak`` if is set and the target transfer function is SDR. This way you can control SDR output separately from HDR output.
 
+``--sdr-adjust-gamma=<auto|yes|no>``
+    SDR传输函数常存在模糊或不匹配的情况。即使文件标记了特定函数（如 ``bt.709`` ），实际内容也可能不符。例如，多数屏幕录制软件将输出标记为 ``bt.709`` ，但内容通常是直接捕获的sRGB。
+
+    在目标端，"sRGB"同样存在歧义：部分显示器出厂校准为纯幂2.2伽玛曲线，而另一些可能采用sRGB分段曲线。这两种配置在交换链设置中通常均标记为"sRGB"。不同平台对色彩管理的实现方式各异，导致合成器实现中也存在类似的不一致性。另见 ``--treat-srgb-as-power22`` 。此外，正确渲染 ``bt.1886`` 需要已知显示器对比度，但该参数通常不可用。请使用 ``--target-contrast`` 进行指定。
+
+    此选项控制是否对SDR内容进行伽马值调整。仅适用于"sRGB"交换链目标配置（因其最常见且存在歧义）。若设为 ``no`` ，标记为 ``sRGB`` 、 ``gamma2.2`` 或 ``bt.1886`` 的内容将原样呈现；若设为 ``yes`` ，则根据可用元数据进行转换。
+
+    ``auto`` （默认值）的行为与 ``no`` 相同，但当显式设置 ``--target-trc`` 时，其行为将等同于 ``yes`` 。
+
+    若能确保源目标两端的元数据均准确无误，通常建议启用此选项。
+
+    （ ``--vo=gpu-next`` 独占）
+
+``--treat-srgb-as-power22=<no|input|output|both|auto>``
+    启用后，sRGB将采用纯幂2.2曲线进行(去)线性化处理，而非标准的sRGB分段传输函数。
+
+    ``auto`` 模式的行为与 ``both`` 相同，但可能根据平台特性进行调整以确保显示效果一致。不同平台下系统合成器使用的sRGB EOTF可能存在差异。
+
+    默认值为 ``auto`` （ ``--vo=gpu-next`` 独占）
+
 ``--tone-mapping=<value>``
     指定用于将图像色调映射到目标显示上的算法。这与HDR->SDR转换和降低色域有关（例如，在标准色域显示器上播放BT.2020内容）。有效值是：
 
@@ -5022,6 +5042,9 @@ GPU渲染选项
     ``mac``
         macOS 后端
 
+    ``x11``
+        X11 后端。此后端仅在X服务器支持 ``Xfixes`` 扩展时可用。
+
     ``wayland``
         Wayland 后端。此后端仅在合成器支持 ``ext-data-control-v1`` 协议时可用。
 
@@ -5031,11 +5054,14 @@ GPU渲染选项
     这是一个对象设定列表选项。详见 `列表选项`_
 
 ``--clipboard-monitor=<yes|no>``
-    （Windows Wayland macOS 独占）
-
     启用剪贴板监视，以便观察 ``clipboard`` 属性的内容变化（默认： no）。这只会影响使用轮询监控剪贴板更新的剪贴板实现。其他平台目前会忽略此选项，并始终/从不通知变更。
 
     在Wayland上，此选项仅对 ``wayland`` 后端有效，对 ``vo`` 后端无效。详见属性 ``current-clipboard-backend``
+
+``--clipboard-xwayland=<yes|no>``
+    在疑似Wayland环境中启用X11剪贴板后端（默认： no）。
+
+    根据Wayland合成器的不同，使用X11后端可能导致mpv无法从原生Wayland客户端获取剪贴板数据。当Wayland后端不可用时禁用X11后端，可使mpv回退至VO后端，从而确保剪贴板功能正常运作。
 
 ``--register``
     （Windows独占）（也可作为 mpv-register 辅助工具使用）

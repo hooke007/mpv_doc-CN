@@ -1236,7 +1236,7 @@ OSD类命令
 Hooks
 ~~~~~
 
-Hooks是播放器核心和脚本或类似的东西之间的同步事件。这适用于客户端API（包括Lua脚本接口）。通常情况下，事件应该是异步的，而hook API提供了一种笨拙而不明显的方式来处理需要更严格协调的事件。没有做出任何API稳定性的保证。不完全遵循协议会使播放器随机冻结。基本上，没有人应该使用这个API。
+Hooks 是播放器核心与脚本等组件之间的同步事件。这适用于client API（包括Lua脚本接口）。通常事件应为异步处理，而hook API提供了处理需要严格协调事件的途径。若未严格遵循协议，可能导致播放器程序冻结。请谨慎使用，若无需同步事件处理则应避免使用。
 
 C API在头文件里有描述。Lua API在Lua部分有描述。
 
@@ -2841,10 +2841,10 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     它有许多子属性：
 
     ``clipboard/text`` (RW)
-        剪贴板中的文本内容（Windows, Wayland 和 macOS 独占）。写入此属性可设置剪贴板中的文本内容（Windows, Wayland 和 macOS 独占）
+        剪贴板中的文本内容。写入此属性可设置剪贴板中的文本内容
 
-    ``clipboard/text-primary``
-        primary selection 中的文本内容（Wayland 和 macOS 独占）。
+    ``clipboard/text-primary`` (RW)
+        primary selection 中的文本内容（X11 和 Wayland 独占）。
 
     .. note::
 
