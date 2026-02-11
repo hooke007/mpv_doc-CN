@@ -24,7 +24,7 @@ OSD命令行
         ``% script-message-to commands type "seek  absolute-percent" 6``
             输入要跳转到的百分比位置。
 
-        ``Ctrl+o script-message-to console type "loadfile ''" 11``
+        ``Ctrl+o script-message-to commands type "loadfile ''" 11``
             输入要播放的文件或 URL，并自动补全文件系统中的路径。
 
 设置

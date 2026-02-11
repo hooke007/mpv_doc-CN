@@ -6,6 +6,8 @@ LUA SCRIPTING
 mp.options functions
 --------------------
 
+（x省x略x内x容x）
+
 设置文件将保存在 mpv 用户文件夹下的 ``script-opts/identifier.conf`` 中。注释行可以 # 开头，杂散的空格不会被删除。布尔值将用 yes/no 表示。
 
 设置文件示例::

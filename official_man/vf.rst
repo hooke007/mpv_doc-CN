@@ -482,6 +482,45 @@
     ``nvidia-true-hdr``
         启用 NVIDIA RTX Video HDR 后处理
 
+``amf_frc``
+    AMD帧率转换滤镜。需配备支持AMF FRC的AMD硬件及驱动程序。
+
+    AMF FRC技术可将低帧率视频输入转换为高端视频帧率效果。该滤镜通过生成中间帧实现输入帧率翻倍。
+
+    当前仅支持D3D11输入。请使用 `--hwdec=d3d11va` 或 `--vf-pre=format=d3d11` 上传数据，并建议配合 `--d3d11va-zero-copy` 以提升性能。
+
+    ``profile=<auto|low|high|super>``
+        选择帧率转换的质量配置。
+
+        ``auto`` （默认）
+            根据输入分辨率选择配置文件。分辨率不高于1440p时采用 ``high`` ，超过1440p时采用 ``super`` 。
+        ``low``
+            减少分层运动搜索层级。仅推荐用于极低分辨率场景。
+        ``high``
+            推荐用于不高于1440p的分辨率。
+        ``super``
+            增加分层运动搜索层级。推荐用于超过1440p的分辨率。
+
+    ``mv-search=<native|performance>``
+        选择运动向量搜索模式。
+
+        ``native`` （默认）
+            在源图像全分辨率上进行运动搜索。
+        ``performance``
+            在缩放后的源图像上进行运动搜索。推荐用于APU或低端GPU以提升性能。
+
+    ``fallback``
+        当置信度过低无法进行插值时，回退至简单帧混合。若未设置，滤镜将重复播放上一帧。
+        （默认： no）
+
+    ``indicator``
+        指定是否在视频左上角显示帧率控制 FRC 指示方块。
+        （默认： no）
+
+    ``future-frame``
+        启用时，除当前帧对外，序列中下一帧的信息也将用于FRC插值计算。此操作将引入额外一帧的延迟。
+        （默认： yes）
+
 ``fingerprint=...``
     计算视频帧fingerprints并作为元数据提供。事实上，它目前几乎不配被称为 ``fingerprint`` ，因为它不计算“正确的”fingerprints，只计算微小的降级图像（但可用于计算图像哈希值或进行相似性匹配）。
 

@@ -3,6 +3,8 @@
 
 通过 ``mp.input.select`` API，控制台可显示供浏览和选择的项目列表。 ``select.lua`` 是该 API 的内置client ，提供脚本命令绑定，用于收集和格式化要在控制台中选择的数据，并对所选项目进行操作。可以使用 ``--load-select=no`` 选项禁用它。
 
+该脚本还被用于填充上下文菜单。
+
 按键绑定
 --------
 
@@ -23,6 +25,12 @@ PGUP, Ctrl+b
 PGDN, Ctrl+f
     向下滚动一页。
 
+Shift+LEFT
+    向左滚动。
+
+Shift+RIGHT
+    向右滚动。
+
 Ctrl+y
     将聚焦的项目复制到剪贴板。
 
@@ -34,6 +42,12 @@ WHEEL_UP
 
 WHEEL_DOWN
     向下滚动。
+
+WHEEL_LEFT 或 Shift+WHEEL_DOWN
+    向左滚动。
+
+WHEEL_RIGHT 或 Shift+WHEEL_UP
+    向右滚动。
 
 输入可打印字符会对显示的项目进行模糊搜索。
 
@@ -115,8 +129,14 @@ WHEEL_DOWN
 ``open-docs``
     在浏览器中打开mpv的在线文档。
 
+``open-chat``
+    在浏览器中打开mpv的chat
+
 ``menu``
     显示一个杂项条目的菜单。
+
+``context-menu``
+    显示上下文菜单。
 
 设置
 ----
@@ -135,3 +155,18 @@ WHEEL_DOWN
     默认： yes
 
     是否只显示路径相同的历史条目中的最后一个。
+
+``menu_conf_path``
+    默认： ~~/menu.conf （参见 `文件`_ )
+
+    用于读取上下文菜单内容定义的路径（参见 `上下文菜单脚本`_ ）
+
+``max_playlist_items``
+    默认： 25
+
+    上下文菜单中播放列表条目的最大数量。
+
+``populate_menu_data``
+    默认： yes （但libmpv除外）
+
+    是否在mpv窗口创建后，根据 ``menu.conf`` 中引用的属性来更新 ``menu-data`` 并生成相应菜单项。

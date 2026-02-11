@@ -41,7 +41,7 @@
 
         轨道选择的选项（ ``--aid`` 但也包括 ``--sid`` 和其它选项）有时可能会出现奇怪的行为。并且，这种行为往往随着每个mpv版本的发布而改变。
 
-        轨道选择的属性将返回播放之外的选项值（符合预期），但在播放过程中，受影响的轨道选择会被返回。例如，在 ``--aid=auto`` 的情况下， ``aid`` 属性会在播放初始化后突然返回 ``2`` （假设文件至少有2个音轨，而且第二个是默认轨）。
+        轨道选择的属性将返回播放之外的选项值（符合预期），但在播放过程中，实际生效的轨道选择会被返回。例如，在 ``--aid=auto`` 的情况下， ``aid`` 属性会在播放初始化后突然返回 ``2`` （假设文件至少有2个音轨，而且第二个是默认轨）。
 
         在mpv0.32.0（和一些之前的版本）中，如果传递的轨道值不存在对应的实际轨道（例如 ``--aid=2`` 但只有1个音轨）， ``aid`` 属性会返回 ``no`` 。然而，如果在播放过程中增加了另一个音轨，再尝试将 ``aid`` 属性设置为 ``2`` ，什么也不会发生，因为 ``aid`` 选项的值仍然是 ``2`` ，而写入相同的值是没有效果的。
 
@@ -441,7 +441,7 @@
     注意， ``--no-config`` 选项优先于该选项。
 
 ``--dump-stats=<filename>``
-    将某些统计数据写入给定的文件。该文件在打开时被截断。该文件将包含原始样本，每个样本都有一个时间戳。为了使这个文件变成可读的，可以使用脚本 ``TOOLS/stats-conv.py`` （目前它以图表形式显示）。
+    将某些统计数据写入给定的文件。该文件在打开时被截断。该文件将包含原始样本，每个样本都有一个时间戳。为可视化统计数据，可以使用脚本 ``TOOLS/stats-conv.py`` （目前它以图表形式显示）。
 
     这个选项只在调试时有用。
 
@@ -457,7 +457,7 @@
     如果设置为 "no"，则不自动加载设置子目录 ``scripts`` （通常是 ``~/.config/mpv/scripts/`` ）中的脚本。（默认： ``yes`` ）
 
 ``--script=<filename>``, ``--scripts=file1.lua:file2.lua:...``
-    加载一个Lua脚本。第二个选项允许你加载多个脚本，用路径分隔符（Unix下为 ``:`` ，Windows下为 ``;`` ）将它们分开。
+    加载一个脚本（Lua或JS）或C插件。第二个选项允许你加载多个脚本，用路径分隔符（Unix下为 ``:`` ，Windows下为 ``;`` ）将它们分开。
 
     ``--scripts`` 是一个路径列表选项。详见 `列表选项`_
 
@@ -595,9 +595,6 @@
         - ``--ytdl-raw-options=force-ipv6=``
         - ``--ytdl-raw-options=proxy=[http://127.0.0.1:3128]``
         - ``--ytdl-raw-options-append=proxy=http://127.0.0.1:3128``
-
-``--ytdl-extract-chapters=<yes|no>``
-    启用从youtube-dl视频描述中提取章节 （默认： yes ）
 
 ``--js-memory-report=<yes|no>``
     启用在数据统计叠加层中为JavaScript脚本报告内存使用情况。默认禁用，因为它会增加开销并增加内存使用量。此选项仅在启动mpv之前启用时才会生效。
@@ -797,15 +794,15 @@
 
     受到积极支持的hwdec：
 
-    :d3d11va:           需要 ``--vo=gpu`` 与 ``--gpu-context=d3d11`` 或 ``--gpu-context=angle`` （Windows 8以上独占）
+    :d3d11va:           需要 ``--vo=gpu`` 或 ``--vo=gpu-next`` 与 ``--gpu-context=d3d11`` 或 ``--gpu-context=angle`` （Windows 8以上独占）
     :d3d11va-copy:      将视频复制回到系统RAM（Windows 8以上独占）
-    :videotoolbox:      需要 ``--vo=gpu`` （macOS 10.8及以上）或 ``--vo=libmpv`` （iOS 9.0及以上）
-    :videotoolbox-copy: 将视频复制回到系统RAM（macOS 10.8或iOS 9.0及以上版本）
-    :vaapi:             需要 ``--vo=gpu`` 或 ``--vo=vaapi`` 或 ``--vo=dmabuf-wayland`` （Linux独占）
+    :videotoolbox:      需要 ``--vo=gpu`` 或 ``--vo=gpu-next``（macOS独占）或 ``--vo=libmpv`` （iOS 9.0及以上）
+    :videotoolbox-copy: 将视频复制回到系统RAM（macOS 10.15或iOS 9.0及以上版本）
+    :vaapi:             需要 ``--vo=gpu`` 或 ``--vo=gpu-next`` 或 ``--vo=vaapi`` 或 ``--vo=dmabuf-wayland`` （Linux独占）
     :vaapi-copy:        将视频复制回到系统RAM（Linux或Windows，且仅某些GPU可用）
-    :nvdec:             需要 ``--vo=gpu`` （任何可用CUDA的平台）
+    :nvdec:             需要 ``--vo=gpu`` 或 ``--vo=gpu-next`` （任何可用CUDA的平台）
     :nvdec-copy:        将视频复制回到系统RAM（任何可用CUDA的平台）
-    :drm:               需要 ``--vo=gpu`` （Linux独占）
+    :drm:               需要 ``--vo=gpu`` 或 ``--vo=gpu-next`` （Linux独占）
     :drm-copy:          将视频复制回到系统RAM（Linux独占）
     :vulkan:            需要 ``--vo=gpu-next`` （任何带有Vulkan视频解码的平台）
     :vulkan-copy:       将视频复制回到系统RAM（任何带有Vulkan视频解码的平台）
@@ -1369,6 +1366,11 @@
 
 ``--audio-client-name=<name>``
     播放器报告给音频API的应用程序名称。如果你想强制使用不同的音频profile（例如使用PulseAudio），或者在使用libmpv时设置你自己的应用程序名称，就很有用。
+
+``--audio-set-media-role=<yes|no>``
+    若启用此功能，mpv 将为支持的音频服务器设置相应的媒体角色，以表明mpv正在播放视频文件还是纯音频文件。该功能默认处于禁用状态，因为按媒体角色设置音量常会导致意外且令人困惑的行为。
+
+    默认： no
 
 ``--audio-buffer=<seconds>``
     设置音频输出的最小缓冲区。如果音频设备可行的话，它实际上可能会创建一个更大的缓冲区。如果设备创建了一个较小的缓冲区，额外的音频将被缓存在一个额外的软件缓冲区中。
@@ -2029,6 +2031,8 @@
     与 ``--keep-open`` 不同，播放器不是暂停的，只是继续播放直到时间结束。（在“播放”期间，它不应该使用任何资源。）
 
     这影响到图像文件，它被定义为只有1个视频帧且无音频。播放器可能会将某些非图像识别为图像，例如，如果 ``--length`` 被用来减少长度到1帧，或者如果你跳转到最后一帧。
+
+    有效时长现已受到 `--speed` 参数影响，而v0.41.0之前的旧版mpv并非如此。
 
     这个选项不影响用于 ``mf://`` 或 ``--merge-files`` 的帧速率。为此，请使用 ``--mf-fps`` 代替。
 
@@ -3593,9 +3597,9 @@ GPU渲染选项
     注意，根据filter的实现细节和视频缩放比例，实际使用的半径可能是不同的（很可能被增加一点）。
 
 ``--scale-antiring=<value>``, ``--cscale-antiring=<value>``, ``--dscale-antiring=<value>``, ``--tscale-antiring=<value>``
-    设置抗振铃强度。这尝试消除振铃，但在此过程中可能会引入其它伪影。必须是0.0和1.0之间的浮点数。默认值0.0完全禁用抗振铃。
+    设置抗振铃强度。这尝试消除振铃，但在此过程中可能会引入其它伪影。必须是0.0和1.0之间的浮点数。默认值是0.0。 ``high-quality`` profile将此值设为0.6，这是一个相当保守的数值，应能微妙地提升图像质量。
 
-    注意，这不影响特殊的 ``bilinear`` 和 ``bicubic_fast`` filter，也不影响任何polar (EWA) 缩放器。
+    注意，这不影响特殊的 ``bilinear`` 和 ``bicubic_fast`` filter，也不影响任何 vo_gpu 下的polar (EWA) 缩放器。
 
     在 ``--vo=gpu-next`` 中，这也会影响polar (EWA) 缩放器。某些filter别名也会隐式的启用抗振铃，与此设置无关（参见 ``--scale`` ）。
 
@@ -3671,7 +3675,7 @@ GPU渲染选项
     no
         禁用mpv所做的任何抖动
     auto
-        自动选择。 ``--vo=gpu`` ：检测位深或回退8bpc。 ``--vo=gpu-next``` ：检测位深或回退8bpc（对于SDR）
+        自动选择。 ``--vo=gpu`` ：检测位深或回退8bpc。 ``--vo=gpu-next``` ：检测位深
     8
         抖动到8比特输出
 
@@ -3729,10 +3733,6 @@ GPU渲染选项
     .. note::
 
         目前还没有可靠的 API 来查询 EGL 中的桌面位深度。你可以根据显示器的位深度手动设置该选项。此选项还会影响 ``--dither-depth`` 的自动检测。
-
-    .. note::
-
-        与 ``--d3d11-output-format`` 不同，此选项也会在 ``--vo=gpu-next`` 下生效。
 
 ``--vulkan-device=<device name>``
     用于渲染和呈现的Vulkan设备的名称或UUID。使用 ``--vulkan-device=help`` 来查看可用设备的列表和它们的名称与UUID。如果未指定，将使用第一个枚举的硬件Vulkan设备。
@@ -3806,6 +3806,10 @@ GPU渲染选项
     .. note::
 
         对于 `--vo=gpu-next`` ，这是一个尽力而为的提示，libplacebo 有最终决定权使用哪种格式。
+
+    .. note::
+
+        对于 ``--vo=gpu-next`` ， ``rgba16f`` 可启用scRGB输出。但该功能目前尚未完全支持，颜色可能比预期更暗，且不支持HDR输出。
 
 ``--d3d11-output-csp=<auto|srgb|linear|pq|bt.2020>``
     选择一个用于D3D11渲染的特定的D3D11输出色彩空间。 ``auto`` 是默认值，它将选择交换链所在的桌面的色彩空间。
@@ -4166,15 +4170,15 @@ GPU渲染选项
 
     ``<appearance>`` 可以是下列之一：
 
-    :auto:                     检测系统设置并适当地设置标题栏的外观。在macOS 10.14上，它也能检测到运行时的变化
+    :auto:                     检测系统设置并适当地设置标题栏的外观。
     :aqua:                     标准的macOS浅色外观
-    :darkAqua:                 标准的macOS暗色外观(macOS 10.14+)
-    :vibrantLight:             充满活力的浅色外观
-    :vibrantDark:              充满活力的深色外观
-    :aquaHighContrast:         浅色无障碍外观(macOS 10.14+)
-    :darkAquaHighContrast:     深色无障碍外观(macOS 10.14+)
-    :vibrantLightHighContrast: 活力的浅色易读性外观(macOS 10.14+)
-    :vibrantDarkHighContrast:  活力的深色易读性外观(macOS 10.14+)
+    :darkAqua:                 标准的macOS暗色外观
+    :vibrantLight:             鲜明的浅色外观
+    :vibrantDark:              鲜明的深色外观
+    :aquaHighContrast:         浅色无障碍外观
+    :darkAquaHighContrast:     深色无障碍外观
+    :vibrantLightHighContrast: 鲜明的浅色易读性外观
+    :vibrantDarkHighContrast:  鲜明的深色易读性外观
 
 ``--macos-title-bar-material=<material>``
     设置标题栏的材质（默认： titlebar）。所有过时的材质不应该在macOS 10.14+上使用，因为它们的功能没有保证。不是所有的材质和 ``--macos-title-bar-appearance`` 的组合都有意义，也不是唯一的。你当前的macOS版本不支持的材质会回退到默认值。（macOS且cocoa-cb独占）
@@ -4183,22 +4187,22 @@ GPU渲染选项
 
     :titlebar:              标准的macOS标题栏材质
     :selection:             标准的macOS选择材质
-    :menu:                  标准的macOS菜单材质(macOS 10.11以上)
-    :popover:               标准的macOS弹出窗口材质(macOS 10.11+)
-    :sidebar:               标准的macOS侧边栏材质(macOS 10.11+)
-    :headerView:            标准的macOS标题视图材质(macOS 10.14+)
-    :sheet:                 标准的macOS页面材质(macOS 10.14+)
-    :windowBackground:      标准的macOS窗口背景材质(macOS 10.14+)
-    :hudWindow:             标准的macOS hudWindow材质(macOS 10.14+)
-    :fullScreen:            标准的macOS全屏材质(macOS 10.14+)
-    :toolTip:               标准的macOS工具提示材质(macOS 10.14+)
-    :contentBackground:     标准的macOS内容背景材质(macOS 10.14+)
-    :underWindowBackground: 标准的macOS窗口下的背景材质(macOS 10.14+)
+    :menu:                  标准的macOS菜单材质
+    :popover:               标准的macOS弹出窗口材质
+    :sidebar:               标准的macOS侧边栏材质
+    :headerView:            标准的macOS标题视图材质
+    :sheet:                 标准的macOS页面材质
+    :windowBackground:      标准的macOS窗口背景材质
+    :hudWindow:             标准的macOS hudWindow材质
+    :fullScreen:            标准的macOS全屏材质
+    :toolTip:               标准的macOS工具提示材质
+    :contentBackground:     标准的macOS内容背景材质
+    :underWindowBackground: 标准的macOS窗口下的背景材质
     :underPageBackground:   标准的macOS页面下的背景材质(在macOS 10.14+中已过时)
     :dark:                  标准的macOS深色材质(在macOS 10.14+中已过时)
-    :light:                 标准的macOS浅色材质(macOS 10.14+)
-    :mediumLight:           标准的macOS中浅材质(macOS 10.11+, 在macOS 10.14+中已过时)
-    :ultraDark:             标准的macOS超深材质(macOS 10.11+, 在macOS 10.14+中已过时)
+    :light:                 标准的macOS浅色材质
+    :mediumLight:           标准的macOS中浅材质(在macOS 10.14+中已过时)
+    :ultraDark:             标准的macOS超深材质(在macOS 10.14+中已过时)
 
 ``--macos-title-bar-color=<color>``
     设置标题栏的颜色（默认：完全透明）。受 ``--macos-title-bar-appearance`` 和 ``--macos-title-bar-material`` 的影响。颜色语法参见 ``--sub-color``
@@ -4837,7 +4841,7 @@ GPU渲染选项
     关于该选项如何影响插值，请参见 ``--interpolation-threshold``
 
 ``--video-sync-max-video-change=<value>``
-    应用于 ``--video-sync=display-...`` 的视频的最大速度差，以百分比为单位（默认： 1）。如果显示器和视频刷新方式在给定范围内不匹配，显示同步模式将被禁用。它还会尝试倍数：在60赫兹的屏幕上播放30帧的视频，每隔一帧就会重复一次。在60赫兹的屏幕上播放24帧的视频将以2-3-2-3-...的模式播放视频。
+    应用于 ``--video-sync=display-...`` 的视频的最大速度差，以百分比为单位（默认： 1）。如果显示器和视频刷新率在给定范围内不匹配，显示同步模式将被禁用。它还会尝试倍数：在60赫兹的屏幕上播放30帧的视频，每隔一帧就会重复一次。在60赫兹的屏幕上播放24帧的视频将以2-3-2-3-...的模式播放视频。
 
     默认设置不够宽松，无法将23.976帧的视频加速到25帧。我们认为音调变化过于极端，默认情况下不允许这种行为。将这个选项设置为 ``5`` 的值来启用它。
 
