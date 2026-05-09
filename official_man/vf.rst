@@ -26,7 +26,7 @@
 
     和 ``filter-parameter-list`` ：
 
-        ``<filter-parameter> | <filter-parameter> "," <filter-parameter-list>``
+        ``<filter-parameter> | <filter-parameter> ":" <filter-parameter-list>``
 
     和 ``filter-parameter`` ：
 
@@ -477,8 +477,12 @@
             NVIDIA RTX Super Resolution
     ``interlaced-only=<yes|no>``
         如果 ``yes`` ，只对标记为隔行的帧进行去隔行（默认： no）
-    ``mode=<blend|bob|adaptive|mocomp|ivctc|none>``
-        尝试选择一个具有给定处理能力的视频处理器。如果一个视频处理器支持多种能力，不清楚实际选择的是哪种算法。 ``none`` 始终回退。在大多数（但不是所有）硬件上，这个选项可能什么都不做，因为视频处理器通常支持所有模式或不支持任何模式。
+    ``mode=<blend|bob|adaptive|mocomp|ivtc|none>``
+        尝试选择具有指定处理能力的视频处理器。如果视频处理器支持多种功能，则无法保证实际会选择哪种算法，这取决于驱动程序。不过，通过不传递参考帧并调整输出帧率，可以强制启用 ``blend`` 和 ``bob`` 模式。其他模式用于选择合适的视频处理器，但最终采用的算法取决于驱动程序和内容。 ``ivtc`` 模式以半速率输出。
+
+    .. note::
+
+        ``ivtc`` 模式仅执行场匹配，不会剔除重复帧。对于 3:2 降频的帧率，可使用 ``decimate`` 滤镜手动移除重复帧： ``--vf=d3d11vpp=“deint:mode=ivtc,format=nv12,decimate=5”`` 。若要将帧下载回 CPU 进行降采样，必须使用 ``format=nv12`` ，且该格式应与 d3d11 帧的底层格式一致。
     ``nvidia-true-hdr``
         启用 NVIDIA RTX Video HDR 后处理
 

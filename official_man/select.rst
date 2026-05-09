@@ -91,8 +91,6 @@ WHEEL_RIGHT 或 Shift+WHEEL_UP
 ``select-subtitle-line``
     选择要查找的字幕行。此功能不适用于图像字幕。
 
-    当前，这需要在 ``PATH`` 或在 Windows 下与 mpv 位于同一文件夹中的 ``ffmpeg`` 。
-
 ``select-audio-device``
     选择一个音频设备。
 

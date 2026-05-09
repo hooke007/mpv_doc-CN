@@ -160,7 +160,7 @@ del             循环 OSC可见性 始终隐藏/自动显示/始终显示
 ``layout``
     默认： ``bottombar``
 
-    OSC的布局。目前可用的有：box, slimbox, bottombar, topbar, slimbottombar, slimtopbar 。0.21.0之前的默认值是 box
+    OSC的布局。目前可用的有：box, slimbox, bottombar, topbar, slimbottombar, slimtopbar, floating
 
 ``seekbarstyle``
     默认： bar
@@ -198,14 +198,14 @@ del             循环 OSC可见性 始终隐藏/自动显示/始终显示
     默认情况下，如果鼠标悬停在 OSC 元素上，使用鼠标滚轮上下滚动会触发某些操作（例如seek）。设置为 ``no`` 可禁用任何特殊的鼠标滚轮行为。
 
 ``deadzonesize``
-    默认： 0.5
+    默认： 0.75
 
-    死区的大小。死区是一个区域，使鼠标像离开窗口一样。在那里移动不会使OSC显示出来，如果鼠标进入该区域，它将立即隐藏。死区从与OSC相对的窗口边界开始，其大小控制它在窗口中的跨度。值在0.0和1.0之间，其中0意味着OSC将总是随着鼠标在窗口中的移动而弹出，1意味着OSC只在鼠标悬停时显示。0.21.0之前的默认值是0。
+    死区的大小。死区是一个区域，使鼠标像离开窗口一样。在那里移动不会使OSC显示出来，如果鼠标进入该区域，它将立即隐藏。死区从与OSC相对的窗口边界开始，其大小控制它在窗口中的跨度。值在0.0和1.0之间，其中0意味着OSC将总是随着鼠标在窗口中的移动而弹出，1意味着OSC只在鼠标悬停时显示。0.42.0之前的默认值是0.5。
 
 ``minmousemove``
     默认： 0
 
-    鼠标在刻度之间移动的最小像素量，使OSC显示出来。0.21.0之前的默认值是3。
+    鼠标在刻度之间移动的最小像素量，使OSC显示出来。
 
 ``showwindowed``
     默认： yes
@@ -221,6 +221,11 @@ del             循环 OSC可见性 始终隐藏/自动显示/始终显示
     默认： yes
 
     空闲状态下显示mpv的logo和文字
+
+``audioonlyscreen``
+    默认： no
+
+    当没有视频轨道或未选择任何视频轨道时，显示 mpv logo。
 
 ``scalewindowed``
     默认： 1.0
@@ -312,6 +317,16 @@ del             循环 OSC可见性 始终隐藏/自动显示/始终显示
 
     调用 osc-visibility 循环script message时要循环切换显示的visibility模式列表。模式之间用 ``_`` 分隔。
 
+``boxwidth``
+    默认： 550
+
+    ``box`` 布局的宽度
+
+``slimboxwidth``
+    默认： 660
+
+    ``slimbox`` 布局的宽度
+
 ``boxmaxchars``
     默认： 80
 
@@ -320,22 +335,42 @@ del             循环 OSC可见性 始终隐藏/自动显示/始终显示
 ``boxvideo``
     默认： no
 
-    是否在视频上覆盖osc（ ``no`` ），或在osc未覆盖的区域内框住视频（ ``yes`` ）。如果设置了这个选项，osc可能会覆盖 ``--video-margin-ratio-*`` 选项，即使用户已经设置了它们（如果所有选项都被设置为默认值，则不会覆盖它们）。此外， ``visibility`` 必须被设置为 ``always`` 。否则，这个选项没有任何效果。
+    是否在视频上覆盖osc（ ``no`` ），或在osc未覆盖的区域内框住视频（ ``yes`` ）。如果设置了这个选项，osc可能会覆盖 ``--video-margin-ratio-*`` 选项，即使用户已经设置了它们（如果所有选项都被设置为默认值，则不会覆盖它们）。默认情况下， ``visibility`` 必须设置为 ``always`` 。若要让边距随 OSC 可见性动态更新，请使用 ``dynamic_margins`` 。
 
     目前，只支持 ``bottombar``, ``slimbottombar``, ``topbar``, ``slimtopbar`` 的布局。如果设置了这个选项，其他的布局就不会改变。另外，如果存在窗口控件（见下文），无论使用哪种OSC布局，它们都会受到影响。
 
-    边框是静态的，即使OSC被设置为只在鼠标交互时出现，边框也会出现。如果OSC是不可见的，边框就会简单地用背景色（默认为黑色）填充。
-
-    目前这仍然会使OSC与字幕重叠（如果 ``--sub-use-margins`` 选项被设置为 ``yes`` ，默认）。这可能会在以后修复。
+    即使将 ``--sub-use-margins`` 设置为 ``yes`` （默认值），字幕仍可能与 OSC 重叠，因为字幕允许延伸至边距区域。将 ``--sub-use-margins=no`` 设置为有效可将字幕限制在视频区域内。
 
     这在个别视频输出驱动中不能正常工作，如 ``--vo=xv`` ，它将OSD渲染进未缩放的视频中。
 
+``dynamic_margins``
+    默认： no
+
+    当设置为 ``yes`` 时，边距会根据 OSC 的实际可见性进行调整：OSC 出现时应用边距，隐藏时移除边距。如果不使用此选项，边距仅在 ``visibility`` 设置为 ``always`` 时应用。
+
+``sub_margins``
+    默认： no
+
+    是否调整字幕边距，以避免字幕与 OSC 重叠。需配合 ``dynamic_margins`` 或 ``visibility=always`` 才能生效。使用 ``--sub-margin-y-offset`` 参数进行调整。
+
+    当启用 ``boxvideo`` 且设置 ``--sub-use-margins=no`` 时，字幕已限定在视频区域内，此选项不会产生额外效果。
+
+``osd_margins``
+    默认： yes
+
+    是否调整 OSD 边距，以避免 OSD 文本与 OSC 重叠。需配合 ``dynamic_margins`` 或 ``visibility=always`` 才能生效。使用 ``--osd-margin-y-offset`` 应用调整。
+
 ``windowcontrols``
-    默认： auto （如果没有窗口边框就显示窗口控件）
+    默认： auto （如果没有窗口边框或标题栏就显示窗口控件）
 
     是否在视频上显示窗口管理控件，如果明确，则放在窗口的一边。当窗口没有装饰时，这可能是可取的，因为它们被明确地禁用（ ``border=no`` ）或者因为当前平台不支持它们（例如：gnome-shell与wayland）。
 
     窗口控件是固定的，提供 ``minimize``, ``maximize`` 和 ``quit`` 。不是所有的平台都实现了 ``minimize`` 和 ``maximize`` ，但 ``quit`` 总是有效的。
+
+``windowcontrols_independent``
+    默认： yes
+
+    是独立于OSC显示窗口控件，还是与OSC一起显示。
 
 ``windowcontrols_alignment``
     默认： right
@@ -348,6 +383,26 @@ del             循环 OSC可见性 始终隐藏/自动显示/始终显示
     默认： ${media-title}
 
     支持属性扩展的字符串，将显示为窗口控件的标题。ASS 标签会被转义，换行符和尾部斜杠会被剥离。
+
+``floatingtitle``
+    默认： yes
+
+    是否在 ``floating`` 布局中显示标题行。启用后，窗口控件将以紧凑按钮的形式呈现，且不显示全宽背景栏。
+
+``floatingwidth``
+    默认： 700
+
+    ``floating`` 布局的宽度。
+
+``floatingalpha``
+    默认： 105
+
+    ``floating`` 布局背景的透明度，范围为 0（不透明）到 255（完全透明）。
+
+``tracknumberswidth``
+    默认： 35
+
+     音频/字幕轨道选择器图标旁边的轨道数量标签的宽度。设置为 ``0`` 可隐藏轨道数量，仅显示图标。
 
 ``greenandgrumpy``
     默认： no
@@ -369,55 +424,67 @@ del             循环 OSC可见性 始终隐藏/自动显示/始终显示
 
     在显示剩余播放时间时，使用Unicode减号而不是ASCII连字符。
 
+``icon_style``
+    默认： layout
+
+    选择用于 OSC 按钮的图标集。这两个图标集均包含在 mpv-osd-symbols 字体中。
+
+    ``layout``
+        根据当前布局选择图标集。
+    ``classic``
+        原始的 mpv 图标集。
+    ``fluent``
+        基于微软 Fluent UI 系统图标的图标集。
+
 ``background_color``
     默认： #000000
 
-    Sets the background color of the OSC.
+    设置 OSC 的背景颜色。
 
 ``timecode_color``
     默认： #FFFFFF
 
-    Sets the color of the timecode and seekbar, of the OSC.
+    设置 OSC 中的时间码和进度条的颜色。
 
 ``title_color``
     默认： #FFFFFF
 
-    Sets the color of the video title. Formatted as #RRGGBB.
+    设置视频标题的颜色。格式为 #RRGGBB 。
 
 ``time_pos_color``
     默认： #FFFFFF
 
-    Sets the color of the timecode at hover position in the seekbar.
+    设置寻址条悬停位置处时间码的颜色。
 
 ``time_pos_outline_color``
     默认： #FFFFFF
 
-    Sets the color of the timecode's outline at hover position in the seekbar. Also affects the timecode in the slimbox layout.
+    设置寻址条悬停位置处时间码轮廓的颜色。同时影响 slimbox 布局中的时间码。
 
 ``buttons_color``
     默认： #FFFFFF
 
-    Sets the colors of the big buttons.
+    设置大按钮的颜色。
 
 ``top_buttons_color``
     默认： #FFFFFF
 
-    Sets the colors of the top buttons.
+    设置顶部按钮的颜色。
 
 ``small_buttonsL_color``
     默认： #FFFFFF
 
-    Sets the colors of the small buttons on the left in the box layout.
+    设置 box 布局中左侧小按钮的颜色。
 
 ``small_buttonsR_color``
     默认： #FFFFFF
 
-    Sets the colors of the small buttons on the right in the box layout.
+    设置 box 布局中右侧小按钮的颜色。
 
 ``held_element_color``
     默认： #999999
 
-    Sets the colors of the elements that are being pressed or held down.
+    设置正在被按下或长按的元素的颜色。
 
 ``tick_delay``
     默认： 1/60
@@ -431,7 +498,12 @@ del             循环 OSC可见性 始终隐藏/自动显示/始终显示
 
     使用显示帧频计算 OSC 重绘的间隔时间。
 
-以下选项可配置点击按钮时运行的命令。 ``shift+mbtn_left`` 也会触发 ``mbtn_mid`` 的命令。
+``max_thumb_size``
+    默认： 200
+
+    预览缩略图的最大显示尺寸。仅在启用了缩略图生成器时才有效。参见 `OSC Preview API`_ 部分。
+
+以下选项可配置点击按钮时运行的命令。 ``shift+mbtn_left`` 也会触发 ``mbtn_mid`` 的命令。以 ``_down_command`` 结尾的选项表示，在按住鼠标按钮期间，该命令会持续被调用。
 
 ``menu_mbtn_left_command=script-binding select/menu; script-message-to osc osc-hide``
 
@@ -511,6 +583,36 @@ del             循环 OSC可见性 始终隐藏/自动显示/始终显示
 
 ``fullscreen_mbtn_right_command="cycle window-maximized"``
 
+``skip_backward_mbtn_left_down_command=seek -5``
+
+``skip_backward_mbtn_mid_down_command=frame-back-step``
+
+``skip_backward_mbtn_right_down_command=seek -30``
+
+``skip_forward_mbtn_left_down_command=seek 10``
+
+``skip_forward_mbtn_mid_down_command=frame-step``
+
+``skip_forward_mbtn_right_down_command=seek 60``
+
+``close_mbtn_left_command=quit``
+
+``close_mbtn_mid_command=``
+
+``close_mbtn_right_command=``
+
+``minimize_mbtn_left_command=cycle window-minimized``
+
+``minimize_mbtn_mid_command=``
+
+``minimize_mbtn_right_command=``
+
+``maximize_mbtn_left_command=cycle ${?fullscreen==yes:fullscreen}${!fullscreen==yes:window-maximized}``
+
+``maximize_mbtn_mid_command=``
+
+``maximize_mbtn_right_command=``
+
 自定义按钮
 ~~~~~~~~~~
 
@@ -556,3 +658,24 @@ OSC脚本会监听某些脚本命令。这些命令可以绑定在 ``input.conf`
 
 ``osc-idlescreen``
     控制空闲状态时mpv的logo可见性。有效的参数是 ``yes`` ``no`` ，也可用 ``cycle`` 来切换。如果传入第二个参数（任意值），则 OSD 上的输出将被静默。
+
+OSC Preview API
+~~~~~~~~~~~~~~~
+
+如果安装了兼容的缩略图生成脚本，OSC 支持在鼠标悬停于进度条上时显示预览缩略图。它通过以下 ``user-data`` 属性与缩略图生成脚本进行通信：
+
+``user-data/osc/draw-preview``
+    由 OSC 设置，用于请求当前播放文件中的缩略图。请求的缩略图时间戳（以秒为单位）存储在 ``user-data/osc/hover-sec`` 中。 ``draw-preview`` 属性是一个包含以下字段的表：
+
+    ``x``, ``y``
+        绘制缩略图的左上角坐标（正整数）。
+
+    ``w``, ``h``
+        用于绘制缩略图的区域的宽度和高度（正整数且不为零）。请注意，这仅指定绘制区域的宽度和高度，实际底层缩略图的大小可能有所不同。
+
+    ``ass``
+        可选的 ASS 字符串，用于在缩略图旁渲染内容，使用 OSD 坐标。这可用于添加装饰，例如缩略图边框。
+
+    OSC 将此属性设置为 ``nil`` 以指示缩略图生成器清除显示的缩略图。
+
+避免安装/启用多个缩略图生成器脚本，因为此 API 要求每次仅有一个处于活动状态。

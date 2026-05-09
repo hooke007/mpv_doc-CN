@@ -3,6 +3,11 @@ LUA SCRIPTING
 
 已精简全部偏开发类的内容（仅保留部分的面向一般用户类的内容），完整内容见 https://mpv.io/manual/master/#lua-scripting
 
+Details on the script initialization and lifecycle
+--------------------------------------------------
+
+（x省x略x内x容x）
+
 mp.options functions
 --------------------
 

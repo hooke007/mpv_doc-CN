@@ -121,6 +121,8 @@ WHEEL_DOWN
 
 这个脚本可以通过放置在mpv用户目录下的设置文件 ``script-opts/console.conf`` 和 ``--script-opts`` 命令行选项来定制。设置语法在 `mp.options functions`_ 中描述。
 
+请注意， ``mp.input`` 客户端可以有选择地覆盖这些选项。
+
 设置选项
 ~~~~~~~~
 

@@ -110,6 +110,11 @@ DOWN   向下滚动一行
 
     是否按终端宽度截断行。
 
+``track_info_selected_only``
+    默认： yes
+
+    仅显示所选轨道的信息，而非所有轨道的信息。
+
 ``plot_perfdata``
     默认： no
 

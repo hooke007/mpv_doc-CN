@@ -173,7 +173,7 @@ Flat命令语法
 
 这适用于部分API，例如Lua脚本中的 ``mp.command_native()`` （有字符串键的表），或者C语言libmpv客户端API中的 ``mpv_command_node()`` （带有 MPV_FORMAT_NODE_MAP ）。
 
-命令的名称是由 ``name`` 字符串字段提供的。每个命令的名称在 `输入命令列表`_ 中的每个命令描述内都有定义。 ``--input-cmdlist`` 也可以列出它们。参见 ``subprocess`` 命令为例。
+命令的名称是由 ``_name`` 字符串字段提供的。每个命令的名称在 `输入命令列表`_ 中的每个命令描述内都有定义。 ``--input-cmdlist`` 也可以列出它们。参见 ``subprocess`` 命令为例。
 
 有些命令不支持命名参数（例如 ``run`` 命令）。你需要使用以数组形式传递参数的API。
 
@@ -212,8 +212,6 @@ Flat命令语法
     多个标志可以合并，例如： ``absolute+keyframes``
 
     默认情况下， ``keyframes`` 用于 ``relative``, ``relative-percent`` 和 ``absolute-percent`` 跳转，而 ``exact`` 用于 ``absolute`` 跳转。
-
-    在mpv 0.9之前， ``keyframes`` 和 ``exact`` 标志必须作为第3个参数传递（基本上是用空格代替 ``+``）。第3个参数仍然被解析，但被认为是过时的语法。
 
     这是一个可扩展命令。详见 `输入命令前缀`_ 中的 ``nonscalable`` 部分的文档。
 
@@ -347,7 +345,7 @@ Flat命令语法
 ``playlist-prev-playlist``
     以不同的 ``playlist-path`` 转到播放列表上的上一个条目。
 
-``playlist-play-index <integer|current|none>``
+``playlist-play-index <integer|current|none> [preserve-options]``]
     开始（或重新开始）播放指定的播放列表索引。除了基于0的播放列表条目索引外，它还支持以下值：
 
     <current>
@@ -355,6 +353,8 @@ Flat命令语法
 
     <none>
         播放被停止。如果空闲模式（ ``--idle`` ）被启用，播放器将进入空闲模式，否则将退出。
+
+    设置 ``preserve-options`` ( ``MPV_FORMAT_FLAG`` ) 将不会在重新开始播放当前播放列表索引时重置文件级选项。
 
     该命令和 ``loadfile`` 类似，它只操作下一个将播放文件的状态，而不等待当前文件被退出，或下一个文件被加载。
 
@@ -480,6 +480,14 @@ Flat命令语法
     <default>
 
         将轨道标记为默认轨道。
+
+    <original>
+
+        标记该音轨为原始语言。
+
+    <commentary>
+
+        标记该音轨包含解说。
 
     <attached-picture> （仅适用于 ``video-add`` ）
 
@@ -624,11 +632,11 @@ OSD类命令
 
     ``x`` 和 ``y`` 指定OSD应该显示的位置。
 
-    ``file`` 指定从原始图像数据读取的文件。它可以是以 ``@`` 为前缀的数字UNIX文件描述符（例如： ``@4`` ），也可以是文件名。文件将被 ``mmap()`` 映射到内存中，被复制，并在命令返回前解除映射（在mpv 0.18.1中已改变）。
+    ``file`` 指定从原始图像数据读取的文件。它可以是以 ``@`` 为前缀的数字UNIX文件描述符（例如： ``@4`` ），也可以是文件名。该文件将在命令返回之前被读入内存。请注意，从 mpv 0.42.0 版本开始，如果指定了文件描述符，该描述符的文件偏移量将会被修改。
 
-    也可以通过传递内存地址作为整数前缀的 ``&`` 字符来传递原始内存地址作为位图内存使用。在这里传递错误的东西会使播放器崩溃。这种模式在与libmpv一起使用时可能很有用。 ``offset`` 参数被简单地添加到内存地址中（从mpv 0.8.0开始，之前被忽略）。
+    也可以通过传递内存地址作为整数前缀的 ``&`` 字符来传递原始内存地址作为位图内存使用。在这里传递错误的东西会使播放器崩溃。这种模式在与libmpv一起使用时可能很有用。 ``offset`` 参数被简单地添加到内存地址中。
 
-    ``offset`` 是源文件中第一个像素的字节偏移（目前的实现总是将整个文件从位置0到图像的末端进行mmap，所以应该避免大的偏移量。在mpv 0.8.0之前，偏移量实际上是直接传递给 ``mmap`` 的，但为了使用更方便，它被改变了）。
+    ``offset`` 是源文件中第一个像素的字节偏移。
 
     ``fmt`` 是一个标识图像格式的字符串。目前，只有 ``bgra`` 被定义。这种格式每个像素有4个字节，每个部分有8位。最不重要的8位是蓝色，最重要的8位是alpha（在little endian中，组成是B-G-R-A，B是第一个字节）。这使用了预乘alpha：每个颜色分量都已经与alpha分量相乘。这意味着每个分量的数值都等于或小于alpha分量（违反这个规则会导致不同视频输出驱动的不同结果：由于混合损坏的alpha值而导致的数值溢出被认为是不应该发生的事情，因此，在这种情况下，该实现并不能确保你得到可预测的行为）。
 
@@ -638,7 +646,11 @@ OSD类命令
 
     .. note::
 
-        在mpv 0.18.1之前，当更新一个覆盖层时，你必须手动进行“双重缓冲”，用一个不同的内存缓冲区来替换它。从mpv 0.18.1开始，内存被简单地复制，并且在提交返回后不引用任何由命令参数指示的内存。如果你想在mpv 0.18.1之前使用这个命令，请阅读旧的文档，看看如何正确处理这个问题。
+        在 mpv 0.42.0 之前，文件会通过 ``mmap()`` 映射到内存中，进行复制，并在命令返回前解除映射。强烈建议不要在命令返回前修改文件，因为这可能会导致 0.42.0 之前的版本崩溃。
+
+        在 mpv 0.18.1 之前，更新叠加层时必须手动进行“双缓冲”，即用另一个内存缓冲区替换当前叠加层。若要在 mpv 0.18.1 之前使用此命令，请查阅旧版文档以了解正确的处理方法。
+
+        应避免使用较大的偏移量，因为 0.42.0 之前的 mpv 版本会将整个文件从位置 0 到图像末尾进行 mmap。在 mpv 0.8.0 之前，偏移量实际上是直接传递给 ``mmap`` 的。自 mpv 0.42.0 起，不再进行 mmap，因此偏移量通过文件定位来处理。
 
 ``overlay-remove <id>``
     移除用 ``overlay-add`` 添加的相同ID的覆盖层。如果没有这个ID的覆盖层，则不做任何处理。
@@ -784,7 +796,7 @@ OSD类命令
 ~~~~~~~~~~
 
 ``run <command> [<arg1> [<arg2> [...]]]``
-    运行指定的命令。与MPlayer/mplayer2和mpv的早期版本（0.2.x和更早的版本）不同，这不会调用shell。相反，命令被直接运行，每个参数单独传递。每个参数都如 `属性扩展`_ 中那样被扩展。
+    运行指定的命令。这不会调用shell。相反，命令被直接运行，每个参数单独传递。每个参数都如 `属性扩展`_ 中那样被扩展。
 
     此命令具有可变数量的参数，也不能与命名参数一起使用。
 
@@ -834,7 +846,7 @@ OSD类命令
         向新进程的stdin输入给定的字符串。由于这是一个字符串，你不能传递任意的二进制数据。如果进程在所有数据写入前终止或关闭管道，剩余的数据将被默默地丢弃。可能在win32上不起效。
 
     ``passthrough_stdin`` (``MPV_FORMAT_FLAG``)
-        如果启用，将新进程的stdin连接到mpv的stdin（默认： no）。在mpv 0.33.0之前，这个参数不存在，但其行为类似于被设置为 yes 。
+        如果启用，将新进程的stdin连接到mpv的stdin（默认： no）。
 
     该命令返回以下结果（作为 ``MPV_FORMAT_NODE_MAP`` ）。
 
@@ -872,7 +884,7 @@ OSD类命令
         ::
 
             local r = mp.command_native({
-                name = "subprocess",
+                _name = "subprocess",
                 playback_only = false,
                 capture_stdout = true,
                 args = {"cat", "/proc/cpuinfo"},
@@ -914,7 +926,7 @@ OSD类命令
     1. 字符串 ``key-binding`` 。
     2. 绑定的名称（如上所述）。
     3. 作为字符串的按键状态（见下文）。
-    4. 按键名称（从mpv0.15.0开始）。
+    4. 按键名称。
     5. 该键将产生的文本，如果不适用，则为空字符串。
     6. 该键的缩放，例如由 ``WHEEL_*`` 键产生的缩放。如果按键不可缩放，则缩放值为 1。
     7. 用户提供的字符串 ``<arg>`` 或空字符串（如果未使用该参数）。
@@ -935,6 +947,11 @@ OSD类命令
     加载一个脚本，类似于 ``--script`` 选项。这是否等待脚本完成初始化已被改变了多次，未来的行为未被定义。
 
     成功后，返回一个 ``mpv_node`` ，其 ``client_id`` 字段设置为新创建的脚本句柄的 ``mpv_client_id()`` API调用的返回值。
+
+    ::
+
+        MPV_FORMAT_NODE_MAP
+            "client_id"    MPV_FORMAT_STRING
 
 截图类命令
 ~~~~~~~~~~
@@ -961,9 +978,14 @@ OSD类命令
 
     旧版本mpv需要把 ``single`` 和 ``each-frame`` 作为第二个参数传递（且无标志）。这种语法仍然可以被解析，但已经过时，将来可能会被移除。
 
-    如果你使用 ``;`` 把这个命令和另一个命令结合起来，你可以使用 ``async`` 标志来使编码/写入图像文件成为异步的。对于普通的独立命令，它总是异步的，这个标志没有影响。（该行为在mpv0.29.0中被更改）
+    如果你使用 ``;`` 把这个命令和另一个命令结合起来，你可以使用 ``async`` 标志来使编码/写入图像文件成为异步的。对于普通的独立命令，它总是异步的，这个标志没有影响。
 
     成功后，将返回一个带有 ``filename`` 字段，设为保存的屏幕截图位置的 ``mpv_node`` 。
+
+    ::
+
+        MPV_FORMAT_NODE_MAP
+            "filename"    MPV_FORMAT_STRING
 
 ``screenshot-to-file <filename> [<flags>]``
     截图并保存到一个指定的文件。文件的格式将由扩展名来猜测（并且 ``--screenshot-format`` 被忽略 —— 当扩展名丢失或未知时，行为是随机的）。
@@ -993,6 +1015,15 @@ OSD类命令
     ``stride`` 是从位于 ``(x0, y0)`` 的像素到位于 ``(x0, y0 + 1)`` 的像素的字节数。如果图像被裁剪或有填充，这个数字可能大于 ``w * bpp`` 。这个数字也可以是负数。可以使用 ``byte_index = y * stride + x * bpp`` 访问像素。这里， ``bpp`` 是每个像素的字节数， ``rgba64`` 格式为 8 ，其他格式为 4 。
 
     ``flags`` 参数与 ``screenshot`` 的第一个参数一样，支持 ``subtitles`` , ``video`` , ``window``
+
+    ::
+
+        MPV_FORMAT_NODE_MAP
+            "w"         MPV_FORMAT_INT64
+            "h"         MPV_FORMAT_INT64
+            "stride"    MPV_FORMAT_INT64
+            "format"    MPV_FORMAT_STRING
+            "data"      MPV_FORMAT_BYTE_ARRAY
 
 滤镜类命令
 ~~~~~~~~~~
@@ -1106,6 +1137,13 @@ OSD类命令
 ``context-menu``
     在视频窗口上显示上下文菜单。详见 `上下文菜单`_ 部分。
 
+``update-clipboard <type> [timeout]``
+    更新剪贴板内容，使 ``clipboard`` 属性反映最新值。如果设置了 ``--clipboard-monitor=no``，则必须使用此命令来更新 ``clipboard`` 属性的值。 ``<type>`` 必须为 ``text`` 或 ``text-primary`` ，以指定是更新剪贴板还是主选区。 ``[timeout]`` 指定等待剪贴板内容更新的最大超时时间（单位为毫秒）。负数表示无限等待。默认为 10 毫秒。
+
+    剪贴板内容一经更新或超时时间一到，该命令即返回。在某些平台上，该命令不执行任何操作并立即返回。
+
+    该命令可通过 API 异步中止。参见 `异步命令详情`_
+
 未记录的命令： ``ao-reload`` （实验性的/内部的）。
 
 事件列表
@@ -1154,7 +1192,7 @@ OSD类命令
             播放是通过发送退出命令结束的。
 
         ``error``
-            发生了一个错误。在这种情况下，有一个 ``error`` 字段和错误字符串。
+            发生了一个错误。
 
         ``redirect``
             发生在播放列表和类似的情况。详情见C API中的 ``MPV_END_FILE_REASON_REDIRECT``
@@ -1166,7 +1204,7 @@ OSD类命令
         正在播放或试图播放的文件的播放列表条目ID。这个值与相应的 ``start-file`` 事件中的 ``playlist_entry_id`` 字段相同。
 
     ``file_error``
-        设置为mpv错误字符串，描述播放失败的大致原因。如果不知道错误，就不设置（在Lua脚本中，这个值是直接设置在 ``error`` 字段上。从mpv 0.33.0开始，这已经被废弃了。在未来，这个 ``error`` 字段对于这个特定事件将被取消设置）。
+        设置为mpv错误字符串，描述播放失败的大致原因。如果不知道错误，就不设置。
 
     ``playlist_insert_id``
         如果加载结束，因为要播放的播放列表条目是例如一个播放列表，而当前的播放列表条目被一些其它条目所取代。这种情况至少在 MPV_END_FILE_REASON_REDIRECT 中可能发生（其它事件类型将来可能出于类似但不同的目的使用这个）。在这种情况下， playlist_insert_id 将被设置为第一个插入条目的播放列表条目ID，而 playlist_insert_num_entries 则是插入的播放列表条目的总数。注意，在这种特定情况下，最后插入的条目的ID是 playlist_insert_id+num-1 。请注意，根据情况，你可能会在看到事件之前观察到新的播放列表条目（例如，在收到事件之前读取 "playlist" 属性或获得属性变化通知）。如果在C API中为0，这个字段就不会被添加。
@@ -1279,6 +1317,11 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
     排序在 ``on_load_fail`` 等之后， ``playback-restart`` 之前。
 
+``on_loaded``
+    在文件加载完成后、音轨选定后但播放开始前调用。如果 API 用户希望在媒体内容显示之前对选定的音轨元数据进行处理，此方法会有所帮助。
+
+    调用顺序在 ``on_preloaded`` 之后， ``playback-restart`` 之前。
+
 ``on_unload``
     在关闭文件之前运行，在实际取消一切初始化之前。在这种状态下不可能恢复播放。
 
@@ -1310,7 +1353,7 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 ``expand-properties``
     所有的字符串参数都按照 `属性扩展`_ 中的描述进行扩展。这是 ``input.conf`` 中命令的默认设置。
 ``repeatable``
-    对于某些命令来说，一直按着一个按键不会重复运行命令。这个前缀在任何情况下都强制启用按键重复。对于一个命令列表：第一个命令决定了整个列表的可重复性（到0.33版本为止 —— 一个列表总是可重复的）。
+    对于某些命令来说，一直按着一个按键不会重复运行命令。这个前缀在任何情况下都强制启用按键重复。对于一个命令列表：第一个命令决定了整个列表的可重复性。
 ``nonrepeatable``
     对于某些命令，按住一个键会重复运行该命令。在任何情况下，该前缀都会强制禁用按键重复。
 ``nonscalable``
@@ -1333,8 +1376,6 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 - 异步libmpv命令API（例如 ``mpv_command_async()`` ）永远不会阻塞调用者，并且总是用消息通知他们完成。 ``sync`` 和 ``async`` 的前缀没有区别。
 - Lua还提供了运行异步命令的API，其行为类似于C语言的对应命令。
 - 在所有情况下，异步模式仍然可以以同步的方式运行命令，甚至在分离模式下。例如，当一个命令没有异步实现的时候，就会发生这种情况。在这种情况下，异步libmpv API仍然不会阻塞调用者。
-
-在mpv 0.29.0之前， ``async`` 前缀只被截图命令使用，并使它们以分离的方式运行文件保存代码。现在这是默认的， ``async`` 只在上面提到的方面改变行为。
 
 目前，以下命令在同步与异步下有不同的等待特性：sub-add, audio-add, sub-reload, audio-reload, rescan-external-files, screenshot, screenshot-to-file, dump-cache, ab-loop-dump-cache
 
@@ -1408,6 +1449,11 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
     .. note:: 这只是一个估计值。（它是由两个不可靠的数量计算出来的：帧数和可能是取整的时间戳）
 
+``env``
+    包含所有环境变量的只读表。可以通过子属性访问特定变量，例如，如果已设置， ``${env/HOME}`` 将返回 ``$HOME`` 。
+
+    .. note:: 在某些平台（例如 Windows）上，环境变量不区分大小写，因此 ``${env/PATH}`` 和 ``${env/Path}`` 将解析为相同的结果。但是，返回的表将包含变量名的原始形式，不会进行任何大小写规范化处理。
+
 ``pid``
     mpv的进程ID。
 
@@ -1441,9 +1487,6 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
 ``duration``
     当前文件的持续时间，以秒为单位。如果持续时间未知，该属性不可用。注意，文件的持续时间并不总是准确的，所以这是一个估计值。
-
-    它取代了 ``length`` 属性，该属性在mpv0.9发布后已过时。（语义是一样的）
-
 
     它有一个子属性：
 
@@ -1481,9 +1524,6 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
     ``time-pos/full``
         即 ``time-pos`` 附带毫秒数
-
-``time-start``
-    已过时。在mpv0.14之前，它用于返回文件的开始时间（可能影响例如传输流）。参见 ``--rebase-start-time`` 选项。
 
 ``time-remaining``
     文件的剩余长度，以秒为单位。注意，文件的持续时间并不总是准确已知的，所以这是一个估计值。
@@ -1533,9 +1573,9 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 ``edition`` (RW)
     当前的edition编号。将此属性设置为一个不同的值将重新开始播放。第一个edition的号码是0。
 
-    对于 Matroska 文件，这是版本。对于DVD/蓝光镜像，这是标题。
+    对于 Matroska 文件，这是版本。对于DVD/蓝光镜像，这是标题。对于 MPEG-TS、HLS 和 EDL 流，这对应于底层的节目/变体。
 
-    在mpv0.31.0之前，如果你没有手动设置选项或属性，这显示的是在运行时选择的实际版本。在mpv0.31.0及以后的版本中，这严格地返回用户设置的选项或属性值，并且增加了 ``current-edition`` 属性来返回运行时选择的版本（默认情况下这与 ``--edition=auto`` 有关）。
+    此方法严格返回用户设置的选项或属性值，而 ``current-edition`` 属性返回运行时选定的版本（这在使用 ``--edition=auto`` （默认值）时尤为重要）。
 
 ``current-edition``
     当前选择的edition。如果没有加载文件，或者文件没有版本，该属性就不可用。（Matroska文件在没有editions和单一edition之间有区别，这将反映在该属性中，尽管在实际中并不重要）
@@ -1563,6 +1603,9 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     ``edition-list/N/title``
         存储在文件中的edition标题。不总是可获取的
 
+    ``edition-list/N/metadata``
+        各版本的元数据键值对。
+
     当用client API使用 ``MPV_FORMAT_NODE`` 查询该属性时，或用Lua ``mp.get_property_native`` ，这将返回一个mpv_node，内容如下：
 
     ::
@@ -1572,6 +1615,7 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
                 "id"                MPV_FORMAT_INT64
                 "title"             MPV_FORMAT_STRING
                 "default"           MPV_FORMAT_FLAG
+                "metadata"          MPV_FORMAT_NODE_MAP
 
 ``metadata``
     元数据键/值对。
@@ -1582,7 +1626,7 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
     这有一系列子属性：
 
-    ``metadata/by-key/<key>``
+    ``metadata/by-key/<key>`` (RW)
         元数据条目 ``<key>`` 的值
 
     ``metadata/list/count``
@@ -1637,7 +1681,7 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 ``core-idle``
     播放核心是否暂停。在特殊情况下，这可能与 ``pause`` 不同，例如当播放器由于网络缓存不足而自行暂停。
 
-    如果播放正在重启或根本没有播放，这也会返回 ``yes`` /true。换句话说，只有在真正有视频播放的情况下，才会返回 ``no`` /false。（从mpv0.7.0开始的行为）
+    如果播放正在重启或根本没有播放，这也会返回 ``yes`` /true。换句话说，只有在真正有视频播放的情况下，才会返回 ``no`` /false。
 
 ``cache-speed``
     缓存和下层（如网络）之间的当前I/O读取速度。这给出了1秒内的字节数（使用client API的 ``MPV_FORMAT_INT64`` 类型）
@@ -1681,8 +1725,8 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
         MPV_FORMAT_NODE_MAP
             "seekable-ranges"   MPV_FORMAT_NODE_ARRAY
                 MPV_FORMAT_NODE_MAP
-                    "start"             MPV_FORMAT_DOUBLE
-                    "end"               MPV_FORMAT_DOUBLE
+                    "start"           MPV_FORMAT_DOUBLE
+                    "end"             MPV_FORMAT_DOUBLE
             "bof-cached"        MPV_FORMAT_FLAG
             "eof-cached"        MPV_FORMAT_FLAG
             "fw-bytes"          MPV_FORMAT_INT64
@@ -1693,10 +1737,10 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
             "raw-input-rate"    MPV_FORMAT_INT64
             "ts-per-stream"     MPV_FORMAT_NODE_ARRAY
                 MPV_FORMAT_NODE_MAP
-                      "type"            MPV_FORMAT_STRING
-                      "cache-duration"  MPV_FORMAT_DOUBLE
-                      "reader-pts"      MPV_FORMAT_DOUBLE
-                      "cache-end"       MPV_FORMAT_DOUBLE
+                    "type"            MPV_FORMAT_STRING
+                    "cache-duration"  MPV_FORMAT_DOUBLE
+                    "reader-pts"      MPV_FORMAT_DOUBLE
+                    "cache-end"       MPV_FORMAT_DOUBLE
 
     其他字段（将来可能被改变或删除）：
 
@@ -1733,7 +1777,7 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 ``mixer-active``
     音频混音器是否激活。
 
-    这个选项相对来说是无用的。在mpv0.18.1之前，它可以用来推断 ``volume`` 属性的行为。
+    这个选项相对来说是无用的。
 
 ``ao-volume`` (RW)
     系统音量。这个属性只有在mpv音频输出当前处于激活状态时才可用，并且只有在底层实现支持音量控制时才可用。该选项的作用或如何解析该值取决于 API。例如，在 ALSA 上，它通常以线性曲线改变整个系统的音频音量，而在 PulseAudio 上，它则以立方曲线控制每个应用程序的音量。
@@ -1787,7 +1831,7 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
     如果可能的话，对它的写入可以改变当前使用的硬件解码器（在内部，播放器可能会重新初始化解码器，并将执行一次跳转以正确刷新视频）。你可以关注其他的hwdec属性来观察这是否成功。
 
-    与mpv0.9.x及之前的版本不同的是，这并不返回当前激活的硬件解码器。从mpv0.18.0开始， ``hwdec-current`` 可用于此目的。
+    这并不返回当前激活的硬件解码器。而 ``hwdec-current`` 可用于此目的。
 
 ``hwdec-current``
     当前正在使用的硬件解码。如果解码是激活的，返回 ``hwdec`` 选项/属性所使用的值之一。 ``no`` 表示软件解码。如果没有加载解码器，该属性不可用。
@@ -1922,6 +1966,7 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
             "dw"                MPV_FORMAT_INT64
             "dh"                MPV_FORMAT_INT64
             "aspect"            MPV_FORMAT_DOUBLE
+            "aspect-name"       MPV_FORMAT_STRING
             "par"               MPV_FORMAT_DOUBLE
             "colormatrix"       MPV_FORMAT_STRING
             "colorlevels"       MPV_FORMAT_STRING
@@ -2092,7 +2137,9 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
         鼠标指针的最后已知坐标
 
     ``mouse-pos/hover``
-        布尔值 —— 鼠标指针是否悬停在视频窗口上。当此值为false时，坐标应被忽略，因为视频后端只有在指针悬停窗口时才会更新坐标
+        布尔值——表示鼠标指针是否悬停在视频窗口上。当此值为 false 且未按下任何鼠标按钮时，应忽略这些坐标，因为在此情况下，视频后端仅在指针悬停于窗口时才会更新坐标。
+
+        如果在指针悬停于视频窗口时按下了鼠标按钮，随后指针在未释放按钮的情况下移出窗口区域，某些视频后端会“捕获”指针并继续报告其坐标。在此情况下，该属性的值可能为 true 或 false，具体取决于视频后端。
 
 ``touch-pos``
     只读 —— 最后已知的触摸点位置，按 OSD 尺寸标准化。
@@ -2135,6 +2182,44 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
         布尔值 - 当前是否聚焦于平板。
     ``tablet-pos/pad-btns/N``
         第N个平板垫按钮的状态， ``pressed`` 或 ``released`` 。
+
+    ::
+
+        MPV_FORMAT_NODE_MAP
+            "x"                  MPV_FORMAT_INT64
+            "y"                  MPV_FORMAT_INT64
+            "tool-in-proximity"  MPV_FORMAT_FLAG
+            "tool-tip"           MPV_FORMAT_STRING
+            "tool-stylus-btn1"   MPV_FORMAT_STRING
+            "tool-stylus-btn2"   MPV_FORMAT_STRING
+            "tool-stylus-btn3"   MPV_FORMAT_STRING
+            "pad-focus"          MPV_FORMAT_FLAG
+            "pad-btns"           MPV_FORMAT_NODE_MAP
+               (key and string value for each pad-btn entry)
+
+``dropped-files``
+    mpv 接收到的最近一次拖放事件的信息。客户端可以通过观察此属性来检测拖放事件的发生时间。如果未发生拖放事件，则此属性不可用。
+
+    包含以下子属性：
+
+    ``dropped-files/time``
+        mpv 接收到的最后一次拖放事件的时间戳，单位为纳秒。该时间戳使用与 ``mpv_get_time_ns()`` 相同的时钟。
+
+    ``dropped-files/action``
+        拖放事件的操作类型。通常为 ``replace`` 。根据平台不同，在某些情况下（例如在释放文件时按住 Shift 键）也可能是 ``append`` 。
+
+    ``dropped-files/files``
+        拖放事件中被释放的文件名。
+
+    当使用客户端 API 通过 ``MPV_FORMAT_NODE`` 或 Lua 的 ``mp.get_property_native`` 查询该属性时，将返回一个包含以下内容的 mpv_node：
+
+    ::
+
+        MPV_FORMAT_NODE_MAP
+            "time"    MPV_FORMAT_INT64
+            "action"  MPV_FORMAT_STRING
+            "files"   MPV_FORMAT_NODE_ARRAY
+                MPV_FORMAT_STRING
 
 ``sub-ass-extradata``
     当前 ASS 字幕轨道的额外数据。不进行格式化。额外数据将以字符串形式按原样返回。此属性不适用于非 ASS 类的字幕轨。
@@ -2180,12 +2265,32 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 ``secondary-sub-end``
     与 ``sub-end`` 相同，但用于次字幕。
 
+``sub-lines``
+    内存中字幕行的列表。如果字幕不是基于文本的（即 DVD/BD 字幕），则不可用。
+
+    当使用客户端 API 通过 ``MPV_FORMAT_NODE`` 查询该属性，或在 Lua 中使用 ``mp.get_property_native`` 时，这将返回一个包含以下内容的 mpv_node：
+
+    ::
+
+        MPV_FORMAT_NODE_ARRAY
+            MPV_FORMAT_NODE_MAP (for each subtitle line)
+                "text"  MPV_FORMAT_STRING
+                "start" MPV_FORMAT_DOUBLE
+                "end"   MPV_FORMAT_DOUBLE
+
+    ``text`` 中会去除ASS标签。
+
+    若未知，则不包含 ``end`` 。
+
+``secondary-sub-lines``
+    与 ``sub-lines`` 相同，但针对次要字幕。
+
 ``playlist-pos`` (RW)
     当前在播放列表中的位置。第一个条目是在0的位置。写入这个属性将在新位置开始播放。
 
     在某些情况下，这不必是当前播放的文件。参见  ``playlist`` 中的 ``current`` 和 ``playing``  标志的解释。
 
-    如果播放列表是空的，或者如果它不是空的，但没有条目是 "current" 的，这个属性就会返回-1。同样，写入-1将使播放器进入空闲模式（如果没有启用空闲模式则退出播放）。（在mpv0.33.0之前，如果没有播放列表条目是“当前的”，这个属性就不可用）
+    如果播放列表是空的，或者如果它不是空的，但没有条目是 "current" 的，这个属性就会返回-1。同样，写入-1将使播放器进入空闲模式（如果没有启用空闲模式则退出播放）。
 
     将当前值写回属性不会有任何影响。如果需要，可使用 ``playlist-play-index`` 重启当前条目的播放。
 
@@ -2244,14 +2349,15 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
         MPV_FORMAT_NODE_ARRAY
             MPV_FORMAT_NODE_MAP (for each playlist entry)
-                "filename"  MPV_FORMAT_STRING
-                "current"   MPV_FORMAT_FLAG (might be missing; since mpv 0.7.0)
-                "playing"   MPV_FORMAT_FLAG (same)
-                "title"     MPV_FORMAT_STRING (optional)
-                "id"        MPV_FORMAT_INT64
+                "filename"      MPV_FORMAT_STRING
+                "current"       MPV_FORMAT_FLAG (might be missing)
+                "playing"       MPV_FORMAT_FLAG (same)
+                "title"         MPV_FORMAT_STRING (optional)
+                "id"            MPV_FORMAT_INT64
+                "playlist-path" MPV_FORMAT_STRING (optional)
 
 ``track-list``
-    音频/视频/字幕的轨道列表，当前条目被标记。
+    音频/视频/字幕的轨道列表，当前条目被标记。如果文件包含多个版本，则仅列出属于当前所选版本的轨道。
 
     这有一系列子属性。用基于0代替 ``N`` 的轨道索引。
 
@@ -2307,7 +2413,10 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
         HLS 流的比特率（如果有）。
 
     ``track-list/N/program-id``
-        HLS 流的节目 ID（如果有）。
+        该流所属的第一个节目 ID（如有）。已过时，请使用 ``track-list/N/program-ids`` 。
+
+    ``track-list/N/program-ids``
+        该流所属的所有节目 ID 列表。一个流可以属于多个节目（例如在 MPEG-TS 或 HLS 中）。如果该流不属于任何节目，则此字段不可用。
 
     ``track-list/N/codec``
         该轨道使用的编解码器名称，例如 ``h264`` 。在某些罕见情况下不可用
@@ -2361,13 +2470,16 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
         容器显示的视频FPS（不总是准确）
 
     ``track-list/N/demux-bitrate``
-        音频平均比特率，以每秒比特为单位（不总是准确）
+        平均比特率，以每秒比特为单位（不总是准确）
 
     ``track-list/N/demux-rotation``
         视频顺时针旋转元数据，以度为单位
 
     ``track-list/N/demux-par``
         像素长宽比
+
+    ``track-list/N/demux-duration``
+        容器指定的轨道时长
 
     ``track-list/N/format-name``
         ffmpeg 格式的简短名称。如果音轨是音频，这将是采样格式的名称。如果音轨是视频，这将是像素格式的名称。
@@ -2407,6 +2519,7 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
                 "hearing-impaired"      MPV_FORMAT_FLAG
                 "hls-bitrate"           MPV_FORMAT_INT64
                 "program-id"            MPV_FORMAT_INT64
+                "program-ids"           MPV_FORMAT_NODE_ARRAY[MPV_FORMAT_INT64]
                 "selected"              MPV_FORMAT_FLAG
                 "main-selection"        MPV_FORMAT_INT64
                 "external"              MPV_FORMAT_FLAG
@@ -2450,6 +2563,8 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
     如果通过 ``--lavfi-complex`` 选择了所要求的类型的轨道，将返回第一个。
 
+    请注意，此属性无法直接使用，必须使用子属性。
+
 ``chapter-list`` (RW)
     章节列表，当前条目被标记。
 
@@ -2486,8 +2601,7 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
                 "label"     MPV_FORMAT_STRING [optional]
                 "enabled"   MPV_FORMAT_FLAG [optional]
                 "params"    MPV_FORMAT_NODE_MAP [optional]
-                    "key"   MPV_FORMAT_STRING
-                    "value" MPV_FORMAT_STRING
+                    (key and string value for each param entry)
 
     也可以用这种格式来写入属性。
 
@@ -2562,15 +2676,16 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     ::
 
         MPV_FORMAT_NODE_MAP
-        "TYPE" MPV_FORMAT_NODE_ARRAY
-            MPV_FORMAT_NODE_MAP
-                "desc"    MPV_FORMAT_STRING
-                "last"    MPV_FORMAT_INT64
-                "avg"     MPV_FORMAT_INT64
-                "peak"    MPV_FORMAT_INT64
-                "count"   MPV_FORMAT_INT64
-                "samples" MPV_FORMAT_NODE_ARRAY
-                     MP_FORMAT_INT64
+            (key and array value for each TYPE entry)
+            MPV_FORMAT_NODE_ARRAY (for each pass entry)
+                MPV_FORMAT_NODE_MAP
+                    "desc"    MPV_FORMAT_STRING
+                    "last"    MPV_FORMAT_INT64
+                    "avg"     MPV_FORMAT_INT64
+                    "peak"    MPV_FORMAT_INT64
+                    "count"   MPV_FORMAT_INT64
+                    "samples" MPV_FORMAT_NODE_ARRAY
+                        MPV_FORMAT_INT64
 
     注意，不支持通过subkeys直接访问这个结构，唯一的访问方式是通过前面提到的 ``MPV_FORMAT_NODE``
 
@@ -2641,6 +2756,9 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     ``user-data/osc/margins``
         该属性由 OSC 实现写入，用于指示其占用的页边距。其子属性 ``l``、``r``、``t`` 和 ``b` 都应分别设置为左、右、上和下边距。值介于 0.0 和 1.0 之间，以窗口宽度/高度为基准。
 
+    ``user-data/osc/draw-preview``
+        用于 OSC 与兼容的缩略图生成器（若已安装）之间的通信。详见 `OSC Preview API`_ 部分。
+
     ``user-data/mpv/ytdl``
         内置 ytdl hook脚本共享的数据。
 
@@ -2652,6 +2770,9 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
     ``user-data/mpv/console/open``
         是否控制台已打开。
+
+    ``user-data/mpv/context-menu/open``
+        是否上下文菜单脚本已打开。
 
 ``menu-data`` (RW)
     此属性存储原始菜单定义。详情请参阅 `上下文菜单`_ 部分。
@@ -2790,6 +2911,20 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     ``option-info/<name>/choices``
         如果该选项是一个可选择的选项，可能可选。整数的选择可能包括也可能不包括（它们可以由 ``min`` 和 ``max`` 暗示）。请注意，那些表现得像选项的选项，但内部不是实际的选项，可能没有这个信息
 
+    ::
+
+        MPV_FORMAT_NODE_MAP
+            "name"                    MPV_FORMAT_STRING
+            "type"                    MPV_FORMAT_STRING
+            "set-from-commandline"    MPV_FORMAT_FLAG
+            "set-locally"             MPV_FORMAT_FLAG
+            "expects-file"            MPV_FORMAT_FLAG
+            "default-value"           MPV_FORMAT_NODE (optional, value of "type")
+            "min"                     MPV_FORMAT_DOUBLE (optional)
+            "max"                     MPV_FORMAT_DOUBLE (optional)
+            "choices"                 MPV_FORMAT_NODE_ARRAY (optional)
+                MPV_FORMAT_STRING
+
 ``property-list``
     顶层属性的列表
 
@@ -2797,6 +2932,16 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     配置预设和其内容的列表。这是高度特定于此的实现，并可能随时改变。目前，它为每个配置预设返回一个选项数组。每个选项有一个名称和一个值，目前值总是一个字符串。请注意，选项数组不是一个表，因为顺序很重要，有可能出现重复的条目。递归的配置预设不被展开，并显示为特殊的 ``profile`` 选项。
 
     如果 ``profile restore`` 字段包含默认值（可能是因为它没有设置，或者显式设置为 ``default`` ），则当前缺少该字段，但将来可能会包含值 ``default`` 。
+
+    ::
+
+        MPV_FORMAT_NODE_ARRAY
+            MPV_FORMAT_NODE_MAP (for each profile entry)
+                "name"       MPV_FORMAT_STRING
+                "options"    MPV_FORMAT_NODE_ARRAY (for each option entry)
+                    MPV_FORMAT_NODE_MAP
+                        "key"      MPV_FORMAT_STRING
+                        "value"    MPV_FORMAT_STRING
 
 ``command-list``
     输入命令列表。该列表返回一个映射数组，其中每个映射节点代表一条命令。该映射包含以下条目：
@@ -2829,9 +2974,12 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
                 "vararg"  MPV_FORMAT_FLAG
                 "args"    MPV_FORMAT_NODE_ARRAY
                     MPV_FORMAT_NODE_MAP
-                        "name"     MPV_FORMAT_STRING
-                        "type"     MPV_FORMAT_STRING
-                        "optional" MPV_FORMAT_FLAG
+                        "name"           MPV_FORMAT_STRING
+                        "type"           MPV_FORMAT_STRING
+                        "optional"       MPV_FORMAT_FLAG
+                        "default-value"  MPV_FORMAT_NODE (optional, value of "type")
+                        "choices"        MPV_FORMAT_NODE_ARRAY (optional)
+                            MPV_FORMAT_STRING
 
 ``input-bindings``
     当前输入按键键绑定的列表。这将返回一个数组，其中每个表节点代表一个单一的按键键/命令的绑定。这个表有以下条目：
@@ -2857,6 +3005,18 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
     ``comment``
         如果存在的话，在同一行的命令后面的注释（例如，input.conf条目 ``f cycle bla # toggle bla`` 会产生一个条目 ``comment = "toggle bla", cmd = "cycle bla"`` ）
 
+    ::
+
+        MPV_FORMAT_NODE_ARRAY
+            MPV_FORMAT_NODE_MAP
+                "key"         MPV_FORMAT_STRING
+                "cmd"         MPV_FORMAT_STRING
+                "is_weak"     MPV_FORMAT_FLAG
+                "owner"       MPV_FORMAT_STRING (optional)
+                "section"     MPV_FORMAT_STRING
+                "priority"    MPV_FORMAT_INT64
+                "comment"     MPV_FORMAT_STRING (optional)
+
     这个属性是只读的，不支持更改提醒。目前，除了脚本添加或删除自己的绑定外，没有任何机制可以在运行时改变按键绑定。
 
 ``clipboard``
@@ -2874,8 +3034,21 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 
         在使用 ``vo`` 剪贴板后端的 Wayland 上，剪贴板内容只有在合成器发送selection数据请求时才会更新（通常是在 VO 窗口被聚焦时）。而 ``wayland`` 后端通常没有这种限制。详见属性 ``current-clipboard-backend``
 
+    .. warning::
+
+        自 mpv 0.42.0 起，如果在某些平台上设置了 ``--clipboard-monitor=no`` ，该属性将不再返回当前剪贴板内容。在这种情况下，读取剪贴板内容时，必须运行 ``update-clipboard`` 命令来手动更新剪贴板内容。
+
+    ::
+
+        MPV_FORMAT_NODE_MAP
+            "text"            MPV_FORMAT_STRING
+            "text-primary"    MPV_FORMAT_STRING
+
 ``current-clipboard-backend``
     包含当前活动剪贴板后端的字符串。有关可用的后端列表，参见选项 ``--clipboard-backends``
+
+``player-operation-mode``
+    当前播放器操作模式的只读字符串，与 ``--player-operation-mode`` 选项对应。若要设置操作模式，请在启动时设置该选项。
 
 ``clock``
     当前的本地时间，格式为 hour:minutes
@@ -2888,15 +3061,11 @@ C API在头文件里有描述。Lua API在Lua部分有描述。
 ``vid``, ``aid``, ``sid``
     当播放处于激活状态时，这些属性返回实际激活的轨道。例如，如果你设置了 ``aid=5`` ，而当前播放的文件不包含ID为5的音轨， ``aid`` 属性将返回 ``no``
 
-    在mpv0.31.0之前，你只能在运行时设置存在的音轨。
-
 ``display-fps``
     这种不一致的行为已过时。弃用后，报告值和选项值被干净地分离开（选项值为 ``overrid-display-fps`` ）。
 
 ``vf``, ``af``
     如果你在播放过程中设置了这些属性，而滤镜链未能成功重新初始化，选项将被设置，但运行时的滤镜链不会改变。另一方面，下一个要播放的视频会失败，因为初始的滤镜链不能被创建。
-
-    这种行为在mpv0.31.0中有所改变。在此之前， *如果* 一个视频（对于 ``vf`` ）或一个音频（对于 ``af`` ）轨道是激活的，新的值被拒绝。如果播放没有激活，行为与当前相同。
 
 ``playlist``
     该属性是只读的，返回当前的内部播放列表。该选项是为了在命令行解析时加载播放列表。对于client API的用户，你应该使用 ``loadlist`` 命令代替。
